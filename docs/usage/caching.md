@@ -32,7 +32,7 @@ When all of these match a previous cache entry, the cached results are printed d
 
 ## Cache storage
 
-The computation cache exists within the `.tach` directory in your project root. The directory is managed by Tach, and your cached results are stored on-disk on each machine where tasks are run.
+The computation cache exists within the directory defined by the `TACH_CACHE_DIR` environment variable (default is `.tach` in your project root). The directory is managed by Tach, and your cached results are stored on-disk on each machine where tasks are run.
 
 We are currently working on a _remote cache_ backend, which will allow multiple developers and CI environments to share a centralized cache to maximize the hit rate. If you are interested in this functionality, reach out through a [GitHub issue](https://github.com/gauge-sh/tach/issues) or via email: [evan@gauge.sh](mailto://evan@gauge.sh); [caelean@gauge.sh](mailto://caelean@gauge.sh)!
 
