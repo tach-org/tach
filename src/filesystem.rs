@@ -310,7 +310,9 @@ impl FSWalker {
         respect_gitignore: bool,
     ) -> Result<Self> {
         let mut walk_builder = ignore::WalkBuilder::new(project_root.as_ref());
-        walk_builder.require_git(false);
+        // Require git repository for git-related ignore rules
+        // This ensures .gitignore files outside repository boundaries are not considered
+        walk_builder.require_git(true);
         if !respect_gitignore {
             // Disable all ignore filters
             walk_builder.ignore(false);
