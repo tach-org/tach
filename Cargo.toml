@@ -33,7 +33,7 @@ ctrlc = "3.4.5"
 rayon = "1.10.0"
 parking_lot = "0.12.3"
 itertools = "0.14.0"
-toml_edit = "0.22.24"
+toml_edit = "0.23.3"
 console = "0.15.11"
 ignore = "0.4.23"
 dashmap = { version = "6.1.0", features = ["serde", "rayon", "inline"] }
