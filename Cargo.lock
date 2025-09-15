@@ -937,9 +937,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.169"
+version = "0.2.175"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a"
+checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
 
 [[package]]
 name = "libcst"
@@ -979,9 +979,9 @@ dependencies = [
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.4.15"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d26c52dbd32dccf2d10cac7725f8eae5296885fb5703b261f7d0a0739ec807ab"
+checksum = "df1d3c3b53da64cf5760482273a98e575c651a67eec7f77df96b5b642de8f039"
 
 [[package]]
 name = "litemap"
@@ -1904,9 +1904,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.44"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154"
+checksum = "cd15f8a2c5551a84d56efdc1cd049089e409ac19a3072d5037a17fd70719ff3e"
 dependencies = [
  "bitflags 2.8.0",
  "errno",
@@ -2233,11 +2233,10 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 
 [[package]]
 name = "tempfile"
-version = "3.17.0"
+version = "3.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a40f762a77d2afa88c2d919489e390a12bdd261ed568e60cfa7e48d4e20f0d33"
+checksum = "84fa4d11fadde498443cca10fd3ac23c951f0dc59e080e9f4b93d4df4e4eea53"
 dependencies = [
- "cfg-if",
  "fastrand",
  "getrandom 0.3.1",
  "once_cell",
