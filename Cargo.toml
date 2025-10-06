@@ -23,7 +23,7 @@ toml = "0.8.19"
 thiserror = "2.0.7"
 serde = { version = "1.0.216", features = ["derive"] }
 glob = "0.3.2"
-petgraph = "0.7.1"
+petgraph = "0.8.3"
 serde_json = "1.0.134"
 tempfile = "3.17.0"
 lsp-server = "0.7.7"
