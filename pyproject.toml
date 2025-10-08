@@ -1,9 +1,8 @@
 [project]
-name = "tach"
+name = "detach"
 version = "0.30.0"
 authors = [
-    { name = "Caelean Barnes", email = "caeleanb@gmail.com" },
-    { name = "Evan Doyle", email = "evanmdoyle@gmail.com" },
+    { name = "detachhead", email = "detachhead@users.noreply.github.com" },
 ]
 description = "A Python tool to maintain a modular package architecture."
 readme = "README.md"
