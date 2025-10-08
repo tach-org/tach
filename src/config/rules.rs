@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyString};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -36,12 +36,15 @@ impl RuleSetting {
     }
 }
 
-impl IntoPy<PyObject> for RuleSetting {
-    fn into_py(self, py: Python) -> PyObject {
+impl<'py> IntoPyObject<'py> for RuleSetting {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = std::convert::Infallible;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, <RuleSetting as IntoPyObject<'py>>::Error> {
         match self {
-            Self::Error => "error".to_object(py),
-            Self::Warn => "warn".to_object(py),
-            Self::Off => "off".to_object(py),
+            Self::Error => "error".into_pyobject(py),
+            Self::Warn => "warn".into_pyobject(py),
+            Self::Off => "off".into_pyobject(py),
         }
     }
 }

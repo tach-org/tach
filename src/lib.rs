@@ -20,7 +20,7 @@ pub mod resolvers;
 pub mod tests;
 use commands::{check, report, server, sync, test};
 use diagnostics::serialize_diagnostics_json;
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyTuple};
 use std::path::PathBuf;
 
 use pyo3::exceptions::{PyKeyboardInterrupt, PyOSError, PySyntaxError, PyValueError};
@@ -133,14 +133,17 @@ impl From<config::error::ConfigError> for PyErr {
     }
 }
 
-impl IntoPy<PyObject> for modules::error::VisibilityErrorInfo {
-    fn into_py(self, py: pyo3::prelude::Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for modules::error::VisibilityErrorInfo {
+    type Target = PyTuple;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+    fn into_pyobject(self, py: pyo3::prelude::Python<'py>) -> Result<Self::Output, Self::Error> {
         (
             self.dependent_module,
             self.dependency_module,
             self.visibility,
         )
-            .into_py(py)
+            .into_pyobject(py)
     }
 }
 
@@ -335,25 +338,25 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<dep_map::PyDependentMap>()?;
     m.add_class::<dep_map::PyDirection>()?;
     m.add_class::<test::TachPytestPluginHandler>()?;
-    m.add_function(wrap_pyfunction_bound!(parse_project_config, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(
+    m.add_function(wrap_pyfunction!(parse_project_config, m)?)?;
+    m.add_function(wrap_pyfunction!(
         parse_project_config_from_pyproject,
         m
     )?)?;
-    m.add_function(wrap_pyfunction_bound!(get_project_imports, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(get_external_imports, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(check_external_dependencies, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(create_dependency_report, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(create_computation_cache_key, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(check_computation_cache, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(update_computation_cache, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(dump_project_config_to_toml, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(check_internal, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(format_diagnostics, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(detect_unused_dependencies, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(sync_project, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(run_server, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(serialize_modules_json, m)?)?;
-    m.add_function(wrap_pyfunction_bound!(serialize_diagnostics_json, m)?)?;
+    m.add_function(wrap_pyfunction!(get_project_imports, m)?)?;
+    m.add_function(wrap_pyfunction!(get_external_imports, m)?)?;
+    m.add_function(wrap_pyfunction!(check_external_dependencies, m)?)?;
+    m.add_function(wrap_pyfunction!(create_dependency_report, m)?)?;
+    m.add_function(wrap_pyfunction!(create_computation_cache_key, m)?)?;
+    m.add_function(wrap_pyfunction!(check_computation_cache, m)?)?;
+    m.add_function(wrap_pyfunction!(update_computation_cache, m)?)?;
+    m.add_function(wrap_pyfunction!(dump_project_config_to_toml, m)?)?;
+    m.add_function(wrap_pyfunction!(check_internal, m)?)?;
+    m.add_function(wrap_pyfunction!(format_diagnostics, m)?)?;
+    m.add_function(wrap_pyfunction!(detect_unused_dependencies, m)?)?;
+    m.add_function(wrap_pyfunction!(sync_project, m)?)?;
+    m.add_function(wrap_pyfunction!(run_server, m)?)?;
+    m.add_function(wrap_pyfunction!(serialize_modules_json, m)?)?;
+    m.add_function(wrap_pyfunction!(serialize_diagnostics_json, m)?)?;
     Ok(())
 }

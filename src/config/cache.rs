@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyString};
 use serde::{Deserialize, Serialize};
 
 use super::utils;
@@ -10,10 +10,13 @@ pub enum CacheBackend {
     Disk,
 }
 
-impl IntoPy<PyObject> for CacheBackend {
-    fn into_py(self, py: Python) -> PyObject {
+impl<'py> IntoPyObject<'py> for CacheBackend {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = std::convert::Infallible;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         match self {
-            Self::Disk => "disk".to_object(py),
+            Self::Disk => "disk".into_pyobject(py),
         }
     }
 }

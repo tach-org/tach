@@ -9,7 +9,7 @@ crate-type = ["cdylib", "lib"]
 bench = false
 
 [dependencies]
-pyo3 = { version = "0.22.5", features = ["abi3-py37", "auto-initialize"] }
+pyo3 = { version = "0.26.0", features = ["abi3-py37", "auto-initialize"] }
 regex = "1.11.1"
 once_cell = "1.21.3"
 ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", tag = "0.9.3" }

@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyString};
 use serde::{Deserialize, Serialize};
 
 pub const ROOT_MODULE_SENTINEL_TAG: &str = "<root>";
@@ -13,13 +13,16 @@ pub enum RootModuleTreatment {
     DependenciesOnly,
 }
 
-impl IntoPy<PyObject> for RootModuleTreatment {
-    fn into_py(self, py: Python) -> PyObject {
+impl<'py> IntoPyObject<'py> for RootModuleTreatment {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = std::convert::Infallible;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         match self {
-            Self::Allow => "allow".to_object(py),
-            Self::Forbid => "forbid".to_object(py),
-            Self::Ignore => "ignore".to_object(py),
-            Self::DependenciesOnly => "dependenciesonly".to_object(py),
+            Self::Allow => "allow".into_pyobject(py),
+            Self::Forbid => "forbid".into_pyobject(py),
+            Self::Ignore => "ignore".into_pyobject(py),
+            Self::DependenciesOnly => "dependenciesonly".into_pyobject(py),
         }
     }
 }

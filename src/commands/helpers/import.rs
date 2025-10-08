@@ -16,13 +16,16 @@ pub struct PythonImport {
     pub line_number: usize,
 }
 
-impl IntoPy<PyObject> for LocatedImport {
-    fn into_py(self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for LocatedImport {
+    type Target = PythonImport;
+    type Output = Bound<'py, Self::Target>;
+    type Error = pyo3::PyErr;
+    fn into_pyobject(self, py: Python<'py>) -> std::result::Result<Self::Output, Self::Error>  {
         PythonImport {
             module_path: self.import.module_path,
             line_number: self.alias_line_number,
         }
-        .into_py(py)
+        .into_pyobject(py)
     }
 }
 

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::ops::Not;
 
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyString};
 use serde::{Deserialize, Serialize};
 
 use super::utils;
@@ -23,9 +23,12 @@ impl Display for InterfaceDataTypes {
     }
 }
 
-impl IntoPy<PyObject> for InterfaceDataTypes {
-    fn into_py(self, py: Python) -> PyObject {
-        self.to_string().to_object(py)
+impl<'py> IntoPyObject<'py> for InterfaceDataTypes {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = std::convert::Infallible;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.to_string().into_pyobject(py)
     }
 }
 

@@ -133,7 +133,7 @@ struct CheckExternalMetadata {
 /// Get metadata for checking external dependencies.
 fn get_check_external_metadata(project_config: &ProjectConfig) -> Result<CheckExternalMetadata> {
     Python::with_gil(|py| {
-        let external_utils = PyModule::import_bound(py, "tach.utils.external")
+        let external_utils = PyModule::import(py, "tach.utils.external")
             .expect("Failed to import tach.utils.external");
         let mut module_mappings: HashMap<String, Vec<String>> = external_utils
             .getattr("get_module_mappings")

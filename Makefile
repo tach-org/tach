@@ -15,8 +15,6 @@ endif
 
 .PHONY: deps
 deps: ## Install dependencies
-	python -m pip install --upgrade uv
-
 	@if [ ! -d "$(VENV)" ]; then \
 		uv venv $(VENV); \
 		echo "Virtual environment created at $(VENV)"; \
