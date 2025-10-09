@@ -339,10 +339,7 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<dep_map::PyDirection>()?;
     m.add_class::<test::TachPytestPluginHandler>()?;
     m.add_function(wrap_pyfunction!(parse_project_config, m)?)?;
-    m.add_function(wrap_pyfunction!(
-        parse_project_config_from_pyproject,
-        m
-    )?)?;
+    m.add_function(wrap_pyfunction!(parse_project_config_from_pyproject, m)?)?;
     m.add_function(wrap_pyfunction!(get_project_imports, m)?)?;
     m.add_function(wrap_pyfunction!(get_external_imports, m)?)?;
     m.add_function(wrap_pyfunction!(check_external_dependencies, m)?)?;

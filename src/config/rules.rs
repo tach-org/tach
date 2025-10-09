@@ -40,7 +40,10 @@ impl<'py> IntoPyObject<'py> for RuleSetting {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = std::convert::Infallible;
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, <RuleSetting as IntoPyObject<'py>>::Error> {
+    fn into_pyobject(
+        self,
+        py: Python<'py>,
+    ) -> Result<Self::Output, <RuleSetting as IntoPyObject<'py>>::Error> {
         match self {
             Self::Error => "error".into_pyobject(py),
             Self::Warn => "warn".into_pyobject(py),

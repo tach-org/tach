@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -51,7 +52,7 @@ def test_mod_edit_interactive_new_configuration(
 
         # Verify the saved configuration
         saved_config = parse_project_config(temp_project_dir)
-        assert set(saved_config.source_roots) == {"src"}
+        assert set(saved_config.source_roots) == {Path("src")}
         assert set(saved_config.module_paths()) == {"module1", "module2", "utils"}
         assert set(saved_config.utility_paths()) == {"utils"}
 
@@ -123,7 +124,7 @@ def test_mod_edit_interactive_update_existing(temp_project_dir, initial_project_
         mock_get.assert_called_once()
 
         saved_config = parse_project_config(temp_project_dir)
-        assert set(saved_config.source_roots) == {"src", "tests"}
+        assert set(saved_config.source_roots) == {Path("src"), Path("tests")}
         assert set(saved_config.module_paths()) == {"new_module", "new_utility"}
         assert set(saved_config.utility_paths()) == {"new_utility"}
 
@@ -152,6 +153,6 @@ def test_mod_edit_interactive_update_existing(temp_project_dir, initial_project_
 
         # Verify final configuration
         final_config = parse_project_config(temp_project_dir)
-        assert set(final_config.source_roots) == {"src"}
+        assert set(final_config.source_roots) == {Path("src")}
         assert set(final_config.module_paths()) == {"new_module", "another_module"}
         assert set(final_config.utility_paths()) == set()

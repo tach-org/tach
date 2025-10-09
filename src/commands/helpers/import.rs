@@ -20,7 +20,7 @@ impl<'py> IntoPyObject<'py> for LocatedImport {
     type Target = PythonImport;
     type Output = Bound<'py, Self::Target>;
     type Error = pyo3::PyErr;
-    fn into_pyobject(self, py: Python<'py>) -> std::result::Result<Self::Output, Self::Error>  {
+    fn into_pyobject(self, py: Python<'py>) -> std::result::Result<Self::Output, Self::Error> {
         PythonImport {
             module_path: self.import.module_path,
             line_number: self.alias_line_number,

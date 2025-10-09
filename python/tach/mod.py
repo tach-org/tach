@@ -63,7 +63,7 @@ def handle_utility_edits(
 
 
 def handle_source_root_edits(
-    project_config: ProjectConfig, selected_source_roots: list[str]
+    project_config: ProjectConfig, selected_source_roots: list[Path]
 ) -> None:
     existing_source_roots = set(project_config.source_roots)
     selected_source_roots_set = set(selected_source_roots)
@@ -93,8 +93,7 @@ def apply_selected_configuration(
         project_config.set_location(project_config_path)
 
     relative_selected_source_roots = [
-        str(source_root.relative_to(project_root))
-        for source_root in selected_source_roots
+        source_root.relative_to(project_root) for source_root in selected_source_roots
     ]
     handle_source_root_edits(project_config, relative_selected_source_roots)
 
