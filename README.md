@@ -1,7 +1,7 @@
-# detach
+# dtach
 
 > [!IMPORTANT]
-> this is a fork of [tach](https://github.com/gauge-sh/tach), which was abandoned. pypi release & updated docs coming soon. for now you can get wheels from [releases](https://github.com/DetachHead/detach/releases)
+> this is a fork of [tach](https://github.com/gauge-sh/tach), which was abandoned. updated docs coming soon.
 
 [![downloads](https://static.pepy.tech/badge/tach/month)](https://pepy.tech/project/tach)
 [![version](https://img.shields.io/pypi/v/tach.svg)](https://pypi.Python.org/pypi/tach)
