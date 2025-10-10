@@ -514,7 +514,7 @@ dependencies = [
     { name = "tomli-w", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "build", version = "1.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
     { name = "build", version = "1.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
@@ -530,6 +530,7 @@ dev = [
     { name = "pytest-mock", version = "3.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
     { name = "rich" },
     { name = "ruff" },
+    { name = "rustup" },
     { name = "setuptools", version = "47.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
     { name = "setuptools", version = "69.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
     { name = "twine", version = "4.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
@@ -538,36 +539,40 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "build", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==1.1.1" },
-    { name = "build", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==1.2.1" },
-    { name = "coverage", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==7.2.7" },
-    { name = "coverage", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==7.6.0" },
     { name = "gitpython", specifier = "~=3.1" },
     { name = "importlib-metadata", marker = "python_full_version == '3.7.*'", specifier = ">=6.0" },
-    { name = "maturin", marker = "extra == 'dev'", specifier = "==1.7.1" },
     { name = "networkx", specifier = ">=2.6,<4.0" },
-    { name = "pip", marker = "extra == 'dev'", specifier = "==24.0" },
     { name = "prompt-toolkit", specifier = "~=3.0" },
-    { name = "prompt-toolkit", marker = "extra == 'dev'", specifier = "==3.0.47" },
     { name = "pydot", specifier = ">=2,<4" },
-    { name = "pyright", marker = "extra == 'dev'", specifier = "==1.1.389" },
-    { name = "pytest", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==7.4.4" },
-    { name = "pytest", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==8.2.2" },
-    { name = "pytest-mock", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==3.11.1" },
-    { name = "pytest-mock", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==3.14.0" },
     { name = "pyyaml", specifier = "~=6.0" },
     { name = "rich", specifier = "~=13.0" },
-    { name = "rich", marker = "extra == 'dev'", specifier = "==13.8.1" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.11.5" },
-    { name = "setuptools", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==47.1.0" },
-    { name = "setuptools", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==69.5.1" },
     { name = "stdlib-list", marker = "python_full_version < '3.10'", specifier = ">=0.10.0" },
     { name = "tomli", specifier = ">=1.2.2" },
     { name = "tomli-w", specifier = "~=1.0" },
-    { name = "twine", marker = "python_full_version == '3.7.*' and extra == 'dev'", specifier = "==4.0.2" },
-    { name = "twine", marker = "python_full_version >= '3.8' and extra == 'dev'", specifier = "==5.1.1" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "build", marker = "python_full_version == '3.7.*'", specifier = "==1.1.1" },
+    { name = "build", marker = "python_full_version >= '3.8'", specifier = "==1.2.1" },
+    { name = "coverage", marker = "python_full_version == '3.7.*'", specifier = "==7.2.7" },
+    { name = "coverage", marker = "python_full_version >= '3.8'", specifier = "==7.6.0" },
+    { name = "maturin", specifier = "==1.7.1" },
+    { name = "pip", specifier = "==24.0" },
+    { name = "prompt-toolkit", specifier = "==3.0.47" },
+    { name = "pyright", specifier = "==1.1.389" },
+    { name = "pytest", marker = "python_full_version == '3.7.*'", specifier = "==7.4.4" },
+    { name = "pytest", marker = "python_full_version >= '3.8'", specifier = "==8.2.2" },
+    { name = "pytest-mock", marker = "python_full_version == '3.7.*'", specifier = "==3.11.1" },
+    { name = "pytest-mock", marker = "python_full_version >= '3.8'", specifier = "==3.14.0" },
+    { name = "rich", specifier = "==13.8.1" },
+    { name = "ruff", specifier = "==0.11.5" },
+    { name = "rustup", specifier = ">=1.28.2.1" },
+    { name = "setuptools", marker = "python_full_version == '3.7.*'", specifier = "==47.1.0" },
+    { name = "setuptools", marker = "python_full_version >= '3.8'", specifier = "==69.5.1" },
+    { name = "twine", marker = "python_full_version == '3.7.*'", specifier = "==4.0.2" },
+    { name = "twine", marker = "python_full_version >= '3.8'", specifier = "==5.1.1" },
+]
 
 [[package]]
 name = "exceptiongroup"
@@ -1613,6 +1618,30 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fc/52/047f35d3b20fd1ae9ccfe28791ef0f3ca0ef0b3e6c1a58badd97d450131b/ruff-0.11.5-py3-none-win32.whl", hash = "sha256:e268da7b40f56e3eca571508a7e567e794f9bfcc0f412c4b607931d3af9c4afe", size = 10320697, upload-time = "2025-04-10T17:13:20.582Z" },
     { url = "https://files.pythonhosted.org/packages/b9/fe/00c78010e3332a6e92762424cf4c1919065707e962232797d0b57fd8267e/ruff-0.11.5-py3-none-win_amd64.whl", hash = "sha256:6c6dc38af3cfe2863213ea25b6dc616d679205732dc0fb673356c2d69608f800", size = 11378665, upload-time = "2025-04-10T17:13:23.349Z" },
     { url = "https://files.pythonhosted.org/packages/43/7c/c83fe5cbb70ff017612ff36654edfebec4b1ef79b558b8e5fd933bab836b/ruff-0.11.5-py3-none-win_arm64.whl", hash = "sha256:67e241b4314f4eacf14a601d586026a962f4002a475aa702c69980a38087aa4e", size = 10460287, upload-time = "2025-04-10T17:13:26.538Z" },
+]
+
+[[package]]
+name = "rustup"
+version = "1.28.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/f0/6d9a229698333819a0d5e04988591a6052f3c31da8995e77092f532dc66b/rustup-1.28.2.1.tar.gz", hash = "sha256:349474e6d5f8e3a971777dbe22e55be068c1d11a8e1bc395e945bfdbb407e2a7", size = 7156, upload-time = "2025-09-12T11:31:04.453Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/33/7f2156d76e89fc4329c30e031d6bb673fbcb16c2a10a442e9de93e975b8a/rustup-1.28.2.1-py3-none-linux_armv6l.whl", hash = "sha256:728fb6ce6fbfef543193e0e05bf8b5515715e278bf21e0b4c226db0389cb396d", size = 6888324, upload-time = "2025-09-12T11:30:27.935Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/e5/720063515dd98e0958ddfc6beec834ea550c22ba388a1ca909e4b5793f88/rustup-1.28.2.1-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:a344c4333624038cdf1678b3718b12514e91b4f0eab5f32aeea0c3184a227f24", size = 5260064, upload-time = "2025-09-12T11:30:30.027Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/d7/2ed1cd1db5e98c090714ab0776ec85d11a99549aab9b25f69c113c4a8cc8/rustup-1.28.2.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:64b6f663ac39ddbe26f99892f4e6749f85ecfb1bba2edf66f1aa32a424f5be98", size = 4869897, upload-time = "2025-09-12T11:30:31.937Z" },
+    { url = "https://files.pythonhosted.org/packages/84/f3/66c6b5c60801ee269aa2ed9034b2bbcccb4145319414f7c69ce81121539b/rustup-1.28.2.1-py3-none-manylinux_2_17_aarch64.whl", hash = "sha256:76493b46a5e9c86e1b472518b63e96e566282ecc2df989ef7cedc8fcf7c6ff14", size = 7964165, upload-time = "2025-09-12T11:30:34.034Z" },
+    { url = "https://files.pythonhosted.org/packages/43/da/2538c814c42f57cdd2e7f58564ecdba33075bbdae98714181204d76d6ef2/rustup-1.28.2.1-py3-none-manylinux_2_17_armv7l.whl", hash = "sha256:b546bd02729e9cad94cd28cc478dab71c4fb576916bd11786e1df2fd84e7890d", size = 6727588, upload-time = "2025-09-12T11:30:36.261Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/c7/242c388c83ea0f40ee7f3fe70b0f46f0024057b84cbf4f376e8dc81013a9/rustup-1.28.2.1-py3-none-manylinux_2_17_i686.whl", hash = "sha256:398b58547628ab5ea87003a0d403bfe2cb158ec3aebcf630add80ff9da9532c5", size = 7188749, upload-time = "2025-09-12T11:30:38.496Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/01/3d6442d3e15c4b7bf2909528dc516ab1e34345f4da553a76e64dfc2a6e49/rustup-1.28.2.1-py3-none-manylinux_2_17_ppc64.whl", hash = "sha256:ae8db47a8e65f71345753bcdea98d211160d72d65013468035bd1e3c9ed85a38", size = 7105152, upload-time = "2025-09-12T11:30:40.859Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/db/ddf8e683d31e8bf416307ef265a20e8a9a5b31ad144dfe05a38c27d03855/rustup-1.28.2.1-py3-none-manylinux_2_17_ppc64le.whl", hash = "sha256:d859c66b40a90a91d53b4179a457effba6915828bdb006fb7dfee9aba1d1b384", size = 6877243, upload-time = "2025-09-12T11:30:43.088Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/9c/c24a77c58e434a11d6b1ccdd3b14a82bb8ff537b9e590152f13f343e3744/rustup-1.28.2.1-py3-none-manylinux_2_17_s390x.whl", hash = "sha256:d17b0ceb8d3c7116fa537120cd6005234af75f2c8877104f6836d89e5f66b75e", size = 8696015, upload-time = "2025-09-12T11:30:45.467Z" },
+    { url = "https://files.pythonhosted.org/packages/67/b2/02246405fc4ec8b9ff2b00cd5b61a12496a28c798d354e0a4ce182a2736f/rustup-1.28.2.1-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:9de2d71b5e4c8059e61113675be2a6c5b963432d7b2508ee5b08e39adae92f6d", size = 7890937, upload-time = "2025-09-12T11:30:48.708Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/3f/d1e9cdbd22cfcff0868a53505a4b09c7295ef776571cae9d272c4b6c57ac/rustup-1.28.2.1-py3-none-musllinux_2_17_aarch64.whl", hash = "sha256:2d8c9af0a951285fe0c71b2215b6fabe590b19c1f5d9a5d98658e6889dc407c8", size = 7829498, upload-time = "2025-09-12T11:30:51.14Z" },
+    { url = "https://files.pythonhosted.org/packages/93/af/9eea48c0c439133eb65d1bde1a5c7552d23814f1e88e6feaa93c2f8b65ad/rustup-1.28.2.1-py3-none-musllinux_2_17_ppc64le.whl", hash = "sha256:e6f2437ef62bdd793a7d7a442e20a3d4654026ac0259f4227b28ae9cb0ea9aa9", size = 6652478, upload-time = "2025-09-12T11:30:54.119Z" },
+    { url = "https://files.pythonhosted.org/packages/24/cd/4e9f5bd350e26f5b275c5516079b5be7cfaa2d0212dc3eff01a6ade0dc36/rustup-1.28.2.1-py3-none-musllinux_2_17_x86_64.whl", hash = "sha256:d9e1e5cc456bccf13967280096a3cf4b1f13d631b81d71153512760e254dc38b", size = 8037751, upload-time = "2025-09-12T11:30:56.523Z" },
+    { url = "https://files.pythonhosted.org/packages/25/16/e05922e5924635ca3a580ffc8d439c8cc0689ffb552dea37cab58c677570/rustup-1.28.2.1-py3-none-win32.whl", hash = "sha256:b371980239c8eaeb64f2787dde2207201f170f698d2d4f0fb99dd49b6192bcd0", size = 4614507, upload-time = "2025-09-12T11:30:58.649Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/29/4e981fbd66c858a9aeb176982e63f335e2f50739128c3aff85c190ac165a/rustup-1.28.2.1-py3-none-win_amd64.whl", hash = "sha256:8c022b623b764b850d7de1287698d6f0da6471af62db0253c422db5b2a9dac77", size = 5220433, upload-time = "2025-09-12T11:31:00.919Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/83/19f7908ae3de589f755c32c7f056c3d7e73c829d9e1c57c1c942f2be5574/rustup-1.28.2.1-py3-none-win_arm64.whl", hash = "sha256:1b8487b976861ab7774a80169dd109299966d654fbbc4980f8d9c647b7974a93", size = 4858650, upload-time = "2025-09-12T11:31:03.078Z" },
 ]
 
 [[package]]
