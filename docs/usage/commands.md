@@ -341,7 +341,7 @@ If you use the [pre-commit framework](https://github.com/pre-commit/pre-commit),
 
 ```yaml
 repos:
-  - repo: https://github.com/gauge-sh/tach-pre-commit
+  - repo: https://github.com/detachhead/dtach-pre-commit
     rev: v0.30.1 # change this to the latest tag!
     hooks:
       - id: tach

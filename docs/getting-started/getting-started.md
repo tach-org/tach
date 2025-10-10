@@ -2,10 +2,14 @@
 
 ## Installation
 
-Tach can be installed via pip:
-
+#### uv (recommended)
 ```bash
-pip install tach
+uv add --dev dtach
+```
+
+#### pip
+```bash
+pip install dtach
 ```
 
 ## Quick Start

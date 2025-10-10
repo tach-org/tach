@@ -1,7 +1,7 @@
-# dtach
+# DTach
 
 > [!IMPORTANT]
-> dtach is a fork of the unmaintained [tach](https://github.com/gauge-sh/tach) project.
+> DTach is a fork of the unmaintained [tach](https://github.com/gauge-sh/tach) project.
 
 [![downloads](https://static.pepy.tech/badge/dtach/month)](https://pepy.tech/project/dtach)
 [![version](https://img.shields.io/pypi/v/dtach.svg)](https://pypi.Python.org/pypi/dtach)
@@ -46,13 +46,13 @@ Tach is:
 
 #### uv (recommended)
 ```bash
-uv add --dev detach
+uv add --dev dtach
 ```
 
 
 #### pip
 ```bash
-pip install detach
+pip install dtach
 ```
 
 ### Setup
@@ -155,12 +155,12 @@ Tach also supports:
 More info in the [docs](https://docs.gauge.sh/). Tach logs anonymized usage statistics which can be [opted out](https://docs.gauge.sh/usage/faq/) of.
 If you have any feedback, we'd love to talk!
 
-If you have any questions or run into any issues, let us know by submitting a [Github Issue](https://github.com/gauge-sh/tach/issues)!
+If you have any questions or run into any issues, let us know by submitting a [Github Issue](https://github.com/detachhead/dtach/issues)!
 
 ---
 
 ### Contributors
 
-<a href="https://github.com/gauge-sh/tach/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=gauge-sh/tach" />
+<a href="https://github.com/detachhead/dtach/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=detachhead/dtach" />
 </a>

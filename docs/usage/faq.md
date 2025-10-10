@@ -70,7 +70,7 @@ Since Tach uses the AST to find imports and public members, dynamic imports (e.g
 
 ### How can I make a feature request or file a bug?
 
-This project uses [GitHub Issues](https://github.com/gauge-sh/tach/issues) to track bugs and feature requests. Search the existing
+This project uses [GitHub Issues](https://github.com/detachhead/dtach/issues) to track bugs and feature requests. Search the existing
 issues before filing new issues to avoid duplicates. File your bug or
 feature request as a new Issue.
 

@@ -1,10 +1,10 @@
-site_name: Tach
-site_url: https://gauge-sh.github.io/tach/
+site_name: DTach
+site_url: https://detachhead.github.io/dtach/
 site_description: A Python tool for managing module dependencies and interfaces
-site_author: Gauge
+site_author: detachhead
 
-repo_name: gauge-sh/tach
-repo_url: https://github.com/gauge-sh/tach
+repo_name: detachhead/dtach
+repo_url: https://github.com/detachhead/dtach
 edit_uri: edit/main/docs/
 
 theme:
@@ -78,7 +78,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/gauge-sh/tach
+      link: https://github.com/detachhead/dtach
     - icon: fontawesome/brands/twitter
       link: https://x.com/gauge_sh
     - icon: fontawesome/brands/linkedin

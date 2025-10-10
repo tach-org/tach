@@ -84,8 +84,8 @@ dev = [
 
 
 [project.urls]
-Homepage = "https://github.com/gauge-sh/tach"
-Issues = "https://github.com/gauge-sh/tach/issues"
+Homepage = "https://github.com/detachhead/dtach"
+Issues = "https://github.com/detachhead/dtach/issues"
 
 [tool.ruff]
 src = ["python"]

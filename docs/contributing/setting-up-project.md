@@ -103,7 +103,7 @@ make fmt
 That's it! You are now ready to push your new dev branch to your forked repo and then raise a PR with appropriate description
 
 Find Beginner Friendly issues here: 
-- [Good First Issues (For beginners)](https://github.com/gauge-sh/tach/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-- [Documentation Issues](https://github.com/gauge-sh/tach/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation)
-- [Issues](https://github.com/gauge-sh/tach/issues)
-- [Documentation](https://github.com/gauge-sh/tach/tree/main/docs)
+- [Good First Issues (For beginners)](https://github.com/detachhead/dtach/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+- [Documentation Issues](https://github.com/detachhead/dtach/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation)
+- [Issues](https://github.com/detachhead/dtach/issues)
+- [Documentation](https://github.com/detachhead/dtach/tree/main/docs)

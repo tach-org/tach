@@ -1,7 +1,10 @@
-# Tach
-> ⚠️ **UNMAINTAINED**: This repository is no longer actively maintained. Issues and pull requests may not receive a response.
+# DTach
 
-Tach is a tool that helps you control dependencies between your Python modules. It allows modules to define explicit public interfaces to prevent deep coupling, creating a more modular architecture.
+DTach is a tool that helps you control dependencies between your Python modules. It allows modules to define explicit public interfaces to prevent deep coupling, creating a more modular architecture.
+
+!!! info
+
+    DTach is a fork of the now-unmaintained [tach](https://github.com/gauge-sh/tach) project. note that the CLI is still invoked using the name `tach` for backwards compatibility.
 
 ## Key Features
 
