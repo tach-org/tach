@@ -1,0 +1,72 @@
+{
+  "editor.formatOnSave": true,
+  "git.allowForcePush": true,
+  "git.autofetch": "all",
+  "git.autoStash": true,
+  "git.pruneOnFetch": true,
+  "git.rebaseWhenSync": true,
+  "git.suggestSmartCommit": false,
+  "git.supportCancellation": true,
+  "git.useEditorAsCommitInput": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "git.useForcePushIfIncludes": false,
+  "terminal.integrated.persistentSessionReviveProcess": "never",
+  "files.autoSave": "onFocusChange",
+  "search.useIgnoreFiles": true,
+  "git.useCommitInputAsStashMessage": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  },
+  "files.eol": "\n",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "testing.automaticallyOpenPeekView": "never",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  // why does vscode treat github actions yaml files as a separate language????
+  "[toml][json][jsonc][yaml][markdown][github-actions-workflow]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "explorer.compactFolders": false,
+  "search.exclude": {
+    "pw": true
+  },
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "debugpy.debugJustMyCode": false,
+  "terminal.integrated.env.windows": {
+    "PATH": "${env:PATH};${workspaceFolder}/.pyprojectx/main"
+  },
+  "terminal.integrated.env.osx": {
+    "PATH": "${env:PATH}:${workspaceFolder}/.pyprojectx/main"
+  },
+  "terminal.integrated.env.linux": {
+    "PATH": "${env:PATH}:${workspaceFolder}/.pyprojectx/main"
+  },
+  "task.problemMatchers.neverPrompt": true,
+  "python.experiments.optInto": ["pythonTestAdapter"],
+  "editor.suggest.showWords": false,
+  "files.readonlyInclude": {
+    ".pyprojectx/**/*": true,
+    ".pytest_cache/**/*": true,
+    ".venv/**/*": true,
+    "**/dist/**/*": true,
+    "uv.lock": true,
+    "pw.lock": true,
+    "pw": true,
+    "pw.bat": true
+  },
+  "chat.commandCenter.enabled": false,
+  "dprint.path": ".vscode/dprint", // https://github.com/dprint/dprint/issues/859#issuecomment-3194102785
+  "git.blame.editorDecoration.enabled": true,
+  "yaml.customTags": [
+    // for mkdocs config. see https://squidfunk.github.io/mkdocs-material/creating-your-site/?h=vscode#minimal-configuration
+    "!ENV scalar",
+    "!ENV sequence",
+    "!relative scalar",
+    "tag:yaml.org,2002:python/name:material.extensions.emoji.to_svg",
+    "tag:yaml.org,2002:python/name:material.extensions.emoji.twemoji",
+    "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format",
+    "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
+  ]
+}
