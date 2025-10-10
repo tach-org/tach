@@ -15,15 +15,7 @@ endif
 
 .PHONY: deps
 deps: ## Install dependencies
-	@if [ ! -d "$(VENV)" ]; then \
-		uv venv $(VENV); \
-		echo "Virtual environment created at $(VENV)"; \
-	else \
-		echo "Virtual environment already exists at $(VENV)"; \
-	fi
-
-	source $(VENV_BIN)/activate && \
-	uv pip install pip maturin
+	./pw uv sync
 
 	@unset CONDA_PREFIX && \
 	source $(VENV_BIN)/activate && \

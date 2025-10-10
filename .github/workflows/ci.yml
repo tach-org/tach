@@ -26,10 +26,10 @@ jobs:
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-uv-
 
       - name: Cache Rust dependencies
         uses: actions/cache@v3
@@ -41,26 +41,24 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+        run: ./pw uv sync
 
       - name: Check ruff
         run: |
-          ruff check
-          ruff format --check
+          ./pw uv run ruff check
+          ./pw uv run ruff format --check
       - name: Test with cargo
         run: |
           cargo test --no-default-features
       - name: Test with pytest and report coverage
         run: |
-          coverage run --branch --source=python -m pytest
-          coverage report
+          ./pw uv run coverage run --branch --source=python -m pytest
+          ./pw uv run coverage report
       - name: Check types with pyright
         run: |
-          pyright --pythonversion ${{ matrix.python-version }}
+          ./pw uv run pyright --pythonversion ${{ matrix.python-version }}
       - name: Check tach
-        run: tach check
+        run: ./pw uv run tach check
       - name: Check Rust linting
         run: cargo clippy
       - name: Check Rust formatting
