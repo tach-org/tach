@@ -66,7 +66,7 @@ lint-rust: ## Lint Rust code
 
 .PHONY: type-check
 type-check: ## Run type checking
-	$(VENV_BIN)/pyright
+	$(VENV_BIN)/basedpyright
 
 
 .PHONY: docs docs-serve docs-build

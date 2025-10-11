@@ -7,7 +7,7 @@
 [![version](https://img.shields.io/pypi/v/dtach.svg)](https://pypi.Python.org/pypi/dtach)
 [![license](https://img.shields.io/pypi/l/dtach.svg)](https://pypi.Python.org/pypi/dtach)
 [![python](https://img.shields.io/pypi/pyversions/dtach.svg)](https://pypi.Python.org/pypi/dtach)
-[![pyright](https://microsoft.github.io/pyright/img/pyright_badge.svg)](https://microsoft.github.io/pyright/)
+[![basedpyright - checked](https://img.shields.io/badge/basedpyright-checked-ffc000)](https://docs.basedpyright.com)
 [![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 Tach is a Python tool to enforce dependencies and interfaces, written in Rust.

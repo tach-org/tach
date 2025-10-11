@@ -58,7 +58,7 @@ dev = [
     # Setup
     "pip==24.0",
     # Code Quality
-    "pyright==1.1.389",
+    "basedpyright>=1.31.7",
     "ruff==0.11.5",
     # Build/Release
     "setuptools==69.5.1",
@@ -82,6 +82,9 @@ Issues = "https://github.com/detachhead/dtach/issues"
 src = ["python"]
 exclude = ["python/tests/example"]
 target-version = "py38"
+extend-exclude = [
+    "pw",
+]
 lint.extend-select = ["I", "TCH", "UP"]
 lint.ignore = ["UP006", "UP007"]
 
@@ -93,9 +96,10 @@ runtime-evaluated-decorators = ["dataclasses.dataclass"]
 exempt-modules = ["typing", "typing_extensions"]
 
 [tool.pyright]
-include = ["python/tach"]
-exclude = ["**/__pycache__", ".venv"]
-strict = ["python/tach"]
+include = ["python"]
+# https://github.com/DetachHead/basedpyright/issues/31
+ignore = ["pw"]
+exclude = ["pw"]
 executionEnvironments = [{ root = "python" }]
 pythonVersion = "3.8"
 

@@ -54,9 +54,9 @@ jobs:
         run: |
           ./pw uv run coverage run --branch --source=python -m pytest
           ./pw uv run coverage report
-      - name: Check types with pyright
+      - name: Check types with basedpyright
         run: |
-          ./pw uv run pyright --pythonversion ${{ matrix.python-version }}
+          ./pw uv run basedpyright --pythonversion ${{ matrix.python-version }}
       - name: Check tach
         run: ./pw uv run tach check
       - name: Check Rust linting
