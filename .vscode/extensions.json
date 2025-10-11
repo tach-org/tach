@@ -7,5 +7,6 @@
         "tamasfe.even-better-toml",
         "redhat.vscode-yaml",
         "github.vscode-github-actions",
+        "rust-lang.rust-analyzer",
     ]
 }

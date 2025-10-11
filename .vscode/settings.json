@@ -68,5 +68,6 @@
     "tag:yaml.org,2002:python/name:material.extensions.emoji.twemoji",
     "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format",
     "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
-  ]
+  ],
+  "rust-analyzer.server.path": ".venv/bin/rust-analyzer"
 }
