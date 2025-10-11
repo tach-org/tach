@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "detachhead.basedpyright",
+        "charliermarsh.ruff",
+        "mhutchie.git-graph",
+        "tamasfe.even-better-toml",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions",
+    ]
+}
