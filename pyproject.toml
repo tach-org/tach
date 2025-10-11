@@ -6,7 +6,7 @@ authors = [
 ]
 description = "A Python tool to maintain a modular package architecture."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -15,7 +15,6 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -37,7 +36,6 @@ dependencies = [
     "networkx>=2.6,<4.0",
     "pydot>=2,<4",
     "stdlib-list>=0.10.0; python_version < '3.10'",
-    "importlib_metadata>=6.0; python_version == '3.7'",
 ]
 keywords = [
     'python',
@@ -63,23 +61,16 @@ dev = [
     "pyright==1.1.389",
     "ruff==0.11.5",
     # Build/Release
-    "setuptools==69.5.1; python_version > '3.7'",
-    "twine==5.1.1; python_version > '3.7'",
-    "build==1.2.1; python_version > '3.7'",
+    "setuptools==69.5.1",
+    "twine==5.1.1",
+    "build==1.2.1",
     # Tests
-    "pytest==8.2.2; python_version > '3.7'",
-    "pytest-mock==3.14.0; python_version > '3.7'",
-    "coverage==7.6.0; python_version > '3.7'",
+    "pytest==8.2.2",
+    "pytest-mock==3.14.0",
+    "coverage==7.6.0",
     # Rust
     "maturin==1.7.1",
     "rustup>=1.28.2.1",
-    # python version 3.7 pinned dependencies
-    "setuptools==47.1.0; python_version == '3.7'",
-    "twine==4.0.2; python_version == '3.7'",
-    "build==1.1.1; python_version == '3.7'",
-    "pytest==7.4.4; python_version == '3.7'",
-    "pytest-mock==3.11.1; python_version == '3.7'",
-    "coverage==7.2.7; python_version == '3.7'",
 ]
 
 
