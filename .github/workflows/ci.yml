@@ -56,7 +56,7 @@ jobs:
           ./pw uv run coverage report
       - name: Check types with basedpyright
         run: |
-          ./pw uv run basedpyright --pythonversion ${{ matrix.python-version }}
+          ./pw uv run basedpyright
       - name: Check tach
         run: ./pw uv run tach check
       - name: Check Rust linting
