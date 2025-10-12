@@ -85,7 +85,7 @@ target-version = "py38"
 extend-exclude = [
     "pw",
 ]
-lint.extend-select = ["I", "TCH", "UP"]
+lint.extend-select = ["I", "TC", "UP"]
 lint.ignore = ["UP006", "UP007"]
 
 [tool.ruff.lint.isort]
