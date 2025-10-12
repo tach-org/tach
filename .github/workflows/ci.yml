@@ -65,3 +65,19 @@ jobs:
         run: ./pw uv run cargo fmt --all --check
       - name: Check Rust
         run: ./pw uv run cargo check
+
+  # for some insane reason it's impossible to configure github actions to require that all checks pass before merging.
+  # you have to create a rule eith every single job in your ci, and remember to manually update that rule when they change.
+  # so instead we need this job at the end that checks the status of all the previous jobs so we don't need to constantly
+  # worry about keeping the rule up to date.
+  all-checks:
+    runs-on: ubuntu-latest
+    needs: build
+    if: always()
+    steps:
+      - name: Check previous job results
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "previous jobs failed"
+            exit 1
+          fi
