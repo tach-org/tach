@@ -41,7 +41,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
 
       - name: Install dependencies
-        run: ./pw uv sync
+        run: ./pw uv sync --all-groups
 
       - name: Check ruff
         run: |

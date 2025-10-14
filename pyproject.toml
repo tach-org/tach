@@ -72,6 +72,12 @@ dev = [
     "maturin==1.7.1",
     "rustup>=1.28.2.1",
 ]
+vscode = [
+    "nodejs-wheel>=22.20.0",
+    "nox>=2025.5.1",
+    "PyHamcrest",
+    "python-jsonrpc-server",
+]
 
 
 [project.urls]
@@ -96,16 +102,16 @@ runtime-evaluated-decorators = ["dataclasses.dataclass"]
 exempt-modules = ["typing", "typing_extensions"]
 
 [tool.pyright]
-include = ["python"]
+include = ["python", "vscode"]
 # https://github.com/DetachHead/basedpyright/issues/31
-ignore = ["pw"]
-exclude = ["pw"]
-executionEnvironments = [{ root = "python" }]
+ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
+exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
+executionEnvironments = [{ root = "python" }, { root = "vscode" }]
 pythonVersion = "3.8"
 
 
 [tool.pytest.ini_options]
-norecursedirs = "python/tests/example"
+norecursedirs = ["python/tests/example", "vscode/bundled"]
 
 [build-system]
 requires = ["maturin>=1.5,<2.0"]

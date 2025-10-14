@@ -34,14 +34,19 @@
   },
   "python.terminal.activateEnvInCurrentTerminal": true,
   "debugpy.debugJustMyCode": false,
+  // even though python.terminal.activateEnvInCurrentTerminal is enabled, we still need to add the venv's script folder to the PATH
+  // because vscode's npm tasks do not run with the activated venv
   "terminal.integrated.env.windows": {
-    "PATH": "${env:PATH};${workspaceFolder}/.pyprojectx/main"
+      "PATH": "${workspaceFolder}/.pyprojectx/main;${workspaceFolder}/vscode/node_modules/.bin;${env:PATH};${workspaceFolder}/.venv/Scripts",
+      "NOX_DEFAULT_VENV_BACKEND": "uv"
   },
   "terminal.integrated.env.osx": {
-    "PATH": "${env:PATH}:${workspaceFolder}/.pyprojectx/main"
+      "PATH": "${workspaceFolder}/.pyprojectx/main:${workspaceFolder}/vscode/node_modules/.bin:${env:PATH}:${workspaceFolder}/.venv/bin",
+      "NOX_DEFAULT_VENV_BACKEND": "uv"
   },
   "terminal.integrated.env.linux": {
-    "PATH": "${env:PATH}:${workspaceFolder}/.pyprojectx/main"
+      "PATH": "${workspaceFolder}/.pyprojectx/main:${workspaceFolder}/vscode/node_modules/.bin:${env:PATH}:${workspaceFolder}/.venv/bin",
+      "NOX_DEFAULT_VENV_BACKEND": "uv"
   },
   "task.problemMatchers.neverPrompt": true,
   "python.experiments.optInto": ["pythonTestAdapter"],
@@ -70,5 +75,7 @@
     "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
   ],
   "rust-analyzer.server.path": ".venv/bin/rust-analyzer",
-  "rust-analyzer.check.command": "clippy"
+  "rust-analyzer.check.command": "clippy",
+  // this is a top-level folder but the ** is still needed due to https://github.com/microsoft/vscode/issues/92114
+  "npm.exclude": "**/.venv/**/*",
 }

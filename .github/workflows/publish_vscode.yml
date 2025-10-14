@@ -1,0 +1,112 @@
+name: publish_vscode
+
+on:
+  release:
+    types: [published]
+
+defaults:
+  run:
+    working-directory: vscode
+
+env:
+  dist_path: ./vscode/dist
+
+jobs:
+  # Build the extension on all platforms.
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            code-target: win32-x64
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            code-target: win32-arm64
+          - os: ubuntu-20.04
+            target: x86_64-unknown-linux-gnu
+            code-target: linux-x64
+          - os: ubuntu-20.04
+            target: aarch64-unknown-linux-gnu
+            code-target: linux-arm64
+            arch: aarch64
+          - os: ubuntu-20.04
+            target: arm-unknown-linux-gnueabihf
+            code-target: linux-armhf
+            arch: armv7
+          - os: macos-13
+            target: x86_64-apple-darwin
+            code-target: darwin-x64
+          - os: macos-14
+            target: aarch64-apple-darwin
+            code-target: darwin-arm64
+            arch: x86_64
+
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+      - run: ../pw uv run nox --session build_package
+
+      # Build the extension.
+      - name: Package Extension (release)
+        run: |
+          ../pw npx vsce package -o "./dist/tach-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
+      # Upload the extension.
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.target }}
+          path: ${{ env.dist_path }}
+
+  # Publish the built extension to the Marketplace.
+  publish:
+    name: "Publish"
+    needs: ["build"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Download all built artifacts.
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-aarch64-apple-darwin
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-x86_64-apple-darwin
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-x86_64-unknown-linux-gnu
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-aarch64-unknown-linux-gnu
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-arm-unknown-linux-gnueabihf
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-x86_64-pc-windows-msvc
+          path: ${{ env.dist_path }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-aarch64-pc-windows-msvc
+          path: ${{ env.dist_path }}
+      - run: ls -al ./dist
+
+      - name: Install dependencies
+        run: ../pw uv run --group vscode npm ci
+
+      - name: Publish Extension - visual studio marketplace
+        run: |
+          ../pw uv run npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ./dist/tach-*.vsix

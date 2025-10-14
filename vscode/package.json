@@ -1,0 +1,133 @@
+{
+    "name": "dtach",
+    "displayName": "DTach",
+    "description": "a maintained fork of the abandoned `tach` linter",
+    "version": "0.30.2",
+    "preview": true,
+    "serverInfo": {
+        "name": "Tach",
+        "module": "tach"
+    },
+    "publisher": "detachhead",
+    "icon": "gauge_logo.png",
+    "license": "LGPL-3.0-only",
+    "homepage": "https://github.com/detachhead/dtach",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/detachhead/dtach.git"
+    },
+    "bugs": {
+        "url": "https://github.com/detachhead/dtach/issues"
+    },
+    "galleryBanner": {
+        "color": "#1e415e",
+        "theme": "dark"
+    },
+    "keywords": [
+        "python",
+        "tach",
+        "rust",
+        "lint",
+        "imports",
+        "package"
+    ],
+    "engines": {
+        "vscode": "^1.78.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Linters",
+        "Formatters"
+    ],
+    "extensionDependencies": [
+        "ms-python.python"
+    ],
+    "capabilities": {
+        "virtualWorkspaces": {
+            "supported": false,
+            "description": "Virtual Workspaces are not supported with Tach."
+        }
+    },
+    "activationEvents": [
+        "onLanguage:python",
+        "workspaceContains:*.py"
+    ],
+    "main": "./dist/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "compile": "webpack",
+        "watch": "webpack --watch",
+        "package": "webpack --mode production --devtool source-map --config ./webpack.config.js",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "format-check": "prettier --check 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
+        "test": "node ./out/test/runTest.js",
+        "vsce-package": "vsce package -o tach.vsix"
+    },
+    "contributes": {
+        "configuration": {
+            "properties": {
+                "tach.importStrategy": {
+                    "default": "fromEnvironment",
+                    "description": "Defines where `tach` is imported from. This setting may be ignored if `tach.path` is set.",
+                    "enum": [
+                        "useBundled",
+                        "fromEnvironment"
+                    ],
+                    "enumDescriptions": [
+                        "Always use the bundled version of `tach`.",
+                        "Use `tach` from environment, fallback to bundled version only if `tach` not available in the environment."
+                    ],
+                    "scope": "window",
+                    "type": "string"
+                },
+                "tach.interpreter": {
+                    "default": [],
+                    "description": "When set to a path to python executable, extension will use that to launch the server and any subprocess.",
+                    "scope": "resource",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tach.configuration": {
+                    "default": "",
+                    "description": "Path to a `tach.toml` file to use for configuration. By default, the extension will mirror the behavior that the `tach` CLI would have.",
+                    "scope": "resource",
+                    "type": "string"
+                }
+            }
+        },
+        "commands": [
+            {
+                "title": "Restart Server",
+                "category": "Tach",
+                "command": "tach.restart"
+            }
+        ]
+    },
+    "dependencies": {
+        "@vscode/python-extension": "^1.0.5",
+        "fs-extra": "^11.3.0",
+        "vscode-languageclient": "^8.1.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.4",
+        "@types/glob": "^8.1.0",
+        "@types/node": "16.x",
+        "@types/vscode": "1.78.0",
+        "@typescript-eslint/eslint-plugin": "^8.25.0",
+        "@typescript-eslint/parser": "^8.25.0",
+        "@vscode/test-electron": "^2.4.1",
+        "@vscode/vsce": "^3.2.2",
+        "eslint": "^9.21.0",
+        "glob": "^11.0.1",
+        "prettier": "^3.5.2",
+        "ts-loader": "^9.5.2",
+        "typescript": "^5.7.3",
+        "webpack": "^5.98.0",
+        "webpack-cli": "^6.0.1"
+    }
+}
