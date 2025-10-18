@@ -119,6 +119,7 @@ ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
 exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
 executionEnvironments = [{ root = "python" }, { root = "vscode" }]
 pythonVersion = "3.8"
+reportImplicitStringConcatenation = false # conflicts with ruff formatter
 
 
 [tool.pytest.ini_options]
