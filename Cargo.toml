@@ -1,6 +1,6 @@
 [package]
 name = "tach"
-version = "0.30.2"
+version = "0.31.0"
 edition = "2021"
 
 [lib]
