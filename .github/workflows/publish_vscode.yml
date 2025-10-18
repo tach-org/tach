@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
-      - run: ../pw uv run nox --session build_package
+      - run: ../pw uv run --group vscode nox --session build_package
 
       # Build the extension.
       - name: Package Extension (release)
@@ -109,4 +109,4 @@ jobs:
 
       - name: Publish Extension - visual studio marketplace
         run: |
-          ../pw uv run npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ./dist/tach-*.vsix
+          ../pw uv run --group vscode npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ./dist/tach-*.vsix
