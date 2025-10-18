@@ -73,12 +73,14 @@ type-check: ## Run type checking
 docs: docs-serve ## Alias for docs-serve
 
 docs-serve: ## Serve documentation locally with live reloading
-	pip install -r docs/requirements.txt
-	mkdocs serve
+	./pw uv run --group docs mkdocs serve
 
 docs-build: ## Build the documentation site
-	pip install -r docs/requirements.txt
-	mkdocs build
+	./pw uv run --group docs mkdocs build --strict
+
+
+docs-check: ## Build the documentation site
+	./pw uv run --group docs mkdocs build
 
 
 .PHONY: help

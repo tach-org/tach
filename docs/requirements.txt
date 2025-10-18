@@ -1,6 +1,0 @@
-mkdocs>=1.5.0
-mkdocs-material>=9.5.0
-pymdown-extensions>=10.0
-mkdocs-social-plugin>=0.1.0
-pillow
-cairosvg

@@ -65,6 +65,8 @@ jobs:
         run: ./pw uv run cargo fmt --all --check
       - name: Check Rust
         run: ./pw uv run cargo check
+      - name: Check docs
+        run: make docs-build
 
   # for some insane reason it's impossible to configure github actions to require that all checks pass before merging.
   # you have to create a rule eith every single job in your ci, and remember to manually update that rule when they change.
