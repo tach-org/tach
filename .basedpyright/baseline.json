@@ -2040,14 +2040,6 @@
         ],
         "./python/tach/show.py": [
             {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 11,
-                    "endColumn": 16,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportAny",
                 "range": {
                     "startColumn": 37,
