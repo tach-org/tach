@@ -52,9 +52,6 @@ keywords = [
 
 [dependency-groups]
 dev = [
-    # Core deps (pinned)
-    "rich==13.8.1",
-    "prompt-toolkit==3.0.47",
     # Setup
     "pip==24.0",
     # Code Quality

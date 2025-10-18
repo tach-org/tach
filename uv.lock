@@ -420,10 +420,8 @@ dev = [
     { name = "coverage" },
     { name = "maturin" },
     { name = "pip" },
-    { name = "prompt-toolkit" },
     { name = "pytest" },
     { name = "pytest-mock" },
-    { name = "rich" },
     { name = "ruff" },
     { name = "rustup", marker = "sys_platform != 'win32'" },
     { name = "setuptools" },
@@ -456,10 +454,8 @@ dev = [
     { name = "coverage", specifier = "==7.6.0" },
     { name = "maturin", specifier = "==1.7.1" },
     { name = "pip", specifier = "==24.0" },
-    { name = "prompt-toolkit", specifier = "==3.0.47" },
     { name = "pytest", specifier = "==8.2.2" },
     { name = "pytest-mock", specifier = "==3.14.0" },
-    { name = "rich", specifier = "==13.8.1" },
     { name = "ruff", specifier = "==0.11.5" },
     { name = "rustup", marker = "sys_platform != 'win32'", specifier = ">=1.28.2.1" },
     { name = "setuptools", specifier = "==69.5.1" },
@@ -1219,16 +1215,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "13.8.1"
+version = "14.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
-    { name = "typing-extensions", marker = "python_full_version < '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/76/40f084cb7db51c9d1fa29a7120717892aeda9a7711f6225692c957a93535/rich-13.8.1.tar.gz", hash = "sha256:8260cda28e3db6bf04d2d1ef4dbc03ba80a824c88b0e7668a0f23126a424844a", size = 222080, upload-time = "2024-09-10T12:52:44.779Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/d2/8920e102050a0de7bfabeb4c4614a49248cf8d5d7a8d01885fbb24dc767a/rich-14.2.0.tar.gz", hash = "sha256:73ff50c7c0c1c77c8243079283f4edb376f0f6442433aecb8ce7e6d0b92d1fe4", size = 219990, upload-time = "2025-10-09T14:16:53.064Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/11/dadb85e2bd6b1f1ae56669c3e1f0410797f9605d752d68fb47b77f525b31/rich-13.8.1-py3-none-any.whl", hash = "sha256:1760a3c0848469b97b558fc61c85233e3dafb69c7a071b4d60c38099d3cd4c06", size = 241608, upload-time = "2024-09-10T12:52:42.714Z" },
+    { url = "https://files.pythonhosted.org/packages/25/7a/b0178788f8dc6cafce37a212c99565fa1fe7872c70c6c9c1e1a372d9d88f/rich-14.2.0-py3-none-any.whl", hash = "sha256:76bc51fe2e57d2b1be1f96c524b890b816e334ab4c1e45888799bfaab0021edd", size = 243393, upload-time = "2025-10-09T14:16:51.245Z" },
 ]
 
 [[package]]
