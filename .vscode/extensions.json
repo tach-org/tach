@@ -8,5 +8,6 @@
         "redhat.vscode-yaml",
         "github.vscode-github-actions",
         "rust-lang.rust-analyzer",
+        "carlos-algms.make-task-provider",
     ]
 }
