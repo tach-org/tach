@@ -33,6 +33,7 @@
     "pw": true
   },
   "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.terminal.shellIntegration.enabled": false, // https://github.com/microsoft/vscode/issues/271480#issuecomment-3410069241
   "debugpy.debugJustMyCode": false,
   // even though python.terminal.activateEnvInCurrentTerminal is enabled, we still need to add the venv's script folder to the PATH
   // because vscode's npm tasks do not run with the activated venv
