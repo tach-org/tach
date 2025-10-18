@@ -124,6 +124,7 @@
         "@vscode/vsce": "^3.2.2",
         "eslint": "^9.21.0",
         "glob": "^11.0.1",
+        "ovsx": "^0.10.6",
         "prettier": "^3.5.2",
         "ts-loader": "^9.5.2",
         "typescript": "^5.7.3",

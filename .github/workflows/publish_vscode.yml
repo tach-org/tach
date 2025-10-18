@@ -110,3 +110,7 @@ jobs:
       - name: Publish Extension - visual studio marketplace
         run: |
           ../pw uv run --group vscode npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ./dist/tach-*.vsix
+
+      - name: Publish Extension - open VSX
+        run: |
+          ../pw uv run npx ovsx publish --pat ${{ secrets.OPEN_VSX_TOKEN }} --packagePath ./dist/tach-*.vsix
