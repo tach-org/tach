@@ -84,6 +84,9 @@ vscode = [
 Homepage = "https://github.com/detachhead/dtach"
 Issues = "https://github.com/detachhead/dtach/issues"
 
+[tool.pyprojectx]
+cwd = "."
+
 [tool.ruff]
 src = ["python"]
 exclude = ["python/tests/example"]
