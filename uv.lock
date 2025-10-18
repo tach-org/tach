@@ -425,7 +425,7 @@ dev = [
     { name = "pytest-mock" },
     { name = "rich" },
     { name = "ruff" },
-    { name = "rustup" },
+    { name = "rustup", marker = "sys_platform != 'win32'" },
     { name = "setuptools" },
     { name = "twine" },
 ]
@@ -461,7 +461,7 @@ dev = [
     { name = "pytest-mock", specifier = "==3.14.0" },
     { name = "rich", specifier = "==13.8.1" },
     { name = "ruff", specifier = "==0.11.5" },
-    { name = "rustup", specifier = ">=1.28.2.1" },
+    { name = "rustup", marker = "sys_platform != 'win32'", specifier = ">=1.28.2.1" },
     { name = "setuptools", specifier = "==69.5.1" },
     { name = "twine", specifier = "==5.1.1" },
 ]
@@ -1275,9 +1275,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/3f/d1e9cdbd22cfcff0868a53505a4b09c7295ef776571cae9d272c4b6c57ac/rustup-1.28.2.1-py3-none-musllinux_2_17_aarch64.whl", hash = "sha256:2d8c9af0a951285fe0c71b2215b6fabe590b19c1f5d9a5d98658e6889dc407c8", size = 7829498, upload-time = "2025-09-12T11:30:51.14Z" },
     { url = "https://files.pythonhosted.org/packages/93/af/9eea48c0c439133eb65d1bde1a5c7552d23814f1e88e6feaa93c2f8b65ad/rustup-1.28.2.1-py3-none-musllinux_2_17_ppc64le.whl", hash = "sha256:e6f2437ef62bdd793a7d7a442e20a3d4654026ac0259f4227b28ae9cb0ea9aa9", size = 6652478, upload-time = "2025-09-12T11:30:54.119Z" },
     { url = "https://files.pythonhosted.org/packages/24/cd/4e9f5bd350e26f5b275c5516079b5be7cfaa2d0212dc3eff01a6ade0dc36/rustup-1.28.2.1-py3-none-musllinux_2_17_x86_64.whl", hash = "sha256:d9e1e5cc456bccf13967280096a3cf4b1f13d631b81d71153512760e254dc38b", size = 8037751, upload-time = "2025-09-12T11:30:56.523Z" },
-    { url = "https://files.pythonhosted.org/packages/25/16/e05922e5924635ca3a580ffc8d439c8cc0689ffb552dea37cab58c677570/rustup-1.28.2.1-py3-none-win32.whl", hash = "sha256:b371980239c8eaeb64f2787dde2207201f170f698d2d4f0fb99dd49b6192bcd0", size = 4614507, upload-time = "2025-09-12T11:30:58.649Z" },
-    { url = "https://files.pythonhosted.org/packages/c5/29/4e981fbd66c858a9aeb176982e63f335e2f50739128c3aff85c190ac165a/rustup-1.28.2.1-py3-none-win_amd64.whl", hash = "sha256:8c022b623b764b850d7de1287698d6f0da6471af62db0253c422db5b2a9dac77", size = 5220433, upload-time = "2025-09-12T11:31:00.919Z" },
-    { url = "https://files.pythonhosted.org/packages/f4/83/19f7908ae3de589f755c32c7f056c3d7e73c829d9e1c57c1c942f2be5574/rustup-1.28.2.1-py3-none-win_arm64.whl", hash = "sha256:1b8487b976861ab7774a80169dd109299966d654fbbc4980f8d9c647b7974a93", size = 4858650, upload-time = "2025-09-12T11:31:03.078Z" },
 ]
 
 [[package]]
