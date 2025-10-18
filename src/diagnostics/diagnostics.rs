@@ -46,7 +46,7 @@ pub enum ConfigurationDiagnostic {
     #[error("Layer '{layer}' is not defined in the project.")]
     UnknownLayer { layer: String },
 
-    #[error("No first-party imports were found. You may need to use 'tach mod' to update your Python source roots. Docs: https://docs.gauge.sh/usage/configuration#source-roots")]
+    #[error("No first-party imports were found. You may need to use 'tach mod' to update your Python source roots. Docs: https://detachhead.github.io/dtach/usage/configuration#source-roots")]
     NoFirstPartyImportsFound(),
 
     #[error("Unexpected error: No checks were enabled.")]

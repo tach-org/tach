@@ -178,6 +178,7 @@ expose = [
     "ROOT_MODULE_SENTINEL_TAG",
     "DEFAULT_EXCLUDE_PATHS",
     "GAUGE_API_BASE_URL",
+    "DOCS_BASE_URL",
 ]
 from = [
     "tach.constants",

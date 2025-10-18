@@ -16,6 +16,7 @@ DEFAULT_EXCLUDE_PATHS = [
 ]
 
 GAUGE_API_BASE_URL: str = os.getenv("GAUGE_API_BASE_URL", "https://app.gauge.sh")
+DOCS_BASE_URL: str = "https://detachhead.github.io/dtach"
 
 __all__ = [
     "PACKAGE_NAME",
@@ -25,4 +26,5 @@ __all__ = [
     "ROOT_MODULE_SENTINEL_TAG",
     "DEFAULT_EXCLUDE_PATHS",
     "GAUGE_API_BASE_URL",
+    "DOCS_BASE_URL",
 ]

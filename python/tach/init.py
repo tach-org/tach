@@ -8,7 +8,12 @@ from rich.prompt import Confirm
 from tach import errors
 from tach import filesystem as fs
 from tach.console import console
-from tach.constants import CONFIG_FILE_NAME, TOOL_NAME
+from tach.constants import (
+    CONFIG_FILE_NAME,
+    DOCS_BASE_URL,
+    GAUGE_API_BASE_URL,
+    TOOL_NAME,
+)
 from tach.extension import ProjectConfig, parse_project_config, sync_project
 from tach.mod import mod_edit_interactive
 from tach.show import upload_show_report
@@ -59,7 +64,7 @@ def prompt_to_show_project() -> bool:
     console.print(
         Panel(
             "Would you like to visualize your dependency graph?\n"
-            f"This will upload your module configuration in [cyan]'{CONFIG_FILE_NAME}.toml'[/] to Gauge ([blue underline]https://app.gauge.sh[/])",
+            f"This will upload your module configuration in [cyan]'{CONFIG_FILE_NAME}.toml'[/] to Gauge ([blue underline]{GAUGE_API_BASE_URL}[/])",
             style="yellow",
         )
     )
@@ -143,7 +148,7 @@ def init_project(project_root: Path, force: bool = False):
     console.print(
         Panel(
             "Welcome to Tach! Let's get started by selecting the modules you want to include in your project.\n"
-            "We will use [cyan]'tach mod'[/] to interactively mark which files or folders should be tracked. You can learn more at [blue underline]https://docs.gauge.sh/usage/faq[/]",
+            f"We will use [cyan]'tach mod'[/] to interactively mark which files or folders should be tracked. You can learn more at [blue underline]{DOCS_BASE_URL}/usage/faq[/]",
             style="yellow",
         )
     )
@@ -163,5 +168,5 @@ def init_project(project_root: Path, force: bool = False):
     console.print(
         "\n[green]Tach is now configured for this project!"
         " Run [cyan]'tach check'[/] to validate your configuration.[/]\n\n"
-        "[green]Full documentation is available at [blue underline]https://docs.gauge.sh[/]"
+        f"[green]Full documentation is available at [blue underline]{DOCS_BASE_URL}[/]"
     )

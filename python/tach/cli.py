@@ -12,7 +12,7 @@ from tach import __version__, cache, extension, icons
 from tach import filesystem as fs
 from tach.check_external import check_external
 from tach.console import console_err
-from tach.constants import CONFIG_FILE_NAME, TOOL_NAME
+from tach.constants import CONFIG_FILE_NAME, DOCS_BASE_URL, TOOL_NAME
 from tach.errors import (
     TachCircularDependencyError,
     TachClosedBetaError,
@@ -1233,7 +1233,7 @@ def main(argv: list[str] = sys.argv[1:]) -> None:
             "WARNING: root module treatment is set to 'ignore' (default as of 0.23.0), but '<root>' appears in your configuration."
             + f"\n\nRun '{TOOL_NAME} sync' to remove the root module from your dependencies,"
             + f" or update 'root_module' in {CONFIG_FILE_NAME}.toml to 'allow' or 'forbid' instead."
-            + "\nDocumentation: https://docs.gauge.sh/usage/configuration#the-root-module"
+            + f"\nDocumentation: {DOCS_BASE_URL}/usage/configuration#the-root-module"
             + "\n",
             style="yellow",
         )
