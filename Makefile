@@ -24,7 +24,7 @@ deps: ## Install dependencies
 
 .PHONY: install
 install: ##  Install the crate as module in the current virtualenv
-	maturin develop --uv --release -E dev
+	maturin develop --uv -E dev
 
 
 .PHONY: profiling
