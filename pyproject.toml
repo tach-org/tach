@@ -57,7 +57,7 @@ dev = [
     "pip==24.0",
     # Code Quality
     "basedpyright>=1.31.7",
-    "ruff==0.11.5",
+    "ruff==0.14.5",
     # Build/Release
     "setuptools==69.5.1",
     "twine==5.1.1",
