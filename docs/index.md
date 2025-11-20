@@ -1,5 +1,4 @@
 # Tach
-> ⚠️ **UNMAINTAINED**: This repository is no longer actively maintained. Issues and pull requests may not receive a response.
 
 Tach is a tool that helps you control dependencies between your Python modules. It allows modules to define explicit public interfaces to prevent deep coupling, creating a more modular architecture.
 

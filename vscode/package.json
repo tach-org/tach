@@ -1,7 +1,7 @@
 {
     "name": "dtach",
     "displayName": "DTach",
-    "description": "a maintained fork of the abandoned `tach` linter",
+    "description": "Linting support for python files using `tach`.",
     "version": "0.32.0",
     "preview": true,
     "serverInfo": {
