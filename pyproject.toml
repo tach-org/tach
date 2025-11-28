@@ -68,7 +68,7 @@ dev = [
     "pytest-mock==3.14.0",
     "coverage==7.6.0",
     # Rust
-    "maturin==1.7.1",
+    "maturin==1.10.2",
     "rustup>=1.28.2.1 ; sys_platform != 'win32'", # https://github.com/konstin/rustup-pypi/issues/5
 ]
 vscode = [
@@ -128,7 +128,7 @@ reportImplicitStringConcatenation = false # conflicts with ruff formatter
 norecursedirs = ["python/tests/example", "vscode/bundled"]
 
 [build-system]
-requires = ["maturin>=1.5,<2.0"]
+requires = ["maturin<2.0,>=1.5"]
 build-backend = "maturin"
 
 [tool.maturin]
