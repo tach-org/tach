@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from unittest.mock import NonCallableMagicMock
 
@@ -12,6 +13,21 @@ from tach.errors import TachCircularDependencyError, TachVisibilityError
 from tach.extension import Diagnostic
 from tach.icons import FAIL, SUCCESS, WARNING
 from tach.parsing.config import parse_project_config
+
+_ansi_escape = re.compile(
+    r"""
+    \x1B  # ESC
+    \[    # literal [
+    [0-?]* # Parameter bytes
+    [ -/]* # Intermediate bytes
+    [@-~]  # Final byte
+    """,
+    re.VERBOSE,
+)
+
+
+def _strip_color_codes(s: str) -> str:
+    return _ansi_escape.sub("", s)
 
 
 def test_valid_example_dir(example_dir, capfd):
@@ -255,15 +271,16 @@ def test_many_features_example_dir(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    general_header = captured.err.index("General\n")
-    interfaces_header = captured.err.index("Interfaces\n")
-    dependencies_header = captured.err.index("Internal Dependencies\n")
-    unused_header = captured.err.index("Unused Dependencies")
+    err = _strip_color_codes(captured.err)
+    general_header = err.index("General\n")
+    interfaces_header = err.index("Interfaces\n")
+    dependencies_header = err.index("Internal Dependencies\n")
+    unused_header = err.index("Unused Dependencies")
 
-    general_section = captured.err[general_header:interfaces_header]
-    interfaces_section = captured.err[interfaces_header:dependencies_header]
-    dependencies_section = captured.err[dependencies_header:unused_header]
-    unused_section = captured.err[unused_header:]
+    general_section = err[general_header:interfaces_header]
+    interfaces_section = err[interfaces_header:dependencies_header]
+    dependencies_section = err[dependencies_header:unused_header]
+    unused_section = err[unused_header:]
 
     expected_general = [
         (
@@ -401,12 +418,12 @@ def test_many_features_example_dir__external(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    general_header = captured.err.index("General\n")
-    external_header = captured.err.index("External Dependencies\n")
+    err = _strip_color_codes(captured.err)
+    general_header = err.index("General\n")
+    external_header = err.index("External Dependencies\n")
 
-    general_section = captured.err[general_header:external_header]
-    external_section = captured.err[external_header:]
-
+    general_section = err[general_header:external_header]
+    external_section = err[external_header:]
     expected_general = [
         ("[WARN]", "real_src/main.py", "ignore directive", "missing a reason"),
         (
@@ -448,10 +465,11 @@ def test_monorepo_workspace_example_dir(example_dir, capfd):
     assert exc_info.value.code == 0
 
     captured = capfd.readouterr()
-    configuration_header = captured.err.index("Configuration\n")
+    err = _strip_color_codes(captured.err)
 
-    configuration_section = captured.err[configuration_header:]
+    configuration_header = err.index("Configuration\n")
 
+    configuration_section = err[configuration_header:]
     expected_configuration = [
         ("[WARN]", "No first-party imports"),
     ]
@@ -472,9 +490,10 @@ def test_monorepo_workspace_example_dir_external(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    external_header = captured.err.index("External Dependencies\n")
+    err = _strip_color_codes(captured.err)
+    external_header = err.index("External Dependencies\n")
 
-    external_section = captured.err[external_header:]
+    external_section = err[external_header:]
 
     expected_external = [
         ("[FAIL]", "requests", "not used"),
@@ -497,10 +516,12 @@ def test_visibility_error_example_dir(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    assert "Module configuration error" in captured.err
-    assert "'module2' cannot depend on 'module3'" in captured.err
-    assert "module3" in captured.err
-    assert "['module1']" in captured.err
+    err = _strip_color_codes(captured.err)
+
+    assert "Module configuration error" in err
+    assert "'module2' cannot depend on 'module3'" in err
+    assert "module3" in err
+    assert "['module1']" in err
 
 
 def test_many_features_example_dir_with_gitignore(example_dir, capfd, tmp_path):
@@ -531,21 +552,23 @@ globbed/**/*.py
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    general_header = captured.err.index("General\n")
-    interfaces_header = captured.err.index("Interfaces\n")
-    dependencies_header = captured.err.index("Internal Dependencies\n")
-    unused_header = captured.err.index("Unused Dependencies")
+    err = _strip_color_codes(captured.err)
 
-    general_section = captured.err[general_header:interfaces_header]
-    interfaces_section = captured.err[interfaces_header:dependencies_header]
-    dependencies_section = captured.err[dependencies_header:unused_header]
-    unused_section = captured.err[unused_header:]
+    general_header = err.index("General\n")
+    interfaces_header = err.index("Interfaces\n")
+    dependencies_header = err.index("Internal Dependencies\n")
+    unused_header = err.index("Unused Dependencies")
+
+    general_section = err[general_header:interfaces_header]
+    interfaces_section = err[interfaces_header:dependencies_header]
+    dependencies_section = err[dependencies_header:unused_header]
+    unused_section = err[unused_header:]
 
     # Files that are gitignored should not appear in the diagnostics
-    assert "real_src/module3/" not in captured.err
-    assert "real_src/module1/controller.py" not in captured.err
-    assert "other_src_root/module4/service.py" not in captured.err
-    assert "real_src/globbed/" not in captured.err
+    assert "real_src/module3/" not in err
+    assert "real_src/module1/controller.py" not in err
+    assert "other_src_root/module4/service.py" not in err
+    assert "real_src/globbed/" not in err
 
     expected_general = [
         (
@@ -612,17 +635,18 @@ globbed/**/*.py
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    general_header = captured.err.index("General\n")
-    external_header = captured.err.index("External Dependencies\n")
+    err = _strip_color_codes(captured.err)
+    general_header = err.index("General\n")
+    external_header = err.index("External Dependencies\n")
 
-    general_section = captured.err[general_header:external_header]
-    external_section = captured.err[external_header:]
+    general_section = err[general_header:external_header]
+    external_section = err[external_header:]
 
     # Files that are gitignored should not appear in the diagnostics
-    assert "real_src/module3/" not in captured.err
-    assert "real_src/module1/controller.py" not in captured.err
-    assert "other_src_root/module4/service.py" not in captured.err
-    assert "real_src/globbed/" not in captured.err
+    assert "real_src/module3/" not in err
+    assert "real_src/module1/controller.py" not in err
+    assert "other_src_root/module4/service.py" not in err
+    assert "real_src/globbed/" not in err
 
     expected_general = [
         ("[WARN]", "real_src/main.py", "ignore directive", "missing a reason"),
