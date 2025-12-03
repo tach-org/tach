@@ -161,10 +161,10 @@ This means that, although tests may pass in your shared environment, an invalid 
 In case you would like to explicitly allow a certain external module, this can be configured in your [`tach.toml`](configuration.md#external)
 
 !!! note
-        It is recommended to run Tach within a virtual environment containing all of
-      your dependencies across all packages. This is because Tach uses the
-      distribution metadata to map module names like 'git' to their distributions
-      ('GitPython').
+    It is recommended to run Tach within a virtual environment containing all of
+    your dependencies across all packages. This is because Tach uses the
+    distribution metadata to map module names like 'git' to their distributions
+    ('GitPython').
 
 ## tach report
 
@@ -206,10 +206,9 @@ then an import of `core.services.member` from within `core.api` would be include
 The `--external` flag includes external (3rd party) dependencies, meaning any import which targets a module outside of your project. For example, importing `pydantic` or `tomli` would be included in this report.
 
 !!! note
-        It is recommended to run Tach within a virtual environment containing all of
-      your dependencies across all packages. This is because Tach uses the
-      distribution metadata to map 3rd party module names like 'git' to their distributions
-      ('GitPython').
+    It is recommended to run Tach within a virtual environment containing all of
+    your dependencies across all packages. This is because Tach uses the
+    distribution metadata to map 3rd party module names like 'git' to their distributions ('GitPython').
 
 Supplying the `--raw` flag will group the results by module name and eliminate formatting, making the output more easily machine-readable.
 

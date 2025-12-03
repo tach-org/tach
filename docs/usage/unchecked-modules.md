@@ -11,7 +11,7 @@ An **unchecked** module should be thought of as a 'known' module which does not 
 The purpose of configuring an unchecked module is to better support **incremental adoption** of Tach.
 
 !!! note
-        Setting `unchecked: true` is different from omitting the `depends_on` field.
+    Setting `unchecked: true` is different from omitting the `depends_on` field.
 
 An unchecked module is allowed to import anything, from any module - even when the module declares a [public interface](configuration.md#interfaces).
 

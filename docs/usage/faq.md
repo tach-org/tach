@@ -37,7 +37,7 @@ This is typically done for modules like `utils/`, `errors/` or `lib/`, which con
 Tach allows marking these modules as **Utilities**, which means they can be used without being listed as an explicit dependency.
 
 !!! note
-        Marking a module with `utility: true` is different from `visibility: ['*']`.
+    Marking a module with `utility: true` is different from `visibility: ['*']`.
 
   Even when a module has public visibility, other modules must declare an
   explicit dependency to use it (in fact, modules are publicly visible by
