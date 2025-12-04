@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+from typing import cast
 from unittest.mock import NonCallableMagicMock
 
 import pytest
@@ -271,7 +272,7 @@ def test_many_features_example_dir(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
     general_header = err.index("General\n")
     interfaces_header = err.index("Interfaces\n")
     dependencies_header = err.index("Internal Dependencies\n")
@@ -418,7 +419,7 @@ def test_many_features_example_dir__external(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
     general_header = err.index("General\n")
     external_header = err.index("External Dependencies\n")
 
@@ -465,7 +466,7 @@ def test_monorepo_workspace_example_dir(example_dir, capfd):
     assert exc_info.value.code == 0
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
 
     configuration_header = err.index("Configuration\n")
 
@@ -490,7 +491,7 @@ def test_monorepo_workspace_example_dir_external(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
     external_header = err.index("External Dependencies\n")
 
     external_section = err[external_header:]
@@ -516,7 +517,7 @@ def test_visibility_error_example_dir(example_dir, capfd):
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
 
     assert "Module configuration error" in err
     assert "'module2' cannot depend on 'module3'" in err
@@ -552,7 +553,7 @@ globbed/**/*.py
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
 
     general_header = err.index("General\n")
     interfaces_header = err.index("Interfaces\n")
@@ -635,7 +636,7 @@ globbed/**/*.py
     assert exc_info.value.code == 1
 
     captured = capfd.readouterr()
-    err = _strip_color_codes(captured.err)
+    err = _strip_color_codes(cast("str", captured.err))
     general_header = err.index("General\n")
     external_header = err.index("External Dependencies\n")
 
