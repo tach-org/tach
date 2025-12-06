@@ -1,6 +1,7 @@
-name: publish_vscode
+name: build & publish vscode extension
 
 on:
+  pull_request:
   release:
     types: [published]
 
@@ -17,41 +18,50 @@ jobs:
     strategy:
       matrix:
         include:
+          # windows (no windows 32 bit build because that doesn't seem to be supported by vsce)
           - os: windows-latest
-            target: x86_64-pc-windows-msvc
             code-target: win32-x64
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            code-target: win32-arm64
+
+          # manylinux
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
             code-target: linux-x64
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
             code-target: linux-arm64
-            arch: aarch64
+
+          # musllinux (github doesn't have alpine runners so we need to run it in a docker container instead)
           - os: ubuntu-latest
-            target: arm-unknown-linux-gnueabihf
-            code-target: linux-armhf
-            arch: armv7
+            container: quay.io/pypa/musllinux_1_2_x86_64
+            code-target: alpine-x64
+          - os: ubuntu-24.04-arm
+            container: quay.io/pypa/musllinux_1_2_aarch64
+            code-target: alpine-arm64
+
+          # macos (https://docs.github.com/en/actions/reference/runners/github-hosted-runners#single-cpu-runners)
           - os: macos-13
-            target: x86_64-apple-darwin
             code-target: darwin-x64
           - os: macos-14
-            target: aarch64-apple-darwin
             code-target: darwin-arm64
-            arch: x86_64
 
-    name: Build (${{ matrix.target }})
-    runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
+    name: Build (${{ matrix.code-target }})
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-      - run: ../pw uv run nox --session build_package
+      - if: matrix.container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/io -w /io
+          run: |
+            cd vscode
+            ../pw uv run nox --session build_package
+
+      - if: ${{ !matrix.container }}
+        uses: actions/setup-python@v5
+      - if: ${{ !matrix.container }}
+        run: ../pw uv run nox --session build_package
 
       # Build the extension.
       - name: Package Extension (release)
@@ -61,12 +71,13 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.target }}
+          name: dist-${{ matrix.code-target }}
           path: ${{ env.dist_path }}
 
-  # Publish the built extension to the Marketplace.
+  # Publish the built extension to the Marketplace & openVSX.
   publish:
     name: "Publish"
+    if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && github.event.action == 'published'
     needs: ["build"]
     runs-on: ubuntu-latest
     steps:
@@ -75,33 +86,6 @@ jobs:
 
       # Download all built artifacts.
       - uses: actions/download-artifact@v4
-        with:
-          name: dist-aarch64-apple-darwin
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-x86_64-apple-darwin
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-x86_64-unknown-linux-gnu
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-aarch64-unknown-linux-gnu
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-arm-unknown-linux-gnueabihf
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-x86_64-pc-windows-msvc
-          path: ${{ env.dist_path }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-aarch64-pc-windows-msvc
-          path: ${{ env.dist_path }}
       - run: ls -al ./dist
 
       - name: Install dependencies

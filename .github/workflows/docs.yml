@@ -10,22 +10,18 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-env:
-  PYTHON_VERSION: '3.12'  # Pin for consistency
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    - name: Install Dependencies
-      run: ./pw uv sync --only-group docs
-    - name: Build Documentation
-      run: ./pw uv run mkdocs build --strict
+      - uses: actions/checkout@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
+      - name: Install Dependencies
+        run: ./pw uv sync --only-group docs
+      - name: Build Documentation
+        run: ./pw uv run mkdocs build --strict
   deploy:
     needs: build
     # Only deploy docs on pushes to main branch
@@ -38,8 +34,6 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
       - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - uses: actions/cache@v4
         with:

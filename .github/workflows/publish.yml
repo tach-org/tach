@@ -15,8 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: 3.14
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -28,38 +26,47 @@ jobs:
 
   linux:
     needs: test
-    runs-on: ${{ matrix.platform.runner }}
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         platform:
-          - runner: ubuntu-22.04
-            target: x86_64
-          - runner: ubuntu-22.04
-            target: x86
-          - runner: ubuntu-22.04
-            target: aarch64
-          - runner: ubuntu-22.04
-            target: armv7
-          - runner: ubuntu-22.04
-            target: s390x
-          - runner: ubuntu-22.04
-            target: ppc64le
+          - target: x86_64
+            manylinux: auto
+          - target: x86
+            manylinux: auto
+          - target: aarch64
+            manylinux: auto
+          - target: armv7
+            manylinux: auto
+          - target: s390x
+            manylinux: auto
+          - target: ppc64le
+            manylinux: auto
+
+          - target: x86_64
+            manylinux: musllinux_1_2
+          - target: x86
+            manylinux: musllinux_1_2
+          - target: aarch64
+            manylinux: musllinux_1_2
+          - target: armv7
+            manylinux: musllinux_1_2
+          - target: ppc64le
+            manylinux: musllinux_1_2
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.14
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: "true"
-          manylinux: auto
+          manylinux: ${{ matrix.platform.manylinux }}
+
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.platform.target }}
+          name: wheels-${{ matrix.platform.target }}-${{ matrix.platform.manylinux }}
           path: dist
 
   windows:
@@ -76,7 +83,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.14
           architecture: ${{ matrix.platform.target }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -103,8 +109,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: 3.14
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
