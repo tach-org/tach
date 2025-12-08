@@ -140,7 +140,7 @@ pub fn check(
     )?;
     let source_root_resolver = SourceRootResolver::new(project_root, &file_walker);
     let source_roots = source_root_resolver.resolve(&project_config.source_roots)?;
-    let package_resolver = PackageResolver::try_new(project_root, &source_roots, &file_walker)?;
+    let package_resolver = PackageResolver::try_new(project_root, &source_roots, &file_walker, false)?;
     let module_tree_builder = ModuleTreeBuilder::new(
         &source_roots,
         &file_walker,

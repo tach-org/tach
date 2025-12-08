@@ -54,7 +54,7 @@ pub fn get_located_project_imports<P: AsRef<Path>>(
         &project_config.exclude,
         project_config.respect_gitignore,
     )?;
-    let package_resolver = PackageResolver::try_new(project_root, source_roots, &file_walker)?;
+    let package_resolver = PackageResolver::try_new(project_root, source_roots, &file_walker, false)?;
     let package = match package_resolver.resolve_file_path(file_path.as_ref()) {
         PackageResolution::Found { package, .. } => package,
         PackageResolution::NotFound | PackageResolution::Excluded => {
@@ -115,7 +115,7 @@ pub fn get_located_external_imports<P: AsRef<Path>>(
         &project_config.exclude,
         project_config.respect_gitignore,
     )?;
-    let package_resolver = PackageResolver::try_new(project_root, source_roots, &file_walker)?;
+    let package_resolver = PackageResolver::try_new(project_root, source_roots, &file_walker, false)?;
     let package = match package_resolver.resolve_file_path(file_path.as_ref()) {
         PackageResolution::Found { package, .. } => package,
         PackageResolution::NotFound | PackageResolution::Excluded => {

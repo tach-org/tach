@@ -13,11 +13,14 @@ pub struct ProjectInfo {
     pub source_paths: Vec<PathBuf>,
 }
 
-pub fn parse_pyproject_toml(pyproject_path: &Path) -> Result<ProjectInfo> {
+pub fn parse_pyproject_toml(
+    pyproject_path: &Path,
+    include_dependency_groups: bool,
+) -> Result<ProjectInfo> {
     let content = fs::read_to_string(pyproject_path)?;
     let toml_value: Value = toml::from_str(&content)?;
     let name = extract_project_name(&toml_value);
-    let dependencies = extract_dependencies(&toml_value);
+    let dependencies = extract_dependencies(&toml_value, include_dependency_groups);
     let source_paths = extract_source_paths(&toml_value, pyproject_path.parent().unwrap());
     Ok(ProjectInfo {
         name,
@@ -34,7 +37,7 @@ fn extract_project_name(toml_value: &Value) -> Option<String> {
         .map(|s| s.to_string())
 }
 
-fn extract_dependencies(toml_value: &Value) -> HashSet<String> {
+fn extract_dependencies(toml_value: &Value, include_dependency_groups: bool) -> HashSet<String> {
     let mut dependencies = HashSet::new();
 
     // Extract dependencies from standard pyproject.toml format
@@ -68,6 +71,16 @@ fn extract_dependencies(toml_value: &Value) -> HashSet<String> {
         }
     }
 
+    // Extract PEP 735 dependency groups if enabled
+    if include_dependency_groups {
+        if let Some(groups) = toml_value
+            .get("dependency-groups")
+            .and_then(|g| g.as_table())
+        {
+            extract_dependency_groups(&mut dependencies, groups);
+        }
+    }
+
     dependencies
 }
 
@@ -92,6 +105,59 @@ fn extract_deps_from_value(dependencies: &mut HashSet<String>, deps: &Value) {
             }
         }
         _ => {}
+    }
+}
+
+/// Extracts dependencies from PEP 735 [dependency-groups] table.
+/// Handles both direct package names and {include-group = "..."} references.
+fn extract_dependency_groups(
+    dependencies: &mut HashSet<String>,
+    groups: &toml::map::Map<String, Value>,
+) {
+    let mut visited = HashSet::new();
+    for group_name in groups.keys() {
+        extract_group_deps(dependencies, groups, group_name, &mut visited);
+    }
+}
+
+/// Recursively extracts dependencies from a single group, resolving include-group references.
+fn extract_group_deps(
+    dependencies: &mut HashSet<String>,
+    groups: &toml::map::Map<String, Value>,
+    group_name: &str,
+    visited: &mut HashSet<String>,
+) {
+    if !visited.insert(group_name.to_string()) {
+        return;
+    }
+
+    let Some(group_value) = groups.get(group_name) else {
+        return;
+    };
+
+    let Some(group_array) = group_value.as_array() else {
+        return;
+    };
+
+    const EXCLUDED_DEPS: [&str; 3] = ["python", "poetry", "poetry-core"];
+
+    for item in group_array {
+        match item {
+            // Direct package name: "pytest>7"
+            Value::String(dep_str) => {
+                let pkg_name = normalize_package_name(&extract_package_name(dep_str));
+                if !EXCLUDED_DEPS.contains(&pkg_name.as_str()) {
+                    dependencies.insert(pkg_name);
+                }
+            }
+            // Include group reference: {include-group = "test"}
+            Value::Table(table) => {
+                if let Some(included_group) = table.get("include-group").and_then(|v| v.as_str()) {
+                    extract_group_deps(dependencies, groups, included_group, visited);
+                }
+            }
+            _ => {}
+        }
     }
 }
 
@@ -194,4 +260,148 @@ pub fn parse_requirements_txt(requirements_path: &Path) -> Result<HashSet<String
     }
 
     Ok(dependencies)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    fn create_temp_pyproject(content: &str) -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(content.as_bytes()).unwrap();
+        file
+    }
+
+    #[test]
+    fn test_dependency_groups_disabled_by_default() {
+        let content = r#"
+[project]
+name = "test"
+dependencies = ["requests"]
+
+[dependency-groups]
+test = ["pytest", "coverage"]
+dev = ["ruff", "mypy"]
+"#;
+        let file = create_temp_pyproject(content);
+        let result = parse_pyproject_toml(file.path(), false).unwrap();
+
+        assert!(result.dependencies.contains("requests"));
+        assert!(!result.dependencies.contains("pytest"));
+        assert!(!result.dependencies.contains("coverage"));
+        assert!(!result.dependencies.contains("ruff"));
+        assert!(!result.dependencies.contains("mypy"));
+    }
+
+    #[test]
+    fn test_dependency_groups_enabled() {
+        let content = r#"
+[project]
+name = "test"
+dependencies = ["requests"]
+
+[dependency-groups]
+test = ["pytest>=7", "coverage[toml]"]
+dev = ["ruff~=0.1", "mypy"]
+"#;
+        let file = create_temp_pyproject(content);
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("requests"));
+        assert!(result.dependencies.contains("pytest"));
+        assert!(result.dependencies.contains("coverage"));
+        assert!(result.dependencies.contains("ruff"));
+        assert!(result.dependencies.contains("mypy"));
+    }
+
+    #[test]
+    fn test_dependency_groups_with_include_group() {
+        let content = r#"
+[project]
+name = "test"
+dependencies = ["requests"]
+
+[dependency-groups]
+coverage = ["coverage[toml]"]
+test = ["pytest", {include-group = "coverage"}]
+"#;
+        let file = create_temp_pyproject(content);
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("requests"));
+        assert!(result.dependencies.contains("pytest"));
+        assert!(result.dependencies.contains("coverage"));
+    }
+
+    #[test]
+    fn test_dependency_groups_with_transitive_include() {
+        let content = r#"
+[project]
+name = "test"
+
+[dependency-groups]
+base = ["base-pkg"]
+mid = ["mid-pkg", {include-group = "base"}]
+top = ["top-pkg", {include-group = "mid"}]
+"#;
+        let file = create_temp_pyproject(content);
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("base_pkg"));
+        assert!(result.dependencies.contains("mid_pkg"));
+        assert!(result.dependencies.contains("top_pkg"));
+    }
+
+    #[test]
+    fn test_dependency_groups_cycle_detection() {
+        let content = r#"
+[project]
+name = "test"
+
+[dependency-groups]
+a = ["pkg-a", {include-group = "b"}]
+b = ["pkg-b", {include-group = "a"}]
+"#;
+        let file = create_temp_pyproject(content);
+        // Should not infinite loop
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("pkg_a"));
+        assert!(result.dependencies.contains("pkg_b"));
+    }
+
+    #[test]
+    fn test_dependency_groups_missing_include_group() {
+        let content = r#"
+[project]
+name = "test"
+
+[dependency-groups]
+test = ["pytest", {include-group = "nonexistent"}]
+"#;
+        let file = create_temp_pyproject(content);
+        // Should not fail, just skip the missing group
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("pytest"));
+    }
+
+    #[test]
+    fn test_dependency_groups_normalizes_names() {
+        let content = r#"
+[project]
+name = "test"
+
+[dependency-groups]
+test = ["My-Package", "another_package", "UPPER-case"]
+"#;
+        let file = create_temp_pyproject(content);
+        let result = parse_pyproject_toml(file.path(), true).unwrap();
+
+        assert!(result.dependencies.contains("my_package"));
+        assert!(result.dependencies.contains("another_package"));
+        assert!(result.dependencies.contains("upper_case"));
+    }
 }

@@ -100,13 +100,17 @@ pub struct Package {
     pub dependencies: HashSet<String>,
 }
 
-impl TryFrom<PackageRoot> for Package {
-    type Error = PackageResolutionError;
-
-    fn try_from(value: PackageRoot) -> std::result::Result<Self, Self::Error> {
+impl Package {
+    fn from_package_root(
+        value: PackageRoot,
+        include_dependency_groups: bool,
+    ) -> Result<Self> {
         match value {
             PackageRoot::Pyproject(path) => {
-                let project_info = parsing::parse_pyproject_toml(&path.join("pyproject.toml"))?;
+                let project_info = parsing::parse_pyproject_toml(
+                    &path.join("pyproject.toml"),
+                    include_dependency_groups,
+                )?;
 
                 Ok(Self {
                     name: project_info.name,
@@ -170,12 +174,13 @@ impl<'a> PackageResolver<'a> {
         project_root: &'a PathBuf,
         source_roots: &'a [PathBuf],
         file_walker: &'a filesystem::FSWalker,
+        include_dependency_groups: bool,
     ) -> Result<Self> {
         let package_for_source_root = source_roots
             .iter()
             .map(|source_root| {
                 let package_root = find_package_root(project_root, source_root)?;
-                let mut package: Package = package_root.try_into()?;
+                let mut package = Package::from_package_root(package_root, include_dependency_groups)?;
                 package.set_source_roots(source_roots.to_vec());
                 Ok((source_root.clone(), package))
             })

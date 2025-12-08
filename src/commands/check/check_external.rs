@@ -196,7 +196,12 @@ fn check_with_modules(
     )?;
     let source_root_resolver = SourceRootResolver::new(project_root, &file_walker);
     let source_roots: Vec<PathBuf> = source_root_resolver.resolve(&project_config.source_roots)?;
-    let package_resolver = PackageResolver::try_new(project_root, &source_roots, &file_walker)?;
+    let package_resolver = PackageResolver::try_new(
+        project_root,
+        &source_roots,
+        &file_walker,
+        project_config.external.include_dependency_groups,
+    )?;
     let module_tree_builder = ModuleTreeBuilder::new(
         &source_roots,
         &file_walker,
