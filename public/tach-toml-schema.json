@@ -256,11 +256,6 @@
             "type": "string"
           },
           "description": "List of module:name pairs to rename imports (e.g. 'PIL:pillow')"
-        },
-        "include_dependency_groups": {
-          "type": "boolean",
-          "default": false,
-          "description": "Include dependencies from PEP 735 [dependency-groups] in pyproject.toml"
         }
       },
       "additionalProperties": false
