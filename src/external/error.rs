@@ -13,4 +13,11 @@ pub enum ParsingError {
     TomlParse(#[from] toml::de::Error),
     #[error("Missing field in TOML: {0}")]
     MissingField(String),
+    #[error("Dependency group '{included}' included from '{from_group}' does not exist")]
+    MissingDependencyGroup {
+        included: String,
+        from_group: String,
+    },
+    #[error("Circular dependency group reference: '{group}' includes itself")]
+    CircularDependencyGroup { group: String },
 }

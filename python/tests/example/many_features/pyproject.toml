@@ -2,7 +2,6 @@
 name = "many_features"
 version = "0.0.1"
 dependencies = [
-    "pyyaml~=6.0",
     "tomli>=1.2.2",
     "tomli-w~=1.0",
     "rich~=13.0",
@@ -14,6 +13,9 @@ dependencies = [
     "importlib_metadata>=6.0; python_version == '3.7'",
 ]
 
+[dependency-groups]
+test_dep_groups = ["pyyaml~=6.0"]
+
 [build-system]
 requires = ["maturin>=1.5,<2.0"]
 build-backend = "maturin"
@@ -22,3 +24,6 @@ build-backend = "maturin"
 python-source = "real_src"
 module-name = "tach.extension"
 features = ["pyo3/extension-module"]
+
+[tool.tach.external]
+include_dependency_groups = ["test_dep_groups"]

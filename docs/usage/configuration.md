@@ -586,6 +586,30 @@ In most cases you should not need to specify `rename` manually (see the Note bel
     distribution metadata to map module names like 'git' to their distributions
     ('GitPython').
 
+### Dependency Groups (PEP 735)
+
+Tach supports [PEP 735 dependency groups](https://peps.python.org/pep-0735/). By default, Tach will include dependencies from the `dev` dependency group when checking external dependencies.
+
+To configure which dependency groups to include, add `[tool.tach.external]` to your `pyproject.toml`:
+
+```toml
+# In pyproject.toml
+[dependency-groups]
+dev = ["ruff", "mypy"]
+test = ["pytest", "coverage"]
+
+[tool.tach.external]
+include_dependency_groups = ["dev", "test"]
+```
+
+This configuration is read from each package's `pyproject.toml`, making it suitable for monorepos where different packages may have different dependency groups.
+
+Special values:
+- `["all"]` - include all dependency groups
+- `[]` - disable dependency groups entirely (only use `[project.dependencies]`)
+
+If `[tool.tach.external]` is not specified, Tach defaults to `["dev"]`.
+
 ## Rules
 
 Tach allows configuring the severity of certain issues. Each entry in the `rules` table can be set to `error`, `warn`, or `off`.
