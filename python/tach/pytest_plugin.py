@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from copy import copy
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -66,28 +65,29 @@ def pytest_collection_modifyitems(
 ):
     handler = config.tach_handler
     seen: set[Path] = set()
-    for item in copy(items):
-        if not item.path:
-            continue
-        if str(item.path) in handler.removed_test_paths:
-            handler.num_removed_items += 1
-            items.remove(item)
-            continue
-        if item.path in seen:
-            continue
+    paths_to_remove: set[Path] = set()
 
-        if str(item.path) in handler.all_affected_modules:
-            # If this test file was changed,
-            # then we know we need to rerun it
-            seen.add(item.path)
+    # First pass: determine which paths should be removed
+    for item in items:
+        if not item.path or item.path in seen:
             continue
-
-        if handler.should_remove_items(file_path=item.path.resolve()):
-            handler.num_removed_items += 1
-            items.remove(item)
-            handler.remove_test_path(item.path)
-
         seen.add(item.path)
+
+        if str(item.path) in handler.removed_test_paths:
+            paths_to_remove.add(item.path)
+        elif str(item.path) not in handler.all_affected_modules:
+            # If this test file was not changed, check if it should be removed
+            if handler.should_remove_items(file_path=item.path.resolve()):
+                paths_to_remove.add(item.path)
+                handler.remove_test_path(item.path)
+
+    # Second pass: remove all items from paths marked for removal
+    original_count = len(items)
+    items[:] = [
+        item for item in items
+        if not item.path or item.path not in paths_to_remove
+    ]
+    handler.num_removed_items = original_count - len(items)
 
 
 def pytest_report_collectionfinish(
