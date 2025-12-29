@@ -330,6 +330,57 @@ Using `pytest`, running `tach test` will perform [impact analysis](https://marti
 This can dramatically speed up your test suite in CI, particularly when you make a small change to a large codebase.
 This command also takes advantage of Tach's [computation cache](caching.md).
 
+### Using the pytest plugin directly
+
+You can also use the Tach pytest plugin directly without the `tach test` wrapper:
+
+```bash
+pytest -p tach.pytest_plugin --tach-base main
+```
+
+This is useful when you want more control over pytest options or when integrating with other pytest plugins.
+
+#### Permanent configuration
+
+To enable the plugin permanently, add it to your `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "-p tach.pytest_plugin --tach-base main"
+```
+
+Or in `pytest.ini`:
+
+```ini
+[pytest]
+addopts = -p tach.pytest_plugin --tach-base main
+```
+
+Or register it in your `conftest.py`:
+
+```python
+pytest_plugins = ["tach.pytest_plugin"]
+```
+
+**Options:**
+
+- `--tach-base`: Base commit to compare against (default: `main`)
+- `--tach-head`: Head commit to compare against (default: current filesystem)
+- `--tach-validate`: Validation mode - run all tests but report what would have been skipped
+
+#### Validation mode
+
+Use `--tach-validate` to verify impact analysis before relying on it in CI:
+
+```bash
+pytest -p tach.pytest_plugin --tach-base main --tach-validate
+```
+
+Runs all tests but reports what would have been skipped. Fails if any "would-be-skipped" test fails, proving impact analysis would have missed it.
+
+!!! tip
+    Use `allow_failure: true` (GitLab) or `continue-on-error: true` (GitHub Actions) if you want validation failures to warn without blocking the pipeline.
+
 ## tach install
 
 Tach can be installed into your development workflow automatically as a pre-commit hook.
