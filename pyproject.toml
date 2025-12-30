@@ -139,3 +139,6 @@ editable-profile = "dev"
 
 [project.scripts]
 tach = "tach.start:start"
+
+[project.entry-points.pytest11]
+tach = "tach.pytest_plugin"

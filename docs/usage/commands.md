@@ -332,54 +332,52 @@ This command also takes advantage of Tach's [computation cache](caching.md).
 
 ### Using the pytest plugin directly
 
-You can also use the Tach pytest plugin directly without the `tach test` wrapper:
+When tach is installed, the pytest plugin is automatically loaded. Just run pytest normally:
 
 ```bash
-pytest -p tach.pytest_plugin --tach-base main
+pytest
 ```
 
-This is useful when you want more control over pytest options or when integrating with other pytest plugins.
+By default, the plugin runs all tests but reports how many could be skipped based on impact analysis. This allows you to see the potential benefit without committing to skipping tests:
 
-#### Permanent configuration
-
-To enable the plugin permanently, add it to your `pyproject.toml`:
-
-```toml
-[tool.pytest.ini_options]
-addopts = "-p tach.pytest_plugin --tach-base main"
+```
+[Tach] 42 tests in 8 files unaffected by changes (~15.3s could be saved). Skip with: pytest --tach-base main
 ```
 
-Or in `pytest.ini`:
+To actually skip unaffected tests, provide the `--tach-base` flag:
 
-```ini
-[pytest]
-addopts = -p tach.pytest_plugin --tach-base main
+```bash
+pytest --tach-base main
 ```
 
-Or register it in your `conftest.py`:
-
-```python
-pytest_plugins = ["tach.pytest_plugin"]
-```
+The plugin auto-detects whether your default branch is `main` or `master`.
 
 **Options:**
 
-- `--tach-base`: Base commit to compare against (default: `main`)
+- `--tach-base`: Base commit to compare against. When provided, unaffected tests are skipped. (default: auto-detects main/master)
 - `--tach-head`: Head commit to compare against (default: current filesystem)
-- `--tach-validate`: Validation mode - run all tests but report what would have been skipped
+- `--tach-verbose`: Show detailed output including changed files and skipped/would-skip test paths
+- `--no-tach`: Disable the tach pytest plugin entirely
 
-#### Validation mode
+#### Duration estimation
 
-Use `--tach-validate` to verify impact analysis before relying on it in CI:
+The plugin caches test durations and estimates time saved when skipping tests. After running your test suite once, subsequent runs will show estimated time saved:
 
-```bash
-pytest -p tach.pytest_plugin --tach-base main --tach-validate
+```
+[Tach] Skipped 5 test files (42 tests) (~12.3s saved) - unaffected by current changes.
 ```
 
-Runs all tests but reports what would have been skipped. Fails if any "would-be-skipped" test fails, proving impact analysis would have missed it.
+#### Validating impact analysis
 
-!!! tip
-    Use `allow_failure: true` (GitLab) or `continue-on-error: true` (GitHub Actions) if you want validation failures to warn without blocking the pipeline.
+By default (without `--tach-base`), the plugin runs all tests but tracks which would be skipped. If any "would-be-skipped" test fails, you'll see a warning:
+
+```
+[Tach] WARNING: 2 test(s) failed that would be skipped by impact analysis!
+[Tach] These failures would be missed when using --tach-base:
+[Tach]   - test_module.py::test_that_unexpectedly_failed
+```
+
+This helps validate impact analysis accuracy before enabling test skipping in CI.
 
 ## tach install
 
