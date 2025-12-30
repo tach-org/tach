@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Generator, Protocol
 
@@ -13,6 +15,42 @@ from tach.filesystem.git_ops import get_changed_files
 from tach.parsing import parse_project_config
 
 TACH_DURATIONS_CACHE_KEY = "tach/durations"
+
+# ANSI color codes
+_COLORS_ENABLED: bool | None = None
+
+
+def _colors_enabled() -> bool:
+    """Check if colors should be enabled."""
+    global _COLORS_ENABLED
+    if _COLORS_ENABLED is None:
+        # Disable colors if NO_COLOR is set or not a TTY
+        _COLORS_ENABLED = (
+            os.environ.get("NO_COLOR") is None
+            and hasattr(sys.stdout, "isatty")
+            and sys.stdout.isatty()
+        )
+    return _COLORS_ENABLED
+
+
+def _green(text: str) -> str:
+    return f"\033[32m{text}\033[0m" if _colors_enabled() else text
+
+
+def _yellow(text: str) -> str:
+    return f"\033[33m{text}\033[0m" if _colors_enabled() else text
+
+
+def _cyan(text: str) -> str:
+    return f"\033[36m{text}\033[0m" if _colors_enabled() else text
+
+
+def _bold(text: str) -> str:
+    return f"\033[1m{text}\033[0m" if _colors_enabled() else text
+
+
+def _dim(text: str) -> str:
+    return f"\033[2m{text}\033[0m" if _colors_enabled() else text
 
 
 def _get_default_branch(project_root: Path) -> str:
@@ -283,62 +321,64 @@ def pytest_report_collectionfinish(
         config, config.tach_would_skip_paths
     )
 
+    prefix = _cyan("[Tach]")
+
     if config.tach_skip_enabled:
         # Skipping is active - show what was skipped
         if config.tach_verbose:
             # Verbose: show changed files
             if handler.all_affected_modules:
                 lines.append(
-                    f"[Tach] {len(handler.all_affected_modules)} file{'s' if len(handler.all_affected_modules) > 1 else ''} changed:"
+                    f"{prefix} {len(handler.all_affected_modules)} file{'s' if len(handler.all_affected_modules) > 1 else ''} changed:"
                 )
                 for changed_path in sorted(handler.all_affected_modules):
-                    lines.append(f"[Tach]   + {changed_path}")
+                    lines.append(f"{prefix}   {_green('+')} {_dim(str(changed_path))}")
 
         # Normal + Verbose: show skipped files
         duration_str = (
-            f" (~{_format_duration(estimated_duration)} saved)"
+            f" ({_green('~' + _format_duration(estimated_duration) + ' saved')})"
             if estimated_duration
             else ""
         )
         lines.append(
-            f"[Tach] Skipped {num_files} test file{'s' if num_files != 1 else ''}"
+            f"{prefix} {_green('Skipped')} {num_files} test file{'s' if num_files != 1 else ''}"
             f" ({num_tests} test{'s' if num_tests != 1 else ''}){duration_str}"
             " - unaffected by current changes."
         )
 
         if config.tach_verbose or num_files <= 5:
             for test_path in handler.removed_test_paths:
-                lines.append(f"[Tach]   - {test_path}")
+                lines.append(f"{prefix}   {_green('-')} {_dim(str(test_path))}")
         elif num_files > 5:
             # Show first 3 and indicate more
             for test_path in list(handler.removed_test_paths)[:3]:
-                lines.append(f"[Tach]   - {test_path}")
-            lines.append(f"[Tach]   ... and {num_files - 3} more")
+                lines.append(f"{prefix}   {_green('-')} {_dim(str(test_path))}")
+            lines.append(f"{prefix}   {_dim(f'... and {num_files - 3} more')}")
     else:
         # Skipping not active - show summary with suggestion
         duration_str = (
-            f" (~{_format_duration(estimated_duration)} could be saved)"
+            f" ({_yellow('~' + _format_duration(estimated_duration) + ' could be saved')})"
             if estimated_duration
             else ""
         )
         lines.append(
-            f"[Tach] {num_tests} test{'s' if num_tests != 1 else ''} in "
+            f"{prefix} {num_tests} test{'s' if num_tests != 1 else ''} in "
             f"{num_files} file{'s' if num_files != 1 else ''} unaffected by changes{duration_str}. "
-            f"Skip with: pytest {skip_cmd}"
+            f"Skip with: {_bold('pytest ' + skip_cmd)}"
         )
 
         if config.tach_verbose:
             # Verbose: show details even in info mode
             if handler.all_affected_modules:
                 lines.append(
-                    f"[Tach] {len(handler.all_affected_modules)} file{'s' if len(handler.all_affected_modules) > 1 else ''} changed:"
+                    f"{prefix} {len(handler.all_affected_modules)} file{'s' if len(handler.all_affected_modules) > 1 else ''} changed:"
                 )
                 for changed_path in sorted(handler.all_affected_modules):
-                    lines.append(f"[Tach]   + {changed_path}")
+                    lines.append(f"{prefix}   {_green('+')} {_dim(str(changed_path))}")
 
-            lines.append("[Tach] Would skip:")
+            lines.append(f"{prefix} Would skip:")
             for test_path in handler.removed_test_paths:
-                lines.append(f"[Tach]   ? {test_path}")
+                lines.append(f"{prefix}   {_yellow('?')} {_dim(str(test_path))}")
 
     return lines
 
