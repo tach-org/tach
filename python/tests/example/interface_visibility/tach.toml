@@ -1,0 +1,18 @@
+source_roots = ["src"]
+
+[[modules]]
+path = "foo"
+depends_on = []
+
+[[modules]]
+path = "bar"
+depends_on = ["foo"]
+
+[[modules]]
+path = "baz"
+depends_on = ["foo"]
+
+[[interfaces]]
+expose = ["Foo"]
+from = ["foo"]
+visibility = ["bar"]

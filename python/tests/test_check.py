@@ -503,6 +503,42 @@ def test_visibility_error_example_dir(example_dir, capfd):
     assert "['module1']" in captured.err
 
 
+@pytest.mark.xfail(
+    reason="Bug: Interface visibility constraints are not enforced without exclusive=true. "
+    "See https://github.com/craigmulligan/tach-issue and "
+    "src/checks/interface.rs:73-74 where empty interface list is treated as NoInterfaces=OK"
+)
+def test_interface_visibility(example_dir, capfd):
+    project_root = example_dir / "interface_visibility"
+    project_config = parse_project_config(root=project_root)
+    assert project_config is not None
+
+    with pytest.raises(SystemExit) as exc_info:
+        tach_check(
+            project_root=project_root,
+            project_config=project_config,
+        )
+    assert exc_info.value.code == 1
+
+    captured = capfd.readouterr()
+
+    # The output should have an Interfaces section
+    interfaces_header = captured.err.index("Interfaces\n")
+    interfaces_section = captured.err[interfaces_header:]
+
+    # baz should NOT be able to import Foo - it's not in the visibility list
+    expected_interfaces = [
+        (
+            "[FAIL]",
+            "src/baz/__init__.py",
+            "foo.Foo",
+            "public interface",
+        ),
+    ]
+
+    _check_expected_messages_unordered(interfaces_section, expected_interfaces)
+
+
 def test_many_features_example_dir_with_gitignore(example_dir, capfd, tmp_path):
     project_root = tmp_path / "many_features"
     shutil.copytree(example_dir / "many_features", project_root)
