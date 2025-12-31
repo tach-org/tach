@@ -249,6 +249,13 @@
             "type": "string"
           },
           "description": "List of external dependency names to ignore during checks"
+        },
+        "rename": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of module:name pairs to rename imports (e.g. 'PIL:pillow')"
         }
       },
       "additionalProperties": false
