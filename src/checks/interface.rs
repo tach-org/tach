@@ -66,11 +66,21 @@ impl<'a> InterfaceChecker<'a> {
             return InterfaceCheckResult::TopLevelModule;
         }
 
+        let any_interfaces_exist = self
+            .interfaces
+            .interfaces_for_module(definition_module)
+            .next()
+            .is_some();
+
         let matching_interfaces = self
             .interfaces
             .get_visible_interfaces(definition_module, usage_module);
 
         if matching_interfaces.is_empty() {
+            if any_interfaces_exist {
+                // Interfaces exist but none are visible due to visibility constraints
+                return InterfaceCheckResult::NotExposed;
+            }
             return InterfaceCheckResult::NoInterfaces;
         }
 
