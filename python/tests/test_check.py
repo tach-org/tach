@@ -503,11 +503,6 @@ def test_visibility_error_example_dir(example_dir, capfd):
     assert "['module1']" in captured.err
 
 
-@pytest.mark.xfail(
-    reason="Bug: Interface visibility constraints are not enforced without exclusive=true. "
-    "See https://github.com/craigmulligan/tach-issue and "
-    "src/checks/interface.rs:73-74 where empty interface list is treated as NoInterfaces=OK"
-)
 def test_interface_visibility(example_dir, capfd):
     project_root = example_dir / "interface_visibility"
     project_config = parse_project_config(root=project_root)
@@ -522,7 +517,6 @@ def test_interface_visibility(example_dir, capfd):
 
     captured = capfd.readouterr()
 
-    # The output should have an Interfaces section
     interfaces_header = captured.err.index("Interfaces\n")
     interfaces_section = captured.err[interfaces_header:]
 
