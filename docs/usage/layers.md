@@ -22,6 +22,44 @@ When a module is assigned to a layer, this module:
 - must explicitly declare dependencies in **its own layer**
 - may never depend on modules in **higher layers**, *even if they are declared*
 
+## Requiring Explicit Dependencies
+
+By default, modules in higher layers can freely depend on modules in lower layers without declaring them in `depends_on`. However, you can require explicit declarations for all cross-layer dependencies by setting `layers_explicit_depends_on = true` in your `tach.toml`:
+
+```toml
+layers_explicit_depends_on = true
+
+layers = ["api", "service", "repo"]
+
+[[modules]]
+path = "api"
+layer = "api"
+depends_on = ["service"]  # Now required, even though api is higher than service
+
+[[modules]]
+path = "service"
+layer = "service"
+depends_on = ["repo"]  # Now required
+
+[[modules]]
+path = "repo"
+layer = "repo"
+depends_on = []
+```
+
+With this flag enabled:
+
+- Modules must explicitly declare **all** cross-layer dependencies in `depends_on`
+- The layer hierarchy still prevents lower layers from depending on higher layers
+- [Utility modules](configuration.md#modules) remain accessible without explicit declaration
+- This provides stricter control over dependencies while maintaining architectural constraints
+
+This is useful when you want:
+
+- Full visibility of all module dependencies in your configuration
+- Finer-grained control over which lower-layer modules each module can access
+- To gradually migrate toward explicit dependency management
+
 ## Closed Layers
 
 By default, modules in higher layers can import from any lower layer. However, you can mark a layer as "closed" to prevent modules in higher layers from importing modules in lower layers.
