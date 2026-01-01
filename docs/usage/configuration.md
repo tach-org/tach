@@ -23,6 +23,8 @@ This is the project-level configuration file which should be in the root of your
 
 `forbid_circular_dependencies` (default: **false**) is a flag which causes `tach check` to fail if any circular dependencies are detected.
 
+`layers_explicit_depends_on` (default: **false**) is a flag which requires modules to explicitly declare dependencies on other layers using `depends_on`, even when those dependencies would be allowed by the layer hierarchy. By default, modules in higher layers can freely depend on modules in lower layers without declaring them. When this flag is enabled, all cross-layer dependencies must be explicit. [Utility modules](configuration.md#modules) remain accessible without explicit declaration.
+
 `respect_gitignore` (default: **true**) is a flag which causes Tach to exclude files and directories matched by `.gitignore`. Possible values:
 
 - `true` - always respect `.gitignore` files

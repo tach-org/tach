@@ -118,7 +118,14 @@ impl<'a> InternalDependencyChecker<'a> {
         let relative_file_path = file_module.relative_file_path();
         // Layer check should take precedence over other depends_on checks
         match self.check_layers(layers, file_module_config, dependency_module_config) {
-            LayerCheckResult::Ok => return Ok(vec![]), // Higher layers can unconditionally import lower layers
+            LayerCheckResult::Ok => {
+                // If layers_explicit_depends_on is enabled and target is not a utility,
+                // don't return early - fall through to check explicit depends_on declaration
+                if !self.project_config.layers_explicit_depends_on || dependency_module_config.utility {
+                    return Ok(vec![]);
+                }
+                // Fall through to check forbidden deps and depends_on
+            }
             LayerCheckResult::LayerViolation {
                 source_layer,
                 source_module,
