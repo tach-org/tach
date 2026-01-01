@@ -152,6 +152,7 @@ class ProjectConfig:
     ignore_type_checking_imports: bool
     include_string_imports: bool
     forbid_circular_dependencies: bool
+    layers_explicit_depends_on: bool
     respect_gitignore: RespectGitIgnore
     # [DEPRECATED] Just reading this to print a warning
     use_regex_matching: bool
