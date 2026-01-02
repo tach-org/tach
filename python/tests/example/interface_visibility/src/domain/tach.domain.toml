@@ -1,0 +1,7 @@
+[root]
+depends_on = []
+
+[[interfaces]]
+from = ["<domain_root>"]
+expose = ["DomainFoo"]
+visibility = ["//bar"]

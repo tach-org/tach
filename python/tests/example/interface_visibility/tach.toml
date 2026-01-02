@@ -6,13 +6,26 @@ depends_on = []
 
 [[modules]]
 path = "bar"
-depends_on = ["foo"]
+depends_on = ["foo", "domain"]
 
 [[modules]]
 path = "baz"
-depends_on = ["foo"]
+depends_on = ["foo", "domain"]
+
+[[modules]]
+path = "qux"
+depends_on = []
+
+[[modules]]
+path = "quux"
+depends_on = ["qux"]
 
 [[interfaces]]
 expose = ["Foo"]
 from = ["foo"]
 visibility = ["bar"]
+
+[[interfaces]]
+expose = ["Qux"]
+from = ["qux"]
+visibility = []

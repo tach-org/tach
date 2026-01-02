@@ -520,12 +520,26 @@ def test_interface_visibility(example_dir, capfd):
     interfaces_header = captured.err.index("Interfaces\n")
     interfaces_section = captured.err[interfaces_header:]
 
-    # baz should NOT be able to import Foo - it's not in the visibility list
     expected_interfaces = [
+        # baz should NOT be able to import Foo - it's not in the visibility list
         (
             "[FAIL]",
             "src/baz/__init__.py",
             "foo.Foo",
+            "public interface",
+        ),
+        # baz should NOT be able to import Domain - it's not in the tach.domain.toml visibility list
+        (
+            "[FAIL]",
+            "src/baz/__init__.py",
+            "domain.Domain",
+            "public interface",
+        ),
+        # quux should NOT be able to import Qux - empty visibility list means nobody can import
+        (
+            "[FAIL]",
+            "src/quux/__init__.py",
+            "qux.Qux",
             "public interface",
         ),
     ]
