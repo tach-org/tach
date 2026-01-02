@@ -65,7 +65,7 @@ class TestPytestPluginSkipping:
         """When there are no changes, all tests should be skipped."""
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
-        result.stdout.fnmatch_lines(["*Skipped 2 test file*"])
+        result.stdout.fnmatch_lines(["*Skipped 5 test* (2 file*"])
 
     def test_source_change_runs_dependent_tests(self, tach_project: pytest.Pytester):
         """When a source file changes, only tests that import it should run."""
@@ -89,7 +89,7 @@ def subtract(a, b):
         result.assert_outcomes(passed=3)
         result.stdout.fnmatch_lines(
             [
-                "*Skipped 1 test file*",
+                "*Skipped 2 test* (1 file*",
                 "*test_no_import.py*",
             ]
         )
@@ -115,7 +115,7 @@ def test_standalone_3():
 
         result = run_pytest(tach_project, "--tach-base", "HEAD~1")
         result.assert_outcomes(passed=3)
-        result.stdout.fnmatch_lines(["*Skipped 1 test file*"])
+        result.stdout.fnmatch_lines(["*Skipped 3 test* (1 file*"])
 
 
 class TestPytestPluginDefaults:
@@ -172,7 +172,7 @@ def test_regular():
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
         # 3 (test_with_import) + 2 (test_no_import) + 4 (test_parametrized) = 9
-        result.stdout.fnmatch_lines(["*Skipped 3 test file* (9 tests)*"])
+        result.stdout.fnmatch_lines(["*Skipped 9 test* (3 file*"])
 
     def test_counts_tests_in_classes(self, tach_project: pytest.Pytester):
         """Should correctly count tests inside test classes."""
@@ -197,7 +197,7 @@ class TestAnotherGroup:
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
         # 3 (test_with_import) + 2 (test_no_import) + 3 (test_class) = 8
-        result.stdout.fnmatch_lines(["*Skipped 3 test file* (8 tests)*"])
+        result.stdout.fnmatch_lines(["*Skipped 8 test* (3 file*"])
 
 
 class TestPytestPluginDurations:

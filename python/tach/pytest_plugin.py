@@ -341,8 +341,8 @@ def pytest_report_collectionfinish(
             else ""
         )
         lines.append(
-            f"{prefix} {_green('Skipped')} {num_files} test file{'s' if num_files != 1 else ''}"
-            f" ({num_tests} test{'s' if num_tests != 1 else ''}){duration_str}"
+            f"{prefix} {_green('Skipped')} {num_tests} test{'s' if num_tests != 1 else ''}"
+            f" ({num_files} file{'s' if num_files != 1 else ''}){duration_str}"
             " - unaffected by current changes."
         )
 
