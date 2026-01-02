@@ -230,7 +230,13 @@ def pytest_configure(config: Config):
         kwargs["head"] = head
     if base:
         kwargs["base"] = base
-    changed_files = get_changed_files(**kwargs)
+
+    try:
+        changed_files = get_changed_files(**kwargs)
+    except Exception:
+        # If we can't determine changed files (e.g., shallow clone in CI
+        # without the base branch), silently disable the plugin and run all tests
+        return
 
     handler = TachPytestPluginHandler(
         project_root=project_root,
