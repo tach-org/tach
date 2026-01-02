@@ -88,7 +88,8 @@ def _get_default_branch(project_root: Path) -> str:
 
 class TachConfig(Protocol):
     tach_handler: TachPytestPluginHandler
-    tach_skip_enabled: bool  # True if --tach-base was explicitly provided
+    tach_skip_enabled: bool
+    """`True` if `--tach-base` was explicitly provided"""
     tach_verbose: bool
     tach_base: str
     tach_head: str
