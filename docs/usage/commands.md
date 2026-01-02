@@ -341,39 +341,52 @@ pytest
 By default, the plugin runs all tests but reports how many could be skipped based on impact analysis. This allows you to see the potential benefit without committing to skipping tests:
 
 ```
-[Tach] 42 tests in 8 files unaffected by changes (~15.3s could be saved). Skip with: pytest --tach-base main
+[Tach] 42 tests in 8 files unaffected by changes (~15.3s could be saved). Skip with: pytest --tach
 ```
 
-To actually skip unaffected tests, provide the `--tach-base` flag:
+To actually skip unaffected tests, provide the `--tach` flag:
 
 ```bash
-pytest --tach-base main
+pytest --tach
 ```
 
 The plugin auto-detects whether your default branch is `main` or `master`.
 
 **Options:**
 
-- `--tach-base`: Base commit to compare against. When provided, unaffected tests are skipped. (default: auto-detects main/master)
-- `--tach-head`: Head commit to compare against (default: current filesystem)
+- `--tach`: Enable test skipping using the auto-detected base branch
+- `--tach-base <commit>`: Set the base commit explicitly (also enables skipping)
+- `--tach-head <commit>`: Head commit to compare against (default: current filesystem)
 - `--tach-verbose`: Show detailed output including changed files and skipped/would-skip test paths
-- `--no-tach`: Disable the tach pytest plugin entirely
+
+To disable the plugin entirely, use pytest's built-in plugin disabling:
+
+```bash
+pytest -p no:tach
+```
+
+You can also disable it in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "-p no:tach"
+```
 
 #### Duration estimation
 
 The plugin caches test durations and estimates time saved when skipping tests. After running your test suite once, subsequent runs will show estimated time saved:
 
 ```
-[Tach] Skipped 5 test files (42 tests) (~12.3s saved) - unaffected by current changes.
+[Tach] Skipped 42 tests (5 files) (~12.3s saved) - unaffected by current changes.
 ```
 
 #### Validating impact analysis
 
-By default (without `--tach-base`), the plugin runs all tests but tracks which would be skipped. If any "would-be-skipped" test fails, you'll see a warning:
+By default (without `--tach`), the plugin runs all tests but tracks which would be skipped. If any "would-be-skipped" test fails, you'll see a warning:
 
 ```
 [Tach] WARNING: 2 test(s) failed that would be skipped by impact analysis!
-[Tach] These failures would be missed when using --tach-base:
+[Tach] These failures would be missed when using --tach:
 [Tach]   - test_module.py::test_that_unexpectedly_failed
 ```
 

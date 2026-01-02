@@ -122,16 +122,22 @@ class TestPytestPluginDefaults:
     def test_default_mode_runs_all_tests_with_suggestion(
         self, tach_project: pytest.Pytester
     ):
-        """Without --tach-base, all tests run but a skip suggestion is shown."""
+        """Without --tach, all tests run but a skip suggestion is shown."""
         result = run_pytest(tach_project)
         # All tests should run
         result.assert_outcomes(passed=5)
-        # Should show suggestion to skip
-        result.stdout.fnmatch_lines(["*unaffected by changes*Skip with*--tach-base*"])
+        # Should show suggestion to skip using --tach
+        result.stdout.fnmatch_lines(["*unaffected by changes*Skip with*--tach*"])
 
-    def test_no_tach_disables_plugin(self, tach_project: pytest.Pytester):
-        """--no-tach should disable the plugin entirely."""
-        result = run_pytest(tach_project, "--no-tach")
+    def test_tach_flag_enables_skipping(self, tach_project: pytest.Pytester):
+        """--tach should enable skipping with auto-detected base branch."""
+        result = run_pytest(tach_project, "--tach")
+        result.assert_outcomes(passed=0)
+        result.stdout.fnmatch_lines(["*Skipped 5 test* (2 file*"])
+
+    def test_disable_plugin_with_p_flag(self, tach_project: pytest.Pytester):
+        """-p no:tach should disable the plugin entirely."""
+        result = run_pytest(tach_project, "-p", "no:tach")
         # All tests should run
         result.assert_outcomes(passed=5)
         # Should NOT show any tach output
