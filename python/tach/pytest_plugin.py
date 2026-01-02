@@ -343,10 +343,15 @@ def pytest_report_collectionfinish(
     estimated_duration = _estimate_skipped_duration(config, state.would_skip_paths)
 
     # Format helpers
-    def _format_paths(paths: set[str] | set[Path], marker: str, max_shown: int = 5) -> str:
+    def _format_paths(
+        paths: set[str] | set[Path], marker: str, max_shown: int = 5
+    ) -> str:
         path_list = list(paths)
         show_all = state.verbose or len(path_list) <= max_shown
-        lines = [f"{prefix}   {marker} {_dim(str(p))}" for p in (path_list if show_all else path_list[:3])]
+        lines = [
+            f"{prefix}   {marker} {_dim(str(p))}"
+            for p in (path_list if show_all else path_list[:3])
+        ]
         if not show_all:
             lines.append(f"{prefix}   {_dim(f'... and {len(path_list) - 3} more')}")
         return "\n".join(lines)
@@ -356,37 +361,55 @@ def pytest_report_collectionfinish(
             return ""
         num = len(handler.all_affected_modules)
         header = f"{prefix} {num} {_pluralize('file', num)} changed:"
-        lines = [f"{prefix}   {_green('+')} {_dim(str(p))}" for p in sorted(handler.all_affected_modules)]
+        lines = [
+            f"{prefix}   {_green('+')} {_dim(str(p))}"
+            for p in sorted(handler.all_affected_modules)
+        ]
         return header + "\n" + "\n".join(lines)
 
     if state.skip_enabled:
-        duration = f" ({_green('~' + _format_duration(estimated_duration) + ' saved')})" if estimated_duration else ""
-        changed_section = (_format_changed() + "\n") if state.verbose and handler.all_affected_modules else ""
+        duration = (
+            f" ({_green('~' + _format_duration(estimated_duration) + ' saved')})"
+            if estimated_duration
+            else ""
+        )
+        changed_section = (
+            (_format_changed() + "\n")
+            if state.verbose and handler.all_affected_modules
+            else ""
+        )
         skipped_paths = _format_paths(handler.removed_test_paths, _green("-"))
 
         output = f"""\
 {changed_section}\
-{prefix} {_green('Skipped')} {num_tests} {_pluralize('test', num_tests)} ({num_files} {_pluralize('file', num_files)}){duration} - unaffected by current changes.
+{prefix} {_green("Skipped")} {num_tests} {_pluralize("test", num_tests)} ({num_files} {_pluralize("file", num_files)}){duration} - unaffected by current changes.
 {skipped_paths}"""
 
     else:
-        duration = f" ({_yellow('~' + _format_duration(estimated_duration) + ' could be saved')})" if estimated_duration else ""
+        duration = (
+            f" ({_yellow('~' + _format_duration(estimated_duration) + ' could be saved')})"
+            if estimated_duration
+            else ""
+        )
         disable_hint = f"{prefix} {_dim('To disable this message: pytest -p no:tach')}"
 
         if state.verbose:
-            changed_section = (_format_changed() + "\n") if handler.all_affected_modules else ""
+            changed_section = (
+                (_format_changed() + "\n") if handler.all_affected_modules else ""
+            )
             would_skip_paths = "\n".join(
-                f"{prefix}   {_yellow('?')} {_dim(str(p))}" for p in handler.removed_test_paths
+                f"{prefix}   {_yellow('?')} {_dim(str(p))}"
+                for p in handler.removed_test_paths
             )
             output = f"""\
-{prefix} {num_tests} {_pluralize('test', num_tests)} in {num_files} {_pluralize('file', num_files)} unaffected by changes{duration}. Skip with: {_bold('pytest --tach')}
+{prefix} {num_tests} {_pluralize("test", num_tests)} in {num_files} {_pluralize("file", num_files)} unaffected by changes{duration}. Skip with: {_bold("pytest --tach")}
 {disable_hint}
 {changed_section}\
 {prefix} Would skip:
 {would_skip_paths}"""
         else:
             output = f"""\
-{prefix} {num_tests} {_pluralize('test', num_tests)} in {num_files} {_pluralize('file', num_files)} unaffected by changes{duration}. Skip with: {_bold('pytest --tach')}
+{prefix} {num_tests} {_pluralize("test", num_tests)} in {num_files} {_pluralize("file", num_files)} unaffected by changes{duration}. Skip with: {_bold("pytest --tach")}
 {disable_hint}"""
 
     return output.strip().split("\n")
