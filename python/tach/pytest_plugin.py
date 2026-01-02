@@ -371,6 +371,7 @@ def pytest_report_collectionfinish(
 
     else:
         duration = f" ({_yellow('~' + _format_duration(estimated_duration) + ' could be saved')})" if estimated_duration else ""
+        disable_hint = f"{prefix} {_dim('To disable this message: pytest -p no:tach')}"
 
         if state.verbose:
             changed_section = (_format_changed() + "\n") if handler.all_affected_modules else ""
@@ -379,11 +380,14 @@ def pytest_report_collectionfinish(
             )
             output = f"""\
 {prefix} {num_tests} {_pluralize('test', num_tests)} in {num_files} {_pluralize('file', num_files)} unaffected by changes{duration}. Skip with: {_bold('pytest --tach')}
+{disable_hint}
 {changed_section}\
 {prefix} Would skip:
 {would_skip_paths}"""
         else:
-            output = f"{prefix} {num_tests} {_pluralize('test', num_tests)} in {num_files} {_pluralize('file', num_files)} unaffected by changes{duration}. Skip with: {_bold('pytest --tach')}"
+            output = f"""\
+{prefix} {num_tests} {_pluralize('test', num_tests)} in {num_files} {_pluralize('file', num_files)} unaffected by changes{duration}. Skip with: {_bold('pytest --tach')}
+{disable_hint}"""
 
     return output.strip().split("\n")
 
