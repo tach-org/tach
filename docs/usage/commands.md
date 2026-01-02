@@ -392,6 +392,10 @@ By default (without `--tach`), the plugin runs all tests but tracks which would 
 
 This helps validate impact analysis accuracy before enabling test skipping in CI.
 
+#### Using in CI
+
+Most CI systems use shallow clones by default. To enable impact analysis, ensure the base branch is fetched (e.g., `git fetch origin main:main` or configure a full clone). If the base branch is unavailable, the plugin disables itself and all tests run normally.
+
 ## tach install
 
 Tach can be installed into your development workflow automatically as a pre-commit hook.
