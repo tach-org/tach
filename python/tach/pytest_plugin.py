@@ -3,11 +3,15 @@ from __future__ import annotations
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Generator, cast
+from typing import TYPE_CHECKING, Any, Generator, cast
 
 import pytest
 from pytest import Collector, Config, StashKey
 from rich.console import Console
+
+if TYPE_CHECKING:
+    from _pytest.reports import TestReport
+    from _pytest.terminal import TerminalReporter
 
 from tach import filesystem as fs
 from tach.extension import TachPytestPluginHandler
@@ -131,7 +135,10 @@ def _get_cached_durations(config: Config) -> dict[str, float]:
     """Get cached test durations from pytest cache."""
     cache = config.cache
     if cache is not None:
-        cached: dict[str, float] | None = cache.get(TACH_DURATIONS_CACHE_KEY, None)
+        cached = cast(
+            "dict[str, float] | None",
+            cache.get(TACH_DURATIONS_CACHE_KEY, None),  # pyright: ignore[reportUnknownMemberType]
+        )
         if cached is not None:
             return cached
     return {}
@@ -223,14 +230,12 @@ def pytest_configure(config: Config):
         else _get_default_branch(project_root)
     )
 
-    kwargs: dict[str, Any] = {"project_root": project_root}
-    if head:
-        kwargs["head"] = head
-    if base:
-        kwargs["base"] = base
-
     try:
-        changed_files = get_changed_files(**kwargs)
+        changed_files = get_changed_files(
+            project_root=project_root,
+            head=head,
+            base=base,
+        )
     except Exception:
         # If we can't determine changed files (e.g., shallow clone in CI
         # without the base branch), only silently disable if no --tach* flags
@@ -427,7 +432,9 @@ def pytest_report_collectionfinish(
     return output.strip().split("\n")
 
 
-def pytest_terminal_summary(terminalreporter: Any, exitstatus: int, config: Config):
+def pytest_terminal_summary(
+    terminalreporter: TerminalReporter, _exitstatus: int, config: Config
+):
     # Check if plugin is active
     if tach_state_key not in config.stash:
         return
@@ -438,7 +445,7 @@ def pytest_terminal_summary(terminalreporter: Any, exitstatus: int, config: Conf
     # Only show validation results when skipping is NOT enabled
     # (i.e., when we ran all tests including would-be-skipped ones)
     if not state.skip_enabled and state.would_skip_paths:
-        failed_reports = terminalreporter.stats.get("failed", [])
+        failed_reports: list[TestReport] = terminalreporter.stats.get("failed", [])
         failed_would_skip: list[str] = []
 
         # Resolve would-skip paths for comparison
@@ -469,10 +476,10 @@ def pytest_terminal_summary(terminalreporter: Any, exitstatus: int, config: Conf
     _record_test_durations(terminalreporter, config)
 
 
-def _record_test_durations(terminalreporter: Any, config: Config) -> None:
+def _record_test_durations(terminalreporter: TerminalReporter, config: Config) -> None:
     """Record test durations to cache for future time estimation."""
     # Get all test reports (passed, failed, etc.)
-    all_reports: list[Any] = []
+    all_reports: list[TestReport] = []
     for category in ["passed", "failed", "error"]:
         all_reports.extend(terminalreporter.stats.get(category, []))
 
