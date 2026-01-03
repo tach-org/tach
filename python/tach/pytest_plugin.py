@@ -19,8 +19,9 @@ TACH_DURATIONS_CACHE_KEY = "tach/durations"
 # Rich console for colored output. force_terminal=True ensures ANSI codes are
 # always generated even when captured. This is needed because pytest_report_collectionfinish
 # requires returning strings (can't print directly), so we capture styled output
-# and return it for pytest to display.
-_console = Console(highlight=False, force_terminal=True)
+# and return it for pytest to display. soft_wrap=True prevents Rich from inserting
+# hard line breaks in long paths.
+_console = Console(highlight=False, force_terminal=True, soft_wrap=True)
 
 
 def _styled(text: str, style: str) -> str:
