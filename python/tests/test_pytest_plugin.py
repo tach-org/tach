@@ -53,8 +53,11 @@ def test_standalone_2():
 
 
 def run_pytest(pytester: pytest.Pytester, *args: str) -> pytest.RunResult:
-    """Run pytest in subprocess to avoid PyO3 reinitialization issues."""
-    return pytester.runpytest_subprocess("-p", "tach.pytest_plugin", *args)
+    """Run pytest in subprocess to avoid PyO3 reinitialization issues.
+
+    The tach plugin is auto-loaded via pytest11 entrypoint.
+    """
+    return pytester.runpytest_subprocess(*args)
 
 
 class TestPytestPluginSkipping:
@@ -62,7 +65,7 @@ class TestPytestPluginSkipping:
         """When there are no changes, all tests should be skipped."""
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
-        result.stdout.fnmatch_lines(["*Skipped 2 test file*"])
+        result.stdout.fnmatch_lines(["*Skipped 5 test* (2 file*"])
 
     def test_source_change_runs_dependent_tests(self, tach_project: pytest.Pytester):
         """When a source file changes, only tests that import it should run."""
@@ -86,7 +89,7 @@ def subtract(a, b):
         result.assert_outcomes(passed=3)
         result.stdout.fnmatch_lines(
             [
-                "*Skipped 1 test file*",
+                "*Skipped 2 test* (1 file*",
                 "*test_no_import.py*",
             ]
         )
@@ -112,7 +115,41 @@ def test_standalone_3():
 
         result = run_pytest(tach_project, "--tach-base", "HEAD~1")
         result.assert_outcomes(passed=3)
-        result.stdout.fnmatch_lines(["*Skipped 1 test file*"])
+        result.stdout.fnmatch_lines(["*Skipped 3 test* (1 file*"])
+
+
+class TestPytestPluginDefaults:
+    def test_default_mode_runs_all_tests_with_suggestion(
+        self, tach_project: pytest.Pytester
+    ):
+        """Without --tach, all tests run but a skip suggestion is shown."""
+        result = run_pytest(tach_project)
+        # All tests should run
+        result.assert_outcomes(passed=5)
+        # Should show suggestion to skip using --tach
+        result.stdout.fnmatch_lines(["*unaffected by changes*Skip with*--tach*"])
+
+    def test_tach_flag_enables_skipping(self, tach_project: pytest.Pytester):
+        """--tach should enable skipping with auto-detected base branch."""
+        result = run_pytest(tach_project, "--tach")
+        result.assert_outcomes(passed=0)
+        result.stdout.fnmatch_lines(["*Skipped 5 test* (2 file*"])
+
+    def test_disable_plugin_with_p_flag(self, tach_project: pytest.Pytester):
+        """-p no:tach should disable the plugin entirely."""
+        result = run_pytest(tach_project, "-p", "no:tach")
+        # All tests should run
+        result.assert_outcomes(passed=5)
+        # Should NOT show any tach output
+        assert "[Tach]" not in result.stdout.str()
+
+    def test_verbose_mode_shows_details(self, tach_project: pytest.Pytester):
+        """--tach-verbose should show changed files and would-skip paths."""
+        result = run_pytest(tach_project, "--tach-verbose")
+        # All tests should run
+        result.assert_outcomes(passed=5)
+        # Should show "Would skip" in verbose output
+        result.stdout.fnmatch_lines(["*Would skip*"])
 
 
 class TestPytestPluginCounting:
@@ -141,7 +178,7 @@ def test_regular():
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
         # 3 (test_with_import) + 2 (test_no_import) + 4 (test_parametrized) = 9
-        result.stdout.fnmatch_lines(["*Skipped 3 test file* (9 tests)*"])
+        result.stdout.fnmatch_lines(["*Skipped 9 test* (3 file*"])
 
     def test_counts_tests_in_classes(self, tach_project: pytest.Pytester):
         """Should correctly count tests inside test classes."""
@@ -166,4 +203,20 @@ class TestAnotherGroup:
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
         # 3 (test_with_import) + 2 (test_no_import) + 3 (test_class) = 8
-        result.stdout.fnmatch_lines(["*Skipped 3 test file* (8 tests)*"])
+        result.stdout.fnmatch_lines(["*Skipped 8 test* (3 file*"])
+
+
+class TestPytestPluginDurations:
+    def test_shows_estimated_duration_after_caching(
+        self, tach_project: pytest.Pytester
+    ):
+        """After running once, estimated duration should be shown on subsequent runs."""
+        # First run to cache durations (without --tach-base, so all tests run)
+        result1 = run_pytest(tach_project)
+        result1.assert_outcomes(passed=5)
+
+        # Second run with --tach-base HEAD to skip tests
+        result2 = run_pytest(tach_project, "--tach-base", "HEAD")
+        result2.assert_outcomes(passed=0)
+        # Should show estimated duration (format: ~X.Xs saved)
+        result2.stdout.fnmatch_lines(["*~*s saved*"])

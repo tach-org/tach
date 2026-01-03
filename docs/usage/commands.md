@@ -330,6 +330,72 @@ Using `pytest`, running `tach test` will perform [impact analysis](https://marti
 This can dramatically speed up your test suite in CI, particularly when you make a small change to a large codebase.
 This command also takes advantage of Tach's [computation cache](caching.md).
 
+### Using the pytest plugin directly
+
+When tach is installed, the pytest plugin is automatically loaded. Just run pytest normally:
+
+```bash
+pytest
+```
+
+By default, the plugin runs all tests but reports how many could be skipped based on impact analysis. This allows you to see the potential benefit without committing to skipping tests:
+
+```
+[Tach] 42 tests in 8 files unaffected by changes (~15.3s could be saved). Skip with: pytest --tach
+```
+
+To actually skip unaffected tests, provide the `--tach` flag:
+
+```bash
+pytest --tach
+```
+
+The plugin auto-detects whether your default branch is `main` or `master`.
+
+**Options:**
+
+- `--tach`: Enable test skipping using the auto-detected base branch
+- `--tach-base <commit>`: Set the base commit explicitly (also enables skipping)
+- `--tach-head <commit>`: Head commit to compare against (default: current filesystem)
+- `--tach-verbose`: Show detailed output including changed files and skipped/would-skip test paths
+
+To disable the plugin entirely, use pytest's built-in plugin disabling:
+
+```bash
+pytest -p no:tach
+```
+
+You can also disable it permanently in `pyproject.toml`:
+
+```toml
+[tool.pytest]
+addopts = ["-p", "no:tach"]
+```
+
+#### Duration estimation
+
+The plugin caches test durations and estimates time saved when skipping tests. After running your test suite once, subsequent runs will show estimated time saved:
+
+```
+[Tach] Skipped 42 tests (5 files) (~12.3s saved) - unaffected by current changes.
+```
+
+#### Validating impact analysis
+
+By default (without `--tach`), the plugin runs all tests but tracks which would be skipped. If any "would-be-skipped" test fails, you'll see a warning:
+
+```
+[Tach] WARNING: 2 test(s) failed that would be skipped by impact analysis!
+[Tach] These failures would be missed when using --tach:
+[Tach]   - test_module.py::test_that_unexpectedly_failed
+```
+
+This helps validate impact analysis accuracy before enabling test skipping in CI.
+
+#### Using in CI
+
+Most CI systems use shallow clones by default. To enable impact analysis, ensure the base branch is fetched (e.g., `git fetch origin main:main` or configure a full clone). If the base branch is unavailable, the plugin disables itself and all tests run normally.
+
 ## tach install
 
 Tach can be installed into your development workflow automatically as a pre-commit hook.
