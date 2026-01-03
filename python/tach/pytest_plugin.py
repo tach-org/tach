@@ -16,7 +16,10 @@ from tach.parsing import parse_project_config
 
 TACH_DURATIONS_CACHE_KEY = "tach/durations"
 
-# Rich console for colored output (uses same settings as tach.console)
+# Rich console for colored output. force_terminal=True ensures ANSI codes are
+# always generated even when captured. This is needed because pytest_report_collectionfinish
+# requires returning strings (can't print directly), so we capture styled output
+# and return it for pytest to display.
 _console = Console(highlight=False, force_terminal=True)
 
 
@@ -106,8 +109,8 @@ class TachPluginState:
     would_skip_paths: set[Path]
 
 
-# StashKey for storing plugin state on pytest Config
 tach_state_key: StashKey[TachPluginState] = StashKey()
+"""StashKey for storing plugin state on pytest Config."""
 
 
 def _format_duration(seconds: float) -> str:
@@ -125,25 +128,19 @@ def _format_duration(seconds: float) -> str:
 
 def _get_cached_durations(config: Config) -> dict[str, float]:
     """Get cached test durations from pytest cache."""
-    try:
-        cache = config.cache
-        if cache is not None:
-            cached: dict[str, float] | None = cache.get(TACH_DURATIONS_CACHE_KEY, None)
-            if cached is not None:
-                return cached
-    except Exception:
-        pass
+    cache = config.cache
+    if cache is not None:
+        cached: dict[str, float] | None = cache.get(TACH_DURATIONS_CACHE_KEY, None)
+        if cached is not None:
+            return cached
     return {}
 
 
 def _save_durations(config: Config, durations: dict[str, float]) -> None:
     """Save test durations to pytest cache."""
-    try:
-        cache = config.cache
-        if cache is not None:
-            cache.set(TACH_DURATIONS_CACHE_KEY, durations)
-    except Exception:
-        pass
+    cache = config.cache
+    if cache is not None:
+        cache.set(TACH_DURATIONS_CACHE_KEY, durations)
 
 
 def _estimate_skipped_duration(
@@ -215,8 +212,8 @@ def pytest_configure(config: Config):
     head = cast("str", config.getoption("--tach-head")) or ""
     verbose = cast("bool", config.getoption("--tach-verbose"))
 
-    # Skipping is enabled if --tach or --tach-base is provided
-    skip_enabled = tach_flag or tach_base_option is not None
+    # Skipping is enabled if --tach, --tach-base, or --tach-head is provided
+    skip_enabled = tach_flag or tach_base_option is not None or bool(head)
 
     # Use explicit base if provided, otherwise auto-detect
     base = (
@@ -235,7 +232,14 @@ def pytest_configure(config: Config):
         changed_files = get_changed_files(**kwargs)
     except Exception:
         # If we can't determine changed files (e.g., shallow clone in CI
-        # without the base branch), silently disable the plugin and run all tests
+        # without the base branch), only silently disable if no --tach* flags
+        # were explicitly provided. Otherwise the user expects the plugin to work.
+        if skip_enabled:
+            raise pytest.UsageError(
+                f"[tach] Could not determine changed files (base='{base}'). "
+                "The base branch may not exist in this checkout. "
+                f"In CI, try: git fetch origin {base}:{base}"
+            )
         return
 
     handler = TachPytestPluginHandler(
@@ -356,10 +360,11 @@ def pytest_report_collectionfinish(
         show_all = state.verbose or len(path_list) <= max_shown
         lines = [
             f"{prefix}   {marker} {_dim(str(p))}"
-            for p in (path_list if show_all else path_list[:3])
+            for p in (path_list if show_all else path_list[:max_shown])
         ]
         if not show_all:
-            lines.append(f"{prefix}   {_dim(f'... and {len(path_list) - 3} more')}")
+            remaining = len(path_list) - max_shown
+            lines.append(f"{prefix}   {_dim(f'... and {remaining} more')}")
         return "\n".join(lines)
 
     def _format_changed() -> str:
@@ -397,7 +402,7 @@ def pytest_report_collectionfinish(
             if estimated_duration
             else ""
         )
-        disable_hint = f"{prefix} {_dim('To disable this message: pytest -p no:tach')}"
+        disable_hint = f"{prefix} {_dim('To disable: pytest -p no:tach (https://docs.gauge.sh/usage/commands#using-the-pytest-plugin-directly)')}"
 
         if state.verbose:
             changed_section = (

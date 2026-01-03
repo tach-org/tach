@@ -365,11 +365,11 @@ To disable the plugin entirely, use pytest's built-in plugin disabling:
 pytest -p no:tach
 ```
 
-You can also disable it in `pyproject.toml`:
+You can also disable it permanently in `pyproject.toml`:
 
 ```toml
-[tool.pytest.ini_options]
-addopts = "-p no:tach"
+[tool.pytest]
+addopts = ["-p", "no:tach"]
 ```
 
 #### Duration estimation
