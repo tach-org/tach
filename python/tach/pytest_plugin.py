@@ -433,8 +433,11 @@ def pytest_report_collectionfinish(
 
 
 def pytest_terminal_summary(
-    terminalreporter: TerminalReporter, _exitstatus: int, config: Config
+    terminalreporter: TerminalReporter,
+    exitstatus: int,
+    config: Config,
 ):
+    _ = exitstatus  # unused, required by pytest hook signature
     # Check if plugin is active
     if tach_state_key not in config.stash:
         return
