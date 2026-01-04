@@ -356,7 +356,7 @@ The plugin auto-detects whether your default branch is `main` or `master`.
 
 - `--tach`: Enable test skipping using the auto-detected base branch
 - `--tach-base <commit>`: Set the base commit explicitly (also enables skipping)
-- `--tach-head <commit>`: Head commit to compare against (default: current filesystem)
+- `--tach-head <commit>`: Head commit to compare against (also enables skipping. default: current filesystem)
 - `--tach-verbose`: Show detailed output including changed files and skipped/would-skip test paths
 
 To disable the plugin entirely, use pytest's built-in plugin disabling:

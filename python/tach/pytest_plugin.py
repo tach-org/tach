@@ -110,7 +110,7 @@ class TachPluginState:
     """True if --tach or --tach-base was explicitly provided to enable skipping."""
     verbose: bool
     base: str
-    head: str
+    head: str | None
     would_skip_paths: set[Path]
 
 
@@ -217,7 +217,7 @@ def pytest_configure(config: Config):
 
     tach_flag = cast("bool", config.getoption("--tach"))
     tach_base_option = cast("str | None", config.getoption("--tach-base"))
-    head = cast("str", config.getoption("--tach-head")) or ""
+    head = cast("str | None", config.getoption("--tach-head")) or None
     verbose = cast("bool", config.getoption("--tach-verbose"))
 
     # Skipping is enabled if --tach, --tach-base, or --tach-head is provided
@@ -434,10 +434,8 @@ def pytest_report_collectionfinish(
 
 def pytest_terminal_summary(
     terminalreporter: TerminalReporter,
-    exitstatus: int,
     config: Config,
 ):
-    _ = exitstatus  # unused, required by pytest hook signature
     # Check if plugin is active
     if tach_state_key not in config.stash:
         return

@@ -143,7 +143,7 @@ def get_current_branch_info(
 
 
 def get_changed_files(
-    project_root: Path, head: str = "", base: str = "main"
+    project_root: Path, head: str | None = None, base: str = "main"
 ) -> list[Path]:
     # Local import because git-python takes ~80ms to load
     from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
