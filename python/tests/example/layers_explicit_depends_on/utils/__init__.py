@@ -1,0 +1,1 @@
+tool = lambda: None

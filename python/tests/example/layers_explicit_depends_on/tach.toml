@@ -1,0 +1,23 @@
+layers_explicit_depends_on = true
+
+layers = ["api", "service", "repo"]
+
+[[modules]]
+path = "api"
+layer = "api"
+depends_on = []
+
+[[modules]]
+path = "service"
+layer = "service"
+depends_on = []
+
+[[modules]]
+path = "repo"
+layer = "repo"
+depends_on = []
+
+[[modules]]
+path = "utils"
+utility = true
+depends_on = []

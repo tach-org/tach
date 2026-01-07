@@ -1,0 +1,11 @@
+layers = ["api", "service"]
+
+[[modules]]
+path = "api"
+layer = "api"
+depends_on = []
+
+[[modules]]
+path = "service"
+layer = "service"
+depends_on = []
