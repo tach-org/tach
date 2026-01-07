@@ -651,61 +651,9 @@ globbed/**/*.py
     _check_expected_messages_unordered(external_section, expected_external)
 
 
-def test_layers_explicit_depends_on(tmp_path, capfd):
+def test_layers_explicit_depends_on(example_dir, capfd):
     """Test the layers_explicit_depends_on flag requires explicit depends_on declarations."""
-    # Create a test project with layers
-    project_root = tmp_path / "test_project"
-    project_root.mkdir()
-
-    # Create tach.toml with layers_explicit_depends_on enabled
-    config_file = project_root / "tach.toml"
-    config_file.write_text("""
-layers_explicit_depends_on = true
-
-layers = ["api", "service", "repo"]
-
-[[modules]]
-path = "api"
-layer = "api"
-depends_on = []
-
-[[modules]]
-path = "service"
-layer = "service"
-depends_on = []
-
-[[modules]]
-path = "repo"
-layer = "repo"
-depends_on = []
-
-[[modules]]
-path = "utils"
-utility = true
-depends_on = []
-""")
-
-    # Create module directories
-    api_dir = project_root / "api"
-    service_dir = project_root / "service"
-    repo_dir = project_root / "repo"
-    utils_dir = project_root / "utils"
-
-    for dir_path in [api_dir, service_dir, repo_dir, utils_dir]:
-        dir_path.mkdir()
-        (dir_path / "__init__.py").write_text("")
-
-    # Create a file in api that imports from service (should fail without explicit depends_on)
-    (api_dir / "handler.py").write_text("from service import something\n")
-
-    # Create a file in api that imports from utils (should pass, utility modules are exempt)
-    (api_dir / "helper.py").write_text("from utils import tool\n")
-
-    # Create the imported modules
-    (service_dir / "__init__.py").write_text("something = 1\n")
-    (utils_dir / "__init__.py").write_text("tool = lambda: None\n")
-
-    # Parse config and run check - should fail due to undeclared dependency
+    project_root = example_dir / "layers_explicit_depends_on"
     project_config = parse_project_config(root=project_root)
     assert project_config is not None
     assert project_config.layers_explicit_depends_on is True
@@ -727,41 +675,9 @@ depends_on = []
     assert "utils" not in captured.err or "api/helper.py" not in captured.err
 
 
-def test_layers_explicit_depends_on_disabled(tmp_path, capfd):
+def test_layers_explicit_depends_on_disabled(example_dir, capfd):
     """Test that layers_explicit_depends_on defaults to false and allows implicit dependencies."""
-    # Create a test project with layers but flag disabled
-    project_root = tmp_path / "test_project"
-    project_root.mkdir()
-
-    # Create tach.toml WITHOUT layers_explicit_depends_on (defaults to false)
-    config_file = project_root / "tach.toml"
-    config_file.write_text("""
-layers = ["api", "service"]
-
-[[modules]]
-path = "api"
-layer = "api"
-depends_on = []
-
-[[modules]]
-path = "service"
-layer = "service"
-depends_on = []
-""")
-
-    # Create module directories
-    api_dir = project_root / "api"
-    service_dir = project_root / "service"
-
-    for dir_path in [api_dir, service_dir]:
-        dir_path.mkdir()
-        (dir_path / "__init__.py").write_text("")
-
-    # Create a file in api that imports from service
-    (api_dir / "handler.py").write_text("from service import something\n")
-    (service_dir / "__init__.py").write_text("something = 1\n")
-
-    # Parse config and run check - should pass
+    project_root = example_dir / "layers_explicit_depends_on_disabled"
     project_config = parse_project_config(root=project_root)
     assert project_config is not None
     assert project_config.layers_explicit_depends_on is False
