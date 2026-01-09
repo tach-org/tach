@@ -1,6 +1,34 @@
 {
     "files": {
+        "./python/tach/__main__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 15,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tach/cache/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 22,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/cache/access.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 21,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -12,6 +40,14 @@
         ],
         "./python/tach/cache/setup.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 16,
@@ -21,6 +57,118 @@
             }
         ],
         "./python/tach/cli.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 14,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 14,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 14,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportAny",
                 "range": {
@@ -46,6 +194,14 @@
                 }
             },
             {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 8,
+                    "endColumn": 44,
+                    "lineCount": 3
+                }
+            },
+            {
                 "code": "reportUnusedParameter",
                 "range": {
                     "startColumn": 36,
@@ -54,6 +210,22 @@
                 }
             },
             {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 14,
+                    "endColumn": 75,
+                    "lineCount": 3
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 16,
+                    "endColumn": 20,
+                    "lineCount": 4
+                }
+            },
+            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 4,
@@ -307,6 +479,22 @@
                     "startColumn": 4,
                     "endColumn": 5,
                     "lineCount": 5
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 9,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 47,
+                    "lineCount": 2
                 }
             },
             {
@@ -435,6 +623,14 @@
                     "startColumn": 36,
                     "endColumn": 52,
                     "lineCount": 1
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 84,
+                    "lineCount": 2
                 }
             },
             {
@@ -1000,7 +1196,41 @@
                 }
             }
         ],
+        "./python/tach/filesystem/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/filesystem/git_ops.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportAny",
                 "range": {
@@ -1090,12 +1320,84 @@
                 }
             }
         ],
+        "./python/tach/filesystem/install.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 15,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tach/filesystem/project.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/filesystem/service.py": [
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 19,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 28,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tach/hooks/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 26,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tach/hooks/pre_commit.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
                     "lineCount": 1
                 }
             }
@@ -1136,15 +1438,153 @@
         ],
         "./python/tach/init.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 13,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 14,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 72,
+                    "lineCount": 3
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 146,
+                    "lineCount": 2
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 16,
+                    "endColumn": 48,
+                    "lineCount": 2
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 16,
+                    "endColumn": 64,
+                    "lineCount": 2
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 182,
+                    "lineCount": 2
+                }
+            },
+            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 19,
                     "lineCount": 1
                 }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 8,
+                    "endColumn": 92,
+                    "lineCount": 3
+                }
+            }
+        ],
+        "./python/tach/interactive/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 29,
+                    "lineCount": 1
+                }
             }
         ],
         "./python/tach/interactive/modules.py": [
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 44,
+                    "endColumn": 53,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -1314,7 +1754,33 @@
                 }
             }
         ],
+        "./python/tach/logging/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/logging/logger.py": [
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 24,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 16,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportExplicitAny",
                 "range": {
@@ -1326,6 +1792,38 @@
         ],
         "./python/tach/mod.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 21,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 8,
@@ -1335,6 +1833,54 @@
             }
         ],
         "./python/tach/modularity.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -1352,6 +1898,14 @@
                 }
             },
             {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 12,
+                    "endColumn": 100,
+                    "lineCount": 3
+                }
+            },
+            {
                 "code": "reportAny",
                 "range": {
                     "startColumn": 11,
@@ -1360,7 +1914,41 @@
                 }
             }
         ],
+        "./python/tach/parsing/__init__.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/parsing/config.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportExplicitAny",
                 "range": {
@@ -1476,6 +2064,46 @@
         ],
         "./python/tach/pytest_plugin.py": [
             {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 39,
+                    "endColumn": 48,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportImplicitStringConcatenation",
+                "range": {
+                    "startColumn": 16,
+                    "endColumn": 61,
+                    "lineCount": 3
+                }
+            },
+            {
                 "code": "reportUnusedParameter",
                 "range": {
                     "startColumn": 4,
@@ -1516,7 +2144,65 @@
                 }
             }
         ],
+        "./python/tach/report.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/show.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 19,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportAny",
                 "range": {
@@ -1662,7 +2348,33 @@
                 }
             }
         ],
+        "./python/tach/start.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 13,
+                    "endColumn": 21,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tach/test.py": [
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 43,
+                    "endColumn": 48,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportAny",
                 "range": {
@@ -1676,6 +2388,14 @@
                 "range": {
                     "startColumn": 46,
                     "endColumn": 49,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportDeprecated",
+                "range": {
+                    "startColumn": 54,
+                    "endColumn": 59,
                     "lineCount": 1
                 }
             },
@@ -1700,6 +2420,22 @@
                 "range": {
                     "startColumn": 37,
                     "endColumn": 45,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportAny",
+                "range": {
+                    "startColumn": 10,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportAny",
+                "range": {
+                    "startColumn": 10,
+                    "endColumn": 16,
                     "lineCount": 1
                 }
             },
@@ -1975,64 +2711,16 @@
                 "code": "reportUnreachable",
                 "range": {
                     "startColumn": 8,
-                    "endColumn": 20,
-                    "lineCount": 5
-                }
-            },
-            {
-                "code": "reportMissingImports",
-                "range": {
-                    "startColumn": 13,
-                    "endColumn": 24,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 32,
-                    "endColumn": 41,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 15,
                     "endColumn": 32,
-                    "lineCount": 1
+                    "lineCount": 3
                 }
             },
             {
                 "code": "reportUnreachable",
                 "range": {
                     "startColumn": 8,
-                    "endColumn": 30,
-                    "lineCount": 4
-                }
-            },
-            {
-                "code": "reportMissingImports",
-                "range": {
-                    "startColumn": 13,
-                    "endColumn": 24,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 32,
-                    "endColumn": 43,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownArgumentType",
-                "range": {
-                    "startColumn": 32,
-                    "endColumn": 45,
-                    "lineCount": 1
+                    "endColumn": 36,
+                    "lineCount": 5
                 }
             },
             {
@@ -2260,36 +2948,36 @@
                 }
             },
             {
-                "code": "reportUnreachable",
+                "code": "reportReturnType",
                 "range": {
-                    "startColumn": 8,
+                    "startColumn": 15,
                     "endColumn": 39,
-                    "lineCount": 3
+                    "lineCount": 1
                 }
             },
             {
                 "code": "reportUnreachable",
                 "range": {
-                    "startColumn": 12,
-                    "endColumn": 56,
-                    "lineCount": 1
+                    "startColumn": 8,
+                    "endColumn": 21,
+                    "lineCount": 14
                 }
             }
         ],
         "./python/tests/example/cycles/domain_one/__init__.py": [
             {
-                "code": "reportImportCycles",
+                "code": "reportMissingImports",
                 "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
+                    "startColumn": 5,
+                    "endColumn": 15,
                     "lineCount": 1
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportUnknownVariableType",
                 "range": {
-                    "startColumn": 5,
-                    "endColumn": 15,
+                    "startColumn": 23,
+                    "endColumn": 24,
                     "lineCount": 1
                 }
             },
@@ -2304,10 +2992,18 @@
         ],
         "./python/tests/example/cycles/domain_three/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 15,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 23,
+                    "endColumn": 24,
                     "lineCount": 1
                 }
             },
@@ -2322,17 +3018,25 @@
         ],
         "./python/tests/example/cycles/domain_two/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 25,
+                    "endColumn": 26,
                     "lineCount": 1
                 }
             }
         ],
         "./python/tests/example/cycles/leftover/mod.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 15,
@@ -2340,7 +3044,7 @@
                 }
             },
             {
-                "code": "reportPrivateLocalImportUsage",
+                "code": "reportUnknownVariableType",
                 "range": {
                     "startColumn": 23,
                     "endColumn": 24,
@@ -2358,17 +3062,7 @@
         ],
         "./python/tests/example/distributed_config/project/module_one/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 23,
-                    "lineCount": 1
-                }
-            }
-        ],
-        "./python/tests/example/distributed_config/project/top_level.py": [
-            {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 23,
@@ -2376,20 +3070,140 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 31,
+                    "endColumn": 41,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tests/example/distributed_config/project/top_level.py": [
+            {
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 31,
+                    "endColumn": 41,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 31,
+                    "endColumn": 41,
                     "lineCount": 1
                 }
             }
         ],
         "./python/tests/example/domain_one/subdomain/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 22,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 30,
+                    "endColumn": 40,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tests/example/layers_explicit_depends_on/api/handler.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 12,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 20,
+                    "endColumn": 29,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
+                "range": {
+                    "startColumn": 20,
+                    "endColumn": 29,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tests/example/layers_explicit_depends_on/api/helper.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 10,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 18,
+                    "endColumn": 22,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
+                "range": {
+                    "startColumn": 18,
+                    "endColumn": 22,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tests/example/layers_explicit_depends_on_disabled/api/handler.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 12,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 20,
+                    "endColumn": 29,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
+                "range": {
+                    "startColumn": 20,
+                    "endColumn": 29,
                     "lineCount": 1
                 }
             }
@@ -2518,7 +3332,7 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
@@ -2526,7 +3340,15 @@
                 }
             },
             {
-                "code": "reportAttributeAccessIssue",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 5,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 5,
@@ -2550,7 +3372,15 @@
                 }
             },
             {
-                "code": "reportAttributeAccessIssue",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 5,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 5,
@@ -2574,7 +3404,15 @@
                 }
             },
             {
-                "code": "reportAttributeAccessIssue",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 5,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 5,
@@ -2598,7 +3436,15 @@
                 }
             },
             {
-                "code": "reportAttributeAccessIssue",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 5,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedImport",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 5,
@@ -2622,14 +3468,6 @@
                 }
             },
             {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportUnknownVariableType",
                 "range": {
                     "startColumn": 4,
@@ -2639,110 +3477,6 @@
             },
             {
                 "code": "reportUnusedImport",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnusedImport",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnusedImport",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnusedImport",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnusedImport",
-                "range": {
-                    "startColumn": 4,
-                    "endColumn": 5,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
                 "range": {
                     "startColumn": 4,
                     "endColumn": 5,
@@ -2792,18 +3526,10 @@
         ],
         "./python/tests/example/many_features/other_src_root/module5/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 16,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 24,
-                    "endColumn": 33,
                     "lineCount": 1
                 }
             },
@@ -2852,18 +3578,10 @@
         ],
         "./python/tests/example/many_features/real_src/globbed/module.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 29,
                     "lineCount": 1
                 }
             },
@@ -2910,34 +3628,10 @@
         ],
         "./python/tests/example/many_features/real_src/globbed/other/module.py": [
             {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 29,
                     "lineCount": 1
                 }
             },
@@ -2986,14 +3680,6 @@
         ],
         "./python/tests/example/many_features/real_src/module1/__init__.py": [
             {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
@@ -3018,10 +3704,18 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 20,
+                    "endColumn": 27,
                     "lineCount": 1
                 }
             },
@@ -3034,18 +3728,10 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 28,
                     "lineCount": 1
                 }
             },
@@ -3216,7 +3902,7 @@
         ],
         "./python/tests/example/many_features/real_src/module2/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 14,
@@ -3248,7 +3934,7 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 14,
@@ -3264,7 +3950,7 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 25,
@@ -3280,18 +3966,10 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 30,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 38,
-                    "endColumn": 47,
                     "lineCount": 1
                 }
             },
@@ -3312,18 +3990,10 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 35,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 43,
-                    "endColumn": 57,
                     "lineCount": 1
                 }
             },
@@ -3346,7 +4016,7 @@
         ],
         "./python/tests/example/many_features/real_src/module2/service.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 19,
@@ -3364,7 +4034,7 @@
         ],
         "./python/tests/example/many_features/real_src/module3/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 14,
@@ -3404,18 +4074,10 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 25,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 33,
-                    "endColumn": 42,
                     "lineCount": 1
                 }
             },
@@ -3682,7 +4344,7 @@
         ],
         "./python/tests/example/many_features/real_src/outer_module.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 7,
                     "endColumn": 14,
@@ -3723,7 +4385,59 @@
                 }
             }
         ],
+        "./python/tests/example/monorepo_namespace/core/backend/src/gauge/backend/mod1/__init__.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 27,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 35,
+                    "endColumn": 36,
+                    "lineCount": 1
+                }
+            }
+        ],
+        "./python/tests/example/monorepo_namespace/core/backend/src/gauge/backend/mod2/__init__.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 27,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 35,
+                    "endColumn": 36,
+                    "lineCount": 1
+                }
+            }
+        ],
         "./python/tests/example/monorepo_namespace/core/backend/src/gauge/backend/mod3.py": [
+            {
+                "code": "reportMissingImports",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 23,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 31,
+                    "endColumn": 32,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnusedExpression",
                 "range": {
@@ -3793,10 +4507,10 @@
         ],
         "./python/tests/example/monorepo_workspace/packages/package1/src/package1/__init__.py": [
             {
-                "code": "reportAttributeAccessIssue",
+                "code": "reportMissingImports",
                 "range": {
-                    "startColumn": 21,
-                    "endColumn": 30,
+                    "startColumn": 5,
+                    "endColumn": 13,
                     "lineCount": 1
                 }
             },
@@ -4313,10 +5027,18 @@
         ],
         "./python/tests/example/valid/domain_one/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 15,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 23,
+                    "endColumn": 24,
                     "lineCount": 1
                 }
             },
@@ -4331,7 +5053,7 @@
         ],
         "./python/tests/example/valid/domain_two/__init__.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 16,
@@ -4339,17 +5061,33 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 24,
+                    "endColumn": 26,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 25,
+                    "endColumn": 26,
                     "lineCount": 1
                 }
             }
         ],
         "./python/tests/example/valid/leftover/mod.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 15,
@@ -4357,7 +5095,7 @@
                 }
             },
             {
-                "code": "reportPrivateLocalImportUsage",
+                "code": "reportUnknownVariableType",
                 "range": {
                     "startColumn": 23,
                     "endColumn": 24,
@@ -4365,10 +5103,18 @@
                 }
             },
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 9,
                     "endColumn": 21,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 34,
+                    "endColumn": 41,
                     "lineCount": 1
                 }
             },
@@ -4391,18 +5137,10 @@
         ],
         "./python/tests/example/visibility_error/src/module1.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 29,
                     "lineCount": 1
                 }
             },
@@ -4425,18 +5163,10 @@
         ],
         "./python/tests/example/visibility_error/src/module2.py": [
             {
-                "code": "reportImplicitRelativeImport",
+                "code": "reportMissingImports",
                 "range": {
                     "startColumn": 5,
                     "endColumn": 12,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportAttributeAccessIssue",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 29,
                     "lineCount": 1
                 }
             },
@@ -4458,6 +5188,22 @@
             }
         ],
         "./python/tests/test_cache.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 22,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 21,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -4724,6 +5470,14 @@
             }
         ],
         "./python/tests/test_changed_files.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 28,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -5238,6 +5992,46 @@
             }
         ],
         "./python/tests/test_check.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 13,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 15,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -7653,9 +8447,201 @@
                     "endColumn": 55,
                     "lineCount": 1
                 }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 36,
+                    "endColumn": 47,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 36,
+                    "endColumn": 47,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 49,
+                    "endColumn": 54,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 49,
+                    "endColumn": 54,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownArgumentType",
+                "range": {
+                    "startColumn": 47,
+                    "endColumn": 59,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownArgumentType",
+                "range": {
+                    "startColumn": 25,
+                    "endColumn": 37,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 12,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 15,
+                    "endColumn": 31,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 31,
+                    "endColumn": 43,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 24,
+                    "endColumn": 36,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 26,
+                    "endColumn": 38,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 65,
+                    "endColumn": 77,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 45,
+                    "endColumn": 56,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 45,
+                    "endColumn": 56,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 58,
+                    "endColumn": 63,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 58,
+                    "endColumn": 63,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownArgumentType",
+                "range": {
+                    "startColumn": 47,
+                    "endColumn": 59,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownArgumentType",
+                "range": {
+                    "startColumn": 25,
+                    "endColumn": 37,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 12,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 15,
+                    "endColumn": 31,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 22,
+                    "endColumn": 34,
+                    "lineCount": 1
+                }
             }
         ],
         "./python/tests/test_cli.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -8115,6 +9101,22 @@
         ],
         "./python/tests/test_export.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 20,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 35,
@@ -8372,6 +9374,14 @@
             }
         ],
         "./python/tests/test_file_tree.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 29,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -9729,6 +10739,30 @@
         ],
         "./python/tests/test_mod.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 21,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 13,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 4,
@@ -10083,6 +11117,14 @@
         ],
         "./python/tests/test_parsing.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 17,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 32,
@@ -10148,6 +11190,30 @@
             }
         ],
         "./python/tests/test_report.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {
@@ -10655,6 +11721,14 @@
         ],
         "./python/tests/test_report_external.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 19,
@@ -11033,6 +12107,22 @@
         ],
         "./python/tests/test_show.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 14,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 35,
@@ -11099,6 +12189,30 @@
         ],
         "./python/tests/test_sync.py": [
             {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 13,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 15,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 24,
+                    "lineCount": 1
+                }
+            },
+            {
                 "code": "reportUnknownParameterType",
                 "range": {
                     "startColumn": 27,
@@ -11399,11 +12513,123 @@
                 "range": {
                     "startColumn": 45,
                     "endColumn": 63,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 41,
+                    "endColumn": 52,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 41,
+                    "endColumn": 52,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownParameterType",
+                "range": {
+                    "startColumn": 54,
+                    "endColumn": 59,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportMissingParameterType",
+                "range": {
+                    "startColumn": 54,
+                    "endColumn": 59,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnusedCallResult",
+                "range": {
+                    "startColumn": 8,
+                    "endColumn": 56,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownArgumentType",
+                "range": {
+                    "startColumn": 24,
+                    "endColumn": 36,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownVariableType",
+                "range": {
+                    "startColumn": 8,
+                    "endColumn": 16,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 19,
+                    "endColumn": 35,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportUnknownMemberType",
+                "range": {
+                    "startColumn": 26,
+                    "endColumn": 38,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportOptionalMemberAccess",
+                "range": {
+                    "startColumn": 33,
+                    "endColumn": 44,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportArgumentType",
+                "range": {
+                    "startColumn": 45,
+                    "endColumn": 66,
+                    "lineCount": 1
+                }
+            },
+            {
+                "code": "reportArgumentType",
+                "range": {
+                    "startColumn": 45,
+                    "endColumn": 66,
                     "lineCount": 1
                 }
             }
         ],
         "./python/tests/test_version.py": [
+            {
+                "code": "reportMissingTypeStubs",
+                "range": {
+                    "startColumn": 5,
+                    "endColumn": 9,
+                    "lineCount": 1
+                }
+            },
             {
                 "code": "reportAny",
                 "range": {
