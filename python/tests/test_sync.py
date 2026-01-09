@@ -144,9 +144,9 @@ def test_layers_explicit_depends_on_sync(example_dir, capfd):
         api_module = next(m for m in modules if m.path == "api")
         service_module = next(m for m in modules if m.path == "service")
 
-        assert api_module.layer == "api"
+        assert api_module.layer == "presentation"
         assert api_module.depends_on == []  # Empty before sync
-        assert service_module.layer == "service"
+        assert service_module.layer == "business"
 
         # Run sync
         with pytest.raises(SystemExit) as exc_info:
@@ -174,16 +174,16 @@ def test_layers_explicit_depends_on_sync(example_dir, capfd):
         assert set(map(lambda dep: dep.path, api_module.depends_on)) == {"service"}
 
         # CRITICAL: Layer configuration should be preserved
-        assert api_module.layer == "api"
-        assert service_module.layer == "service"
+        assert api_module.layer == "presentation"
+        assert service_module.layer == "business"
 
         # Verify the config file was written correctly
         config_file = temp_project_root / "tach.toml"
         config_content = config_file.read_text()
 
         # Verify layer assignments are still in the file
-        assert 'layer = "api"' in config_content
-        assert 'layer = "service"' in config_content
+        assert 'layer = "presentation"' in config_content
+        assert 'layer = "business"' in config_content
 
         # Verify depends_on was added
         assert 'depends_on = ["service"]' in config_content or "depends_on = ['service']" in config_content

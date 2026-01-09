@@ -1,11 +1,11 @@
-layers = ["api", "service"]
+layers = ["presentation", "business"]
 
 [[modules]]
 path = "api"
-layer = "api"
+layer = "presentation"
 depends_on = []
 
 [[modules]]
 path = "service"
-layer = "service"
+layer = "business"
 depends_on = []

@@ -1,20 +1,20 @@
 layers_explicit_depends_on = true
 
-layers = ["api", "service", "repo"]
+layers = ["presentation", "business", "data"]
 
 [[modules]]
 path = "api"
-layer = "api"
+layer = "presentation"
 depends_on = []
 
 [[modules]]
 path = "service"
-layer = "service"
+layer = "business"
 depends_on = []
 
 [[modules]]
 path = "repo"
-layer = "repo"
+layer = "data"
 depends_on = []
 
 [[modules]]

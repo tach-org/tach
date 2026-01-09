@@ -29,21 +29,21 @@ By default, modules in higher layers can freely depend on modules in lower layer
 ```toml
 layers_explicit_depends_on = true
 
-layers = ["api", "service", "repo"]
+layers = ["presentation", "business", "data"]
 
 [[modules]]
 path = "api"
-layer = "api"
-depends_on = ["service"]  # Now required, even though api is higher than service
+layer = "presentation"
+depends_on = ["user_service"]  # Must explicitly declare dependency on modules in lower layers
 
 [[modules]]
-path = "service"
-layer = "service"
-depends_on = ["repo"]  # Now required
+path = "user_service"
+layer = "business"
+depends_on = ["user_repo"]  # Must explicitly declare dependency on modules in lower layers
 
 [[modules]]
-path = "repo"
-layer = "repo"
+path = "user_repo"
+layer = "data"
 depends_on = []
 ```
 
