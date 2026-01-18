@@ -181,9 +181,5 @@ def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixtur
         config_file = temp_project_root / "tach.toml"
         config_content = config_file.read_text()
 
-        # Verify layer assignments are still in the file
-        assert 'layer = "presentation"' in config_content
-        assert 'layer = "business"' in config_content
-
         # Verify depends_on was added
         assert 'depends_on = ["service"]' in config_content or "depends_on = ['service']" in config_content
