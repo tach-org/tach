@@ -126,7 +126,7 @@ def test_many_features_example_dir(example_dir, capfd):
         )
 
 
-def test_layers_explicit_depends_on_sync(example_dir, capfd):
+def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixture[str]):
     """Test that tach sync populates depends_on and preserves layer config when layers_explicit_depends_on=true."""
     project_root = example_dir / "layers_explicit_depends_on"
 

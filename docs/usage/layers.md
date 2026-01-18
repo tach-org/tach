@@ -51,6 +51,7 @@ With this flag enabled:
 
 - Modules must explicitly declare **all** cross-layer dependencies in `depends_on`
 - The layer hierarchy still prevents lower layers from depending on higher layers
+- Modules must still explicitly declare dependencies in the same layer
 - [Utility modules](configuration.md#modules) remain accessible without explicit declaration
 - This provides stricter control over dependencies while maintaining architectural constraints
 

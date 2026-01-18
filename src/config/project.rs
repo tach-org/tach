@@ -86,7 +86,7 @@ pub struct ProjectConfig {
     #[pyo3(get)]
     pub forbid_circular_dependencies: bool,
     #[serde(default, skip_serializing_if = "Not::not")]
-    #[pyo3(get, set)]
+    #[pyo3(get)]
     pub layers_explicit_depends_on: bool,
     #[serde(default, skip_serializing_if = "utils::is_default")]
     #[pyo3(get)]
