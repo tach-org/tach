@@ -121,7 +121,9 @@ impl<'a> InternalDependencyChecker<'a> {
             LayerCheckResult::Ok => {
                 // If layers_explicit_depends_on is enabled and target is not a utility,
                 // don't return early - fall through to check explicit depends_on declaration
-                if !self.project_config.layers_explicit_depends_on || dependency_module_config.utility {
+                if !self.project_config.layers_explicit_depends_on
+                    || dependency_module_config.utility
+                {
                     return Ok(vec![]);
                 }
                 // Fall through to check forbidden deps and depends_on
