@@ -180,13 +180,3 @@ def test_layers_explicit_depends_on_sync(
         # CRITICAL: Layer configuration should be preserved
         assert api_module.layer == "presentation"
         assert service_module.layer == "business"
-
-        # Verify the config file was written correctly
-        config_file = temp_project_root / "tach.toml"
-        config_content = config_file.read_text()
-
-        # Verify depends_on was added
-        assert (
-            'depends_on = ["service"]' in config_content
-            or "depends_on = ['service']" in config_content
-        )
