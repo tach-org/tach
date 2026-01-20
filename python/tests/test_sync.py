@@ -126,13 +126,15 @@ def test_many_features_example_dir(example_dir, capfd):
         )
 
 
-def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixture[str]):
+def test_layers_explicit_depends_on_sync(
+    example_dir: Path, capfd: pytest.CaptureFixture[str]
+):
     """Test that tach sync populates depends_on and preserves layer config when layers_explicit_depends_on=true."""
     project_root = example_dir / "layers_explicit_depends_on"
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_project_root = Path(temp_dir) / "layers_explicit_depends_on"
-        shutil.copytree(project_root, temp_project_root)
+        _ = shutil.copytree(project_root, temp_project_root)
 
         # Parse config before sync
         project_config = parse_project_config(root=temp_project_root)
@@ -164,6 +166,7 @@ def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixtur
 
         # Parse config after sync
         project_config = parse_project_config(root=temp_project_root)
+        assert project_config is not None
         modules = project_config.all_modules()
 
         # Verify sync populated depends_on
@@ -171,7 +174,8 @@ def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixtur
         service_module = next(m for m in modules if m.path == "service")
 
         # Sync should have detected the import from api to service
-        assert set(map(lambda dep: dep.path, api_module.depends_on)) == {"service"}
+        assert api_module.depends_on is not None
+        assert {depends_on.path for depends_on in api_module.depends_on} == {"service"}
 
         # CRITICAL: Layer configuration should be preserved
         assert api_module.layer == "presentation"
@@ -182,4 +186,7 @@ def test_layers_explicit_depends_on_sync(example_dir: Path, capfd: CaptureFixtur
         config_content = config_file.read_text()
 
         # Verify depends_on was added
-        assert 'depends_on = ["service"]' in config_content or "depends_on = ['service']" in config_content
+        assert (
+            'depends_on = ["service"]' in config_content
+            or "depends_on = ['service']" in config_content
+        )

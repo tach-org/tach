@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from typing import TYPE_CHECKING
 from unittest.mock import NonCallableMagicMock
 
 import pytest
@@ -12,6 +13,9 @@ from tach.errors import TachCircularDependencyError, TachVisibilityError
 from tach.extension import Diagnostic
 from tach.icons import FAIL, SUCCESS, WARNING
 from tach.parsing.config import parse_project_config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_valid_example_dir(example_dir, capfd):
@@ -651,7 +655,9 @@ globbed/**/*.py
     _check_expected_messages_unordered(external_section, expected_external)
 
 
-def test_layers_explicit_depends_on(example_dir, capfd):
+def test_layers_explicit_depends_on(
+    example_dir: Path, capfd: pytest.CaptureFixture[str]
+):
     """Test the layers_explicit_depends_on flag requires explicit depends_on declarations."""
     project_root = example_dir / "layers_explicit_depends_on"
     project_config = parse_project_config(root=project_root)
@@ -675,7 +681,9 @@ def test_layers_explicit_depends_on(example_dir, capfd):
     assert "utils" not in captured.err or "api/helper.py" not in captured.err
 
 
-def test_layers_explicit_depends_on_disabled(example_dir, capfd):
+def test_layers_explicit_depends_on_disabled(
+    example_dir: Path, capfd: pytest.CaptureFixture[str]
+):
     """Test that layers_explicit_depends_on defaults to false and allows implicit dependencies."""
     project_root = example_dir / "layers_explicit_depends_on_disabled"
     project_config = parse_project_config(root=project_root)

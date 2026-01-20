@@ -1,1 +1,1 @@
-from service import something
+from ..service import something  # pyright: ignore[reportUnusedImport]

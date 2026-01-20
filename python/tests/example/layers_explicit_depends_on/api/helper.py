@@ -1,1 +1,1 @@
-from utils import tool
+from ..utils import tool  # pyright: ignore[reportUnusedImport]
