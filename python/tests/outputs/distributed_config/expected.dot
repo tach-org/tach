@@ -3,5 +3,6 @@ strict digraph {
 "project.module_two";
 "project.top_level";
 "project.module_one" -> "project.module_two";
+"project.top_level" -> "project.module_one";
 "project.top_level" -> "project.module_two";
 }

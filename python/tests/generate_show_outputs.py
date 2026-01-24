@@ -11,8 +11,11 @@ for each example directory that has a valid project configuration
 
 from __future__ import annotations
 
+import shutil
+import tempfile
 from pathlib import Path
 
+from tach.extension import sync_project
 from tach.parsing.config import parse_project_config
 from tach.show import (
     generate_module_graph_dot_string,
@@ -32,37 +35,53 @@ def generate_outputs_for_example(example_name: str) -> tuple[str | None, str | N
     """
     Generate DOT and Mermaid outputs for a given example directory.
 
+    Copies the example to a temp directory to isolate side effects of sync_project.
+
     Returns:
         Tuple of (dot_output, mermaid_output) or (None, None) if invalid config.
     """
-    example_path = get_example_dir() / example_name
+    source_path = get_example_dir() / example_name
 
-    try:
+    # Copy to temp directory to isolate side effects of sync_project
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        example_path = Path(tmp_dir) / example_name
+        _ = shutil.copytree(source_path, example_path)
+
+        try:
+            project_config = parse_project_config(root=example_path)
+        except Exception as e:
+            print(f"Error parsing config for {example_name}: {e}")
+            return None, None
+
+        if project_config is None:
+            return None, None
+
+        # Check if there are modules to show
+        if project_config.has_no_modules():
+            return None, None
+
+        # Sync project to ensure dependencies are up to date (modifies config file on disk)
+        sync_project(example_path, project_config)
+
+        # Re-parse config to get the updated version after sync
         project_config = parse_project_config(root=example_path)
-    except Exception as e:
-        print(f"Error parsing config for {example_name}: {e}")
-        return None, None
+        if project_config is None:
+            print(f"Error re-parsing config for {example_name} after sync")
+            return None, None
 
-    if project_config is None:
-        return None, None
-
-    # Check if there are modules to show
-    if project_config.has_no_modules():
-        return None, None
-
-    try:
-        dot_output = generate_module_graph_dot_string(
-            project_config=project_config,
-            included_paths=[],
-        )
-        mermaid_output = generate_module_graph_mermaid_string(
-            project_config=project_config,
-            included_paths=[],
-        )
-        return dot_output, mermaid_output
-    except Exception as e:
-        print(f"Error generating output for {example_name}: {e}")
-        return None, None
+        try:
+            dot_output = generate_module_graph_dot_string(
+                project_config=project_config,
+                included_paths=[],
+            )
+            mermaid_output = generate_module_graph_mermaid_string(
+                project_config=project_config,
+                included_paths=[],
+            )
+            return dot_output, mermaid_output
+        except Exception as e:
+            print(f"Error generating output for {example_name}: {e}")
+            return None, None
 
 
 def main() -> None:

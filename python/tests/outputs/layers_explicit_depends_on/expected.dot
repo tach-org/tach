@@ -1,2 +1,5 @@
 strict digraph {
+api;
+service;
+api -> service;
 }

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 import pytest
 
+from tach.extension import sync_project
 from tach.parsing.config import parse_project_config
 from tach.show import (
     generate_module_graph_dot_string,
@@ -72,6 +74,8 @@ OUTPUT_TEST_CASES = get_output_test_cases()
     ids=[f"{name}-{otype}" for name, otype, _ in OUTPUT_TEST_CASES],
 )
 def test_show_output_matches_expected(
+    example_dir: Path,
+    tmp_path: Path,
     example_name: str,
     output_type: str,
     expected_file_path: str,
@@ -80,12 +84,22 @@ def test_show_output_matches_expected(
     Test that generate_module_graph_dot_string or generate_module_graph_mermaid_string
     produces output matching the expected file.
     """
-    example_dir = get_example_dir()
-    project_root = example_dir / example_name
+    # Copy example to temp directory to isolate side effects of sync_project
+    source_dir = example_dir / example_name
+    project_root = tmp_path / example_name
+    _ = shutil.copytree(source_dir, project_root)
+
     project_config = parse_project_config(root=project_root)
 
     assert project_config is not None, f"Failed to parse config for {example_name}"
     assert not project_config.has_no_modules(), f"No modules found for {example_name}"
+
+    # Sync project to ensure dependencies are up to date (modifies config file on disk)
+    sync_project(project_root, project_config)
+
+    # Re-parse config to get the updated version after sync
+    project_config = parse_project_config(root=project_root)
+    assert project_config is not None, f"Failed to re-parse config for {example_name}"
 
     # Generate the appropriate output
     if output_type == "dot":
@@ -111,17 +125,16 @@ def test_show_output_matches_expected(
     )
 
 
-# Keep the original smoke test for generate_show_report
-def test_many_features_example_dir(example_dir: Path) -> None:
+# Smoke test for generate_show_report
+def test_generate_show_report(example_dir: Path) -> None:
     """
     Smoke test for generate_show_report.
-
-    This example directory has Python files outside source roots,
-    which has previously caused bugs.
     """
-    project_root = example_dir / "many_features"
+    project_root = example_dir / "valid"
     project_config = parse_project_config(root=project_root)
     assert project_config is not None
+
+    sync_project(project_root, project_config)
 
     report = generate_show_report(
         project_root=project_root, project_config=project_config, included_paths=[]

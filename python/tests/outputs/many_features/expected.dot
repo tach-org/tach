@@ -3,11 +3,22 @@ strict digraph {
 module4;
 module1;
 "module1.api";
-module5;
 "module1.**";
+module2;
+outer_module;
+module3;
+"module3.submodule1";
+"module3.submodule2";
+"module3.submodule3";
+"globbed.other.module";
+module5;
 "globbed.**" -> module4;
+module4 -> "globbed.other.module";
 module1 -> "module1.api";
-module1 -> module5;
 "module1.api" -> "module1.**";
+module2 -> outer_module;
+module3 -> module1;
+"module3.submodule1" -> "module3.submodule2";
+"module3.submodule1" -> "module3.submodule3";
 module5 -> "module1.api";
 }

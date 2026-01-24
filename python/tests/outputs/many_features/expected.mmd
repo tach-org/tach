@@ -1,19 +1,19 @@
 graph TD
     globbed.** --> module4
     module1 --> module1.api
-    module1 --> module5
     module1.api --> module1.**
+    module2 --> outer_module
+    module3 --> module1
+    module3.submodule1 --> module3.submodule2
+    module3.submodule1 --> module3.submodule3
+    module4 --> globbed.other.module
     module5 --> module1.api
     module1.*
     module1.submodule1
     module1.submodule2
     module1.submodule3
-    module2
-    module3
-    module3.submodule1
     module3.submodule2
     module3.submodule3
     module3.submodule3.closed
     module3.submodule3.lowest_open
-    module4
     outer_module
