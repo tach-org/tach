@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pytest
@@ -11,48 +10,6 @@ from tach.show import (
     generate_module_graph_mermaid_string,
     generate_show_report,
 )
-
-
-def normalize_dot_output(dot_string: str) -> str:
-    """
-    Normalize DOT output for comparison by sorting lines.
-
-    DOT output from networkx/pydot can have non-deterministic ordering.
-    This function extracts lines inside the digraph braces and sorts them
-    to ensure consistent comparison.
-    """
-    # Match the content inside "strict digraph { ... }"
-    match = re.match(r"(strict digraph \{)\n(.*?)\n(\})\n?", dot_string, re.DOTALL)
-    if not match:
-        return dot_string
-
-    header = match.group(1)
-    body = match.group(2)
-    footer = match.group(3)
-
-    # Split body into lines and sort them
-    lines = [line for line in body.split("\n") if line.strip()]
-    sorted_lines = sorted(lines)
-
-    return f"{header}\n" + "\n".join(sorted_lines) + f"\n{footer}\n"
-
-
-def normalize_mermaid_output(mermaid_string: str) -> str:
-    """
-    Normalize Mermaid output for comparison by sorting lines.
-
-    Mermaid output can have non-deterministic ordering of edges and nodes.
-    This function sorts all lines after the "graph TD" header.
-    """
-    lines = mermaid_string.split("\n")
-    if not lines or not lines[0].strip().startswith("graph"):
-        return mermaid_string
-
-    header = lines[0]
-    body_lines = [line for line in lines[1:] if line.strip()]
-    sorted_lines = sorted(body_lines)
-
-    return header + "\n" + "\n".join(sorted_lines)
 
 
 def get_example_dir() -> Path:
@@ -146,14 +103,6 @@ def test_show_output_matches_expected(
 
     # Read expected output
     expected_output = Path(expected_file_path).read_text()
-
-    # Normalize output for comparison (ordering can be non-deterministic)
-    if output_type == "dot":
-        actual_output = normalize_dot_output(actual_output)
-        expected_output = normalize_dot_output(expected_output)
-    elif output_type == "mermaid":
-        actual_output = normalize_mermaid_output(actual_output)
-        expected_output = normalize_mermaid_output(expected_output)
 
     # Compare
     assert actual_output == expected_output, (
