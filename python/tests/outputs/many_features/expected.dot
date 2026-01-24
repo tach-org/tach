@@ -1,0 +1,13 @@
+strict digraph {
+"globbed.**";
+module4;
+module5;
+"module1.api";
+module1;
+"module1.**";
+"globbed.**" -> module4;
+module5 -> "module1.api";
+"module1.api" -> "module1.**";
+module1 -> "module1.api";
+module1 -> module5;
+}
