@@ -126,15 +126,16 @@ def test_show_output_matches_expected(
 
 
 # Smoke test for generate_show_report
-def test_generate_show_report(example_dir: Path) -> None:
+def test_many_features_example_dir(example_dir: Path) -> None:
     """
     Smoke test for generate_show_report.
+
+    This example directory has Python files outside source roots,
+    which has previously caused bugs.
     """
-    project_root = example_dir / "valid"
+    project_root = example_dir / "many_features"
     project_config = parse_project_config(root=project_root)
     assert project_config is not None
-
-    sync_project(project_root, project_config)
 
     report = generate_show_report(
         project_root=project_root, project_config=project_config, included_paths=[]
