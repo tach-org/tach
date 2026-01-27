@@ -133,7 +133,7 @@ def _format_duration(seconds: float) -> str:
 
 def _get_cached_durations(config: Config) -> dict[str, float]:
     """Get cached test durations from pytest cache."""
-    cache = config.cache
+    cache = getattr(config, 'cache', None)
     if cache is not None:
         cached = cast(
             "dict[str, float] | None",
@@ -146,7 +146,7 @@ def _get_cached_durations(config: Config) -> dict[str, float]:
 
 def _save_durations(config: Config, durations: dict[str, float]) -> None:
     """Save test durations to pytest cache."""
-    cache = config.cache
+    cache = getattr(config, 'cache', None)
     if cache is not None:
         cache.set(TACH_DURATIONS_CACHE_KEY, durations)
 
