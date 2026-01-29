@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generator, cast
 
 import pytest
-from pytest import Collector, Config, StashKey
+from pytest import Collector, Config, Item, StashKey
 from rich.console import Console
 
 if TYPE_CHECKING:
@@ -304,20 +304,26 @@ def pytest_collect_file(
 
     # Check if file should be removed based on its imports
     if handler.should_remove_items(file_path=resolved_path):
-        # Recursively count all test items before discarding
-        for collector in result:
-            handler.num_removed_items += _count_items(collector)
         handler.remove_test_path(file_path)
         state.would_skip_paths.add(file_path)
 
-        # Only skip if --tach or --tach-base was provided
-        if state.skip_enabled:
-            return []
-
-        # Otherwise, run the tests but we've recorded them as would-skip
-        return result
-
     return result
+
+
+def pytest_collection_modifyitems(config: Config, items: list[Item]):
+    state = config.stash.get(tach_state_key, None)
+    if state is None:
+        return
+    items_to_remove = [
+        item for item in items if state.handler.should_remove_items(file_path=item.path)
+    ]
+    state.handler.num_removed_items = len(items_to_remove)
+
+    # Only skip if --tach or --tach-base was provided
+    if state.skip_enabled:
+        for item in items_to_remove:
+            items.remove(item)
+        config.hook.pytest_deselected(items=items_to_remove)
 
 
 def _pluralize(word: str, count: int) -> str:
