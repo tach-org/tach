@@ -30,7 +30,7 @@
             "type":"debugpy",
             "request":"launch",
             "module":"pytest",
-            "args": ["-p", "tach.pytest_plugin"],
+            "args": ["-p", "tach"],
             "presentation": {
                 "group": "test"
             }
@@ -40,7 +40,7 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceRoot}/.venv/bin/python",
-            "args": ["-m", "pytest", "-p", "tach.pytest_plugin"],
+            "args": ["-m", "pytest", "-p", "tach"],
             "cwd": "${workspaceRoot}",
             "presentation": {
                 "group": "test"
