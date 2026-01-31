@@ -78,12 +78,10 @@ vscode = [
     "python-jsonrpc-server",
 ]
 docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.5.0",
-    "pymdown-extensions>=10.0",
-    "mkdocs-social-plugin>=0.1.0 ; python_version >= '3.11'",
+    "mkdocs==1.6.1",
+    "mkdocs-material==9.5.34",
+    "pymdown-extensions==10.11.2",
     "pillow",
-    "cairosvg",
 ]
 
 
