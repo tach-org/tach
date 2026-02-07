@@ -36,7 +36,8 @@ impl FromIterator<u8> for CacheKey {
     }
 }
 
-static CACHE_DIR: &str = ".tach";
+static ENV_KEY_CACHE_DIR: &str = "TACH_CACHE_DIR";
+static DEFAULT_CACHE_DIR: &str = ".tach";
 
 pub type ComputationCacheValue = (Vec<(u8, String)>, u8);
 
@@ -48,7 +49,12 @@ fn build_computation_cache<P: AsRef<Path>>(
             .set_disk_directory(
                 project_root
                     .as_ref()
-                    .join(CACHE_DIR)
+                    .join(
+                        match env::var(ENV_KEY_CACHE_DIR) {
+                            Ok(env_value) => env_value,
+                            Err() => DEFAULT_CACHE_DIR,
+                        }
+                    )
                     .join("computation-cache"),
             )
             .build()?,
