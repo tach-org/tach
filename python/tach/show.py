@@ -111,8 +111,9 @@ def generate_module_graph_dot_string(
 
     modules = project_config.filtered_modules(included_paths)
 
-    for module in modules:
-        for dependency in module.depends_on or []:
+    # Sort modules by path for deterministic output
+    for module in sorted(modules, key=lambda m: m.path):
+        for dependency in sorted(module.depends_on or [], key=lambda d: d.path):
             upsert_edge(graph, module.path, dependency.path, dependency.deprecated)  # type: ignore
 
     pydot_graph: pydot.Dot = nx.nx_pydot.to_pydot(graph)  # type: ignore
@@ -128,8 +129,9 @@ def generate_module_graph_mermaid_string(
     isolated: list[str] = []
     LINE_ARROW = "-->"
     DOTTED_ARROW = "-.->"
-    for module in modules:
-        for dependency in module.depends_on or []:
+    # Sort modules by path for deterministic output
+    for module in sorted(modules, key=lambda m: m.path):
+        for dependency in sorted(module.depends_on or [], key=lambda d: d.path):
             module_name = module.path.strip("<>")
             dependency_name = dependency.path.strip("<>")
             if dependency.deprecated:
