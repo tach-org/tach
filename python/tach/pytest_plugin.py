@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generator, cast
 
 import pytest
-from pytest import Collector, Config, Item, StashKey
+from pytest import Cache, Collector, Config, Item, StashKey
 from rich.console import Console
 
 if TYPE_CHECKING:
@@ -131,9 +131,17 @@ def _format_duration(seconds: float) -> str:
     return f"{hours}h {mins}m"
 
 
+def _get_pytest_cache(config: Config) -> Cache | None:
+    """
+    retrieve the pytest cache from the config object. Use of `getattr` is required because
+    the cache is not guaranteed to exist (e.g. pytest running with `-p no:cacheprovider`).
+    """
+    return getattr(config, "cache", None)
+
+
 def _get_cached_durations(config: Config) -> dict[str, float]:
     """Get cached test durations from pytest cache."""
-    cache = config.cache
+    cache = _get_pytest_cache(config)
     if cache is not None:
         cached = cast(
             "dict[str, float] | None",
@@ -146,7 +154,7 @@ def _get_cached_durations(config: Config) -> dict[str, float]:
 
 def _save_durations(config: Config, durations: dict[str, float]) -> None:
     """Save test durations to pytest cache."""
-    cache = config.cache
+    cache = _get_pytest_cache(config)
     if cache is not None:
         cache.set(TACH_DURATIONS_CACHE_KEY, durations)
 
