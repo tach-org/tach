@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field
 from json.decoder import JSONDecodeError
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 from urllib import error, request
 
 from tach.constants import GAUGE_API_BASE_URL
@@ -16,11 +16,14 @@ from tach.modularity import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
     import pydot  # type: ignore
 
-    from tach.extension import ProjectConfig
+    from tach.extension import DependencyConfig, ModuleConfig, ProjectConfig
+
+ConfigT = TypeVar("ConfigT", "ModuleConfig", "DependencyConfig")
 
 
 @dataclass
@@ -85,6 +88,19 @@ def upload_show_report(
         return None
 
 
+def _sorted_by_path(items: list[ConfigT]) -> list[ConfigT]:
+    return sorted(items, key=lambda item: item.path)
+
+
+def _sorted_module_dependencies(
+    modules: list[ModuleConfig],
+) -> Iterator[tuple[ModuleConfig, DependencyConfig]]:
+    """Yield (module, dependency) pairs sorted by path for deterministic output."""
+    for module in _sorted_by_path(modules):
+        for dependency in _sorted_by_path(module.depends_on or []):
+            yield module, dependency
+
+
 def generate_module_graph_dot_string(
     project_config: ProjectConfig,
     included_paths: list[Path],
@@ -111,10 +127,8 @@ def generate_module_graph_dot_string(
 
     modules = project_config.filtered_modules(included_paths)
 
-    # Sort modules by path for deterministic output
-    for module in sorted(modules, key=lambda m: m.path):
-        for dependency in sorted(module.depends_on or [], key=lambda d: d.path):
-            upsert_edge(graph, module.path, dependency.path, dependency.deprecated)  # type: ignore
+    for module, dependency in _sorted_module_dependencies(modules):
+        upsert_edge(graph, module.path, dependency.path, dependency.deprecated)  # type: ignore
 
     pydot_graph: pydot.Dot = nx.nx_pydot.to_pydot(graph)  # type: ignore
     return str(pydot_graph.to_string())  # type: ignore
@@ -129,15 +143,15 @@ def generate_module_graph_mermaid_string(
     isolated: list[str] = []
     LINE_ARROW = "-->"
     DOTTED_ARROW = "-.->"
-    # Sort modules by path for deterministic output
-    for module in sorted(modules, key=lambda m: m.path):
-        for dependency in sorted(module.depends_on or [], key=lambda d: d.path):
-            module_name = module.path.strip("<>")
-            dependency_name = dependency.path.strip("<>")
-            if dependency.deprecated:
-                edges.append(f"    {module_name} {DOTTED_ARROW} {dependency_name}")
-            else:
-                edges.append(f"    {module_name} {LINE_ARROW} {dependency_name}")
+    for module, dependency in _sorted_module_dependencies(modules):
+        module_name = module.path.strip("<>")
+        dependency_name = dependency.path.strip("<>")
+        if dependency.deprecated:
+            edges.append(f"    {module_name} {DOTTED_ARROW} {dependency_name}")
+        else:
+            edges.append(f"    {module_name} {LINE_ARROW} {dependency_name}")
+
+    for module in _sorted_by_path(modules):
         if not module.depends_on:
             isolated.append(f"    {module.path.strip('<>')}")
 

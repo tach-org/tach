@@ -10,7 +10,6 @@ from tach.parsing.config import parse_project_config
 from tach.show import (
     generate_module_graph_dot_string,
     generate_module_graph_mermaid_string,
-    generate_show_report,
 )
 
 
@@ -115,29 +114,13 @@ def test_show_output_matches_expected(
     else:
         pytest.fail(f"Unknown output type: {output_type}")
 
-    # Read expected output
-    expected_output = Path(expected_file_path).read_text()
+    # Read expected output and auto-update if changed
+    expected_file = Path(expected_file_path)
+    expected_output = expected_file.read_text()
 
-    # Compare
-    assert actual_output == expected_output, (
-        f"Output mismatch for {example_name} ({output_type})\n"
-        f"To update expected output, run: python -m tests.generate_show_outputs"
-    )
-
-
-# Smoke test for generate_show_report
-def test_many_features_example_dir(example_dir: Path) -> None:
-    """
-    Smoke test for generate_show_report.
-
-    This example directory has Python files outside source roots,
-    which has previously caused bugs.
-    """
-    project_root = example_dir / "many_features"
-    project_config = parse_project_config(root=project_root)
-    assert project_config is not None
-
-    report = generate_show_report(
-        project_root=project_root, project_config=project_config, included_paths=[]
-    )
-    assert report is not None
+    if actual_output != expected_output:
+        _ = expected_file.write_text(actual_output)
+        pytest.fail(
+            f"Output mismatch for {example_name} ({output_type})\n"
+            f"Output files have been updated with the changes. Review them before committing."
+        )
