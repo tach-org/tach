@@ -1,0 +1,1978 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python tool for managing module dependencies and interfaces">
+      
+      
+        <meta name="author" content="Gauge">
+      
+      
+        <link rel="canonical" href="https://gauge-sh.github.io/tach/usage/commands/">
+      
+      
+        <link rel="prev" href="../../getting-started/getting-started/">
+      
+      
+        <link rel="next" href="../configuration/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Commands - Tach</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Commands - Tach" />
+<meta property="og:description" content="A Python tool for managing module dependencies and interfaces" />
+<meta property="og:image" content="https://gauge-sh.github.io/tach/assets/images/social/usage/commands.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://gauge-sh.github.io/tach/usage/commands/" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Commands - Tach" />
+<meta property="twitter:description" content="A Python tool for managing module dependencies and interfaces" />
+<meta property="twitter:image" content="https://gauge-sh.github.io/tach/assets/images/social/usage/commands.png" />
+</head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#commands" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Tach" class="md-header__button md-logo" aria-label="Tach" data-md-component="logo">
+      
+  <img src="../../assets/dark_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Tach
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Commands
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gauge-sh/tach" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gauge-sh/tach
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/introduction/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../contributing/setting-up-project/" class="md-tabs__link">
+          
+  
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Tach" class="md-nav__button md-logo" aria-label="Tach" data-md-component="logo">
+      
+  <img src="../../assets/dark_logo.png" alt="logo">
+
+    </a>
+    Tach
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gauge-sh/tach" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gauge-sh/tach
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/why-tach/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Why Tach
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tach-init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach init
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-mod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach mod
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach check
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach check">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependency-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-check-external" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach check-external
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach report
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach show
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach map
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach map">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-jq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With jq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#closures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Closures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-the-pytest-plugin-directly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the pytest plugin directly
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the pytest plugin directly">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#duration-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Duration estimation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validating-impact-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validating impact analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-in-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using in CI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach install
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-pre-commit-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With pre-commit framework
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard install
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deprecate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deprecation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tach-ignore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tach Ignore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../unchecked-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unchecked Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vscode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../caching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/setting-up-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting Up Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/working-with-docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Docs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tach-init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach init
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-mod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach mod
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach check
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach check">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependency-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-check-external" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach check-external
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach report
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach show
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach map
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach map">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-jq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With jq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#closures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Closures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-the-pytest-plugin-directly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the pytest plugin directly
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the pytest plugin directly">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#duration-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Duration estimation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validating-impact-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validating impact analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-in-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using in CI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tach-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tach install
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tach install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-pre-commit-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With pre-commit framework
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard install
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h1>
+<h2 id="tach-init">tach init<a class="headerlink" href="#tach-init" title="Permanent link">&para;</a></h2>
+<p>Tach provides a guided setup process in <code>tach init</code>. This command will provide guidance and perform validation,
+while walking through <code>tach mod</code>, <code>tach sync</code> and <code>tach show</code>.</p>
+<p>New users should start with this command.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>usage: tach init [-h] [--force]
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Initialize a new project
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>options:
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  -h, --help  show this help message and exit
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  --force     Force re-initialization if project is already configured.
+</code></pre></div>
+<h2 id="tach-mod">tach mod<a class="headerlink" href="#tach-mod" title="Permanent link">&para;</a></h2>
+<p>Tach provides an interactive editor for configuring your module boundaries - <code>tach mod</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>usage: tach mod [-h] [-d [DEPTH]] [-e file_or_path,...]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Configure module boundaries interactively
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>options:
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  -d [DEPTH], --depth [DEPTH]
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>                        The number of child directories to expand from the root
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  -e file_or_path,..., --exclude file_or_path,...
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>                        Comma separated path list to exclude. tests/, ci/, etc.
+</code></pre></div>
+<p>Running <code>tach mod</code> will open an editor in your terminal where you can mark your module boundaries.</p>
+<p>You can navigate with the arrow keys, mark individual modules with <code>Enter</code>, and mark all siblings
+as modules with <code>Ctrl + a</code>.</p>
+<p>You can also mark your Python <a href="../configuration/#source-roots">source roots</a> by pressing <code>s</code>.
+This allows Tach to understand module paths and correctly identify first-party imports.</p>
+<p>You can mark modules as <a href="../configuration/#modules">utilities</a> by pressing <code>u</code>. This is appropriate for modules like <code>utils/</code>, which can be freely used by the rest of the code.</p>
+<p>To save your modules, use <code>Ctrl + s</code>. Otherwise, to exit without saving, use <code>Ctrl + c</code>.</p>
+<p>Any time you make changes with <code>tach mod</code>, run <a href="./#tach-sync"><code>tach sync</code></a>
+to automatically configure dependency rules.</p>
+<h2 id="tach-sync">tach sync<a class="headerlink" href="#tach-sync" title="Permanent link">&para;</a></h2>
+<p>Tach can automatically sync your project configuration (<code>tach.toml</code>) with your project's actual dependencies.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>usage: tach sync [-h] [--add] [-e file_or_path,...]
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Sync constraints with actual dependencies in your project.
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>options:
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  --add                 add all existing constraints and re-sync dependencies.
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  -e file_or_path,..., --exclude file_or_path,...
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>                        Comma separated path list to exclude. tests/, ci/, etc.
+</code></pre></div>
+<p>When this command runs, Tach will analyze the imports in your Python project.</p>
+<p>Any undeclared dependencies will be automatically resolved by
+adding the corresponding dependencies to your <code>tach.toml</code> file.</p>
+<p>With <code>--add</code>,
+any missing dependencies in your <code>tach.toml</code> will be added, but does not remove unused dependencies.</p>
+<p>When run without the <code>--add</code> flag, <code>tach sync</code> will remove modules from the <code>tach.yml</code> file that do not exist in the project's source roots.</p>
+<h2 id="tach-check">tach check<a class="headerlink" href="#tach-check" title="Permanent link">&para;</a></h2>
+<p>Tach will flag any unwanted imports between modules. We recommend you run <code>tach check</code> like a linter or test runner, e.g. in pre-commit hooks, on-save hooks, and in CI pipelines.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>usage: tach check [-h] [--exact] [--dependencies] [--interfaces] [-e file_or_path,...]
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Check existing boundaries against your dependencies and module interfaces
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>options:
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  --exact               When checking dependencies, raise errors if any dependencies are unused.
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  --dependencies        Check dependency constraints between modules. When present, all checks must be explicitly enabled.
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  --interfaces          Check interface implementations. When present, all checks must be explicitly enabled.
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  -e file_or_path,..., --exclude file_or_path,...
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                        Comma separated path list to exclude. tests/, ci/, etc.
+</code></pre></div>
+<p>Using the <code>--dependencies</code> or <code>--interfaces</code> flag will limit the checks performed to the respective category.
+By default, all checks will be performed.</p>
+<h3 id="dependency-errors">Dependency Errors<a class="headerlink" href="#dependency-errors" title="Permanent link">&para;</a></h3>
+<p>An error will indicate:</p>
+<ul>
+<li>the file path in which the error was detected</li>
+<li>the module associated with that file</li>
+<li>the module associated with the attempted import</li>
+</ul>
+<p>If <code>--exact</code> is provided, additional errors will be raised if a dependency exists in <code>tach.toml</code> that does not exist in the code.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>&gt;<span class="w"> </span>tach<span class="w"> </span>check
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>❌<span class="w"> </span>tach/check.py<span class="o">[</span>L8<span class="o">]</span>:<span class="w"> </span>Cannot<span class="w"> </span>import<span class="w"> </span><span class="s1">&#39;tach.filesystem&#39;</span>.<span class="w"> </span>Module<span class="w"> </span><span class="s1">&#39;tach&#39;</span><span class="w"> </span>cannot<span class="w"> </span>depend<span class="w"> </span>on<span class="w"> </span><span class="s1">&#39;tach.filesystem&#39;</span>.
+</code></pre></div>
+<p>NOTE: If your terminal supports hyperlinks, you can click on the failing file path to go directly to the error.</p>
+<h3 id="interface-errors">Interface Errors<a class="headerlink" href="#interface-errors" title="Permanent link">&para;</a></h3>
+<p>An error will indicate:</p>
+<ul>
+<li>the file path in which the error was detected</li>
+<li>the module associated with that file</li>
+<li>the module associated with the attempted import</li>
+<li>the non-public member associated with the attempted import</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>❌<span class="w">  </span>tach/mod.py<span class="o">[</span>L13<span class="o">]</span>:<span class="w"> </span>Module<span class="w"> </span><span class="s1">&#39;tach.interactive&#39;</span><span class="w"> </span>has<span class="w"> </span>a<span class="w"> </span>defined<span class="w"> </span>public<span class="w"> </span>interface.<span class="w"> </span>Only<span class="w"> </span>imports<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>public<span class="w"> </span>interface<span class="w"> </span>of<span class="w"> </span>this<span class="w"> </span>module<span class="w"> </span>are<span class="w"> </span>allowed.<span class="w"> </span>The<span class="w"> </span>import<span class="w"> </span><span class="s1">&#39;tach.interactive.get_selected_modules_interactive&#39;</span><span class="w"> </span><span class="o">(</span><span class="k">in</span><span class="w"> </span>module<span class="w"> </span><span class="s1">&#39;tach.mod&#39;</span><span class="o">)</span><span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>public.
+</code></pre></div>
+<p>NOTE: If your terminal supports hyperlinks, you can click on the failing file path to go directly to the error.</p>
+<h2 id="tach-check-external">tach check-external<a class="headerlink" href="#tach-check-external" title="Permanent link">&para;</a></h2>
+<p>Tach can validate that the external imports in your Python packages match your declared package dependencies in <code>pyproject.toml</code> or <code>requirements.txt</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>usage: tach check-external [-h] [-e file_or_path,...]
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Perform checks related to third-party dependencies
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>options:
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>  -h, --help  show this help message and exit
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>  -e file_or_path,..., --exclude file_or_path,...
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>                        Comma separated path list to exclude. tests/, ci/, etc.
+</code></pre></div>
+<p>For all Python files in each <a href="../configuration/#source-roots">source root</a>, Tach will determine which package it belongs to,
+and compare its dependencies to those declared in <code>pyproject.toml</code> or <code>requirements.txt</code>.
+Tach will report an error for any external import which is not satisfied by the declared dependencies.</p>
+<p>This also means that, for monorepos which contain multiple Python packages, Tach will detect when an import comes from a source root in another package,
+and verify that this dependency is declared. Make sure to configure <a href="../configuration/#source-roots"><code>source_roots</code></a> for every package (globs are coming soon!).</p>
+<p>This is typically useful if you are developing more than one Python package from a single virtual environment.
+Although your local environment may contain the dependencies for all your packages, when an end-user installs each package they will only install the dependencies listed in the <code>pyproject.toml</code>.</p>
+<p>This means that, although tests may pass in your shared environment, an invalid import can still cause errors at runtime for your users.</p>
+<p>In case you would like to explicitly allow a certain external module, this can be configured in your <a href="../configuration/#external"><code>tach.toml</code></a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is recommended to run Tach within a virtual environment containing all of
+your dependencies across all packages. This is because Tach uses the
+distribution metadata to map module names like 'git' to their distributions
+('GitPython').</p>
+</div>
+<h2 id="tach-report">tach report<a class="headerlink" href="#tach-report" title="Permanent link">&para;</a></h2>
+<p>Tach can generate a report showing all the dependencies and usages of a given module.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>usage: tach report [-h] [--dependencies] [--usages] [--external] [-d module_path,...] [-u module_path,...] [--raw] [-e file_or_path,...] path
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Create a report of dependencies and usages.
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>positional arguments:
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>  path                  The path or directory path used to generate the report.
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>options:
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  --dependencies        Generate dependency report. When present, all reports must be explicitly enabled.
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>  --usages              Generate usage report. When present, all reports must be explicitly enabled.
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>  --external            Generate external dependency report. When present, all reports must be explicitly enabled.
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>  -d module_path,..., --dependency-modules module_path,...
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>                        Comma separated module list of dependencies to include [includes everything by default]
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>  -u module_path,..., --usage-modules module_path,...
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>                        Comma separated module list of usages to include [includes everything by default]
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>  --raw                 Group lines by module and print each without any formatting.
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>  -e file_or_path,..., --exclude file_or_path,...
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>                        Comma separated path list to exclude. tests/, ci/, etc.
+</code></pre></div>
+<p>By default, this will generate a textual report showing the file and line number of each module dependency, module usage, and external dependency. Each section corresponds to a command line flag.</p>
+<p>The given <code>path</code> can be a directory or a file path. The <a href="../configuration/#modules">module</a> which contains the given path will be used to determine which imports to include in the report.
+Generally, if an import points to a file which is contained by a different module, it will be included.</p>
+<p>The <code>--dependencies</code> flag includes module dependencies, meaning any import which targets a different module within your project. For example, if <code>core.api</code> and <code>core.services</code> are marked as modules,
+then an import of <code>core.api.member</code> from within <code>core.services</code> would be included in a report for <code>core/services</code>.</p>
+<p>The <code>--usages</code> flag includes module usages, meaning any import which comes from a different module within your project. For example, if <code>core.api</code> and <code>core.services</code> are marked as modules,
+then an import of <code>core.services.member</code> from within <code>core.api</code> would be included in a report for <code>core/services</code>.</p>
+<p>The <code>--external</code> flag includes external (3rd party) dependencies, meaning any import which targets a module outside of your project. For example, importing <code>pydantic</code> or <code>tomli</code> would be included in this report.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is recommended to run Tach within a virtual environment containing all of
+your dependencies across all packages. This is because Tach uses the
+distribution metadata to map 3rd party module names like 'git' to their distributions ('GitPython').</p>
+</div>
+<p>Supplying the <code>--raw</code> flag will group the results by module name and eliminate formatting, making the output more easily machine-readable.</p>
+<h2 id="tach-show">tach show<a class="headerlink" href="#tach-show" title="Permanent link">&para;</a></h2>
+<p>Tach will generate a visual representation of your dependency graph!</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>usage: tach show [-h] [--web] [--mermaid] [-o [OUT]] [included_paths ...]
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Visualize the dependency graph of your project.
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>positional arguments:
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  included_paths        Paths to include in the module graph. If not provided, the entire project is
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>                        included.
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>options:
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  --web                 Open your dependency graph in a remote web viewer.
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>  --mermaid             Generate a mermaid.js graph instead of a DOT file.
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>  -o [OUT], --out [OUT]
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>                        Specify an output path for a locally generated module graph file.
+</code></pre></div>
+<p>These are the results of <code>tach show --web</code> on the Tach codebase itself:
+<img alt="tach show" src="../../assets/tach_show.png" /></p>
+<h2 id="tach-map">tach map<a class="headerlink" href="#tach-map" title="Permanent link">&para;</a></h2>
+<p>Tach can generate a JSON dependency map showing the relationships between files in your project.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>usage: tach map [-h] [-o OUTPUT] [--direction {dependencies,dependents}] [--closure CLOSURE]
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Build a dependency map and write it to a file or stdout
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>options:
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  -h, --help            show this help message and exit
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  -o OUTPUT, --output OUTPUT
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>                        Output file path. Use &#39;-&#39; for stdout (default: &#39;-&#39;)
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>  --direction {dependencies,dependents}
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>                        Direction of the map (default: &#39;dependencies&#39;)
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>  --closure CLOSURE     Get the closure for a specific file path
+</code></pre></div></p>
+<p>By default, <code>tach map</code> outputs to stdout and shows dependencies. The output is a JSON object where each key is a file path and its value is an array of file paths it depends on.</p>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;src/core.py&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;src/utils.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;src/config.py&quot;</span><span class="p">],</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;src/utils.py&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;src/config.py&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;src/utils.py&quot;</span><span class="p">]</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
+</code></pre></div></p>
+<p>This map is particularly useful for build tools, test runners, and development servers that need to understand file dependencies.</p>
+<p>For example, it can help with test selection by identifying affected files, or support hot-reloading by finding all files that need to be reloaded when a dependency changes.</p>
+<h3 id="with-jq">With jq<a class="headerlink" href="#with-jq" title="Permanent link">&para;</a></h3>
+<p>You can use <a href="https://jqlang.org/download/"><code>jq</code></a> to query this output. Here are some useful examples:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Get dependencies for a specific file</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>tach<span class="w"> </span>map<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.&quot;src/core.py&quot;&#39;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Find all files that depend on utils.py (using dependents direction)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>tach<span class="w"> </span>map<span class="w"> </span>--direction<span class="w"> </span>dependents<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.&quot;src/utils.py&quot;&#39;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Count dependencies for each file</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>tach<span class="w"> </span>map<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;map_values(length)&#39;</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1"># Find files with no dependencies</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>tach<span class="w"> </span>map<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;to_entries | map(select(.value | length == 0)) | map(.key)&#39;</span>
+</code></pre></div>
+<h3 id="closures">Closures<a class="headerlink" href="#closures" title="Permanent link">&para;</a></h3>
+<p>The <code>--closure</code> flag can be used to find all transitive dependencies for a specific file path. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Get all direct and indirect dependencies of core.py</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tach<span class="w"> </span>map<span class="w"> </span>--closure<span class="w"> </span>src/core.py
+</code></pre></div>
+<p>Example output with closure:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">[</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="s2">&quot;src/core.py&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="s2">&quot;src/utils.py&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="s2">&quot;src/config.py&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="s2">&quot;src/constants.py&quot;</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">]</span>
+</code></pre></div></p>
+<p>The output includes the target file itself and all files that are either directly or indirectly required by it. In this example, if <code>src/core.py</code> imports <code>config.py</code> which in turn imports <code>constants.py</code>, all of these files will appear in the closure.</p>
+<h2 id="tach-test">tach test<a class="headerlink" href="#tach-test" title="Permanent link">&para;</a></h2>
+<p>Tach also functions as an intelligent test runner.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>usage: tach test [-h] [--base [BASE]] [--head [HEAD]] [--disable-cache] ...
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Run tests on modules impacted by the current changes.
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>positional arguments:
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>  pytest_args      Arguments forwarded to pytest. Use &#39;--&#39; to separate
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>                   these arguments. Ex: &#39;tach test -- -v&#39;
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>options:
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>  -h, --help       show this help message and exit
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>  --base [BASE]    The base commit to use when determining which modules
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>                   are impacted by changes. [default: &#39;main&#39;]
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>  --head [HEAD]    The head commit to use when determining which modules
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>                   are impacted by changes. [default: current filesystem]
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>  --disable-cache  Do not check cache for results, and
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>                   do not push results to cache.
+</code></pre></div>
+<p>Using <code>pytest</code>, running <code>tach test</code> will perform <a href="https://martinfowler.com/articles/rise-test-impact-analysis.html">impact analysis</a> on the changes between your current filesystem and your <code>main</code> branch to determine which test files need to be run.
+This can dramatically speed up your test suite in CI, particularly when you make a small change to a large codebase.
+This command also takes advantage of Tach's <a href="../caching/">computation cache</a>.</p>
+<h3 id="using-the-pytest-plugin-directly">Using the pytest plugin directly<a class="headerlink" href="#using-the-pytest-plugin-directly" title="Permanent link">&para;</a></h3>
+<p>When tach is installed, the pytest plugin is automatically loaded. Just run pytest normally:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pytest
+</code></pre></div>
+<p>By default, the plugin runs all tests but reports how many could be skipped based on impact analysis. This allows you to see the potential benefit without committing to skipping tests:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>[Tach] 42 tests in 8 files unaffected by changes (~15.3s could be saved). Skip with: pytest --tach
+</code></pre></div>
+<p>To actually skip unaffected tests, provide the <code>--tach</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>pytest<span class="w"> </span>--tach
+</code></pre></div>
+<p>The plugin auto-detects whether your default branch is <code>main</code> or <code>master</code>.</p>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>--tach</code>: Enable test skipping using the auto-detected base branch</li>
+<li><code>--tach-base &lt;commit&gt;</code>: Set the base commit explicitly (also enables skipping)</li>
+<li><code>--tach-head &lt;commit&gt;</code>: Head commit to compare against (also enables skipping. default: current filesystem)</li>
+<li><code>--tach-verbose</code>: Show detailed output including changed files and skipped/would-skip test paths</li>
+</ul>
+<p>To disable the plugin entirely, use pytest's built-in plugin disabling:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>pytest<span class="w"> </span>-p<span class="w"> </span>no:tach
+</code></pre></div>
+<p>You can also disable it permanently in <code>pyproject.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[tool.pytest]</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;no:tach&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h4 id="duration-estimation">Duration estimation<a class="headerlink" href="#duration-estimation" title="Permanent link">&para;</a></h4>
+<p>The plugin caches test durations and estimates time saved when skipping tests. After running your test suite once, subsequent runs will show estimated time saved:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>[Tach] Skipped 42 tests (5 files) (~12.3s saved) - unaffected by current changes.
+</code></pre></div>
+<h4 id="validating-impact-analysis">Validating impact analysis<a class="headerlink" href="#validating-impact-analysis" title="Permanent link">&para;</a></h4>
+<p>By default (without <code>--tach</code>), the plugin runs all tests but tracks which would be skipped. If any "would-be-skipped" test fails, you'll see a warning:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>[Tach] WARNING: 2 test(s) failed that would be skipped by impact analysis!
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>[Tach] These failures would be missed when using --tach:
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>[Tach]   - test_module.py::test_that_unexpectedly_failed
+</code></pre></div>
+<p>This helps validate impact analysis accuracy before enabling test skipping in CI.</p>
+<h4 id="using-in-ci">Using in CI<a class="headerlink" href="#using-in-ci" title="Permanent link">&para;</a></h4>
+<p>Most CI systems use shallow clones by default. To enable impact analysis, ensure the base branch is fetched (e.g., <code>git fetch origin main:main</code> or configure a full clone). If the base branch is unavailable, the plugin disables itself and all tests run normally.</p>
+<h2 id="tach-install">tach install<a class="headerlink" href="#tach-install" title="Permanent link">&para;</a></h2>
+<p>Tach can be installed into your development workflow automatically as a pre-commit hook.</p>
+<h3 id="with-pre-commit-framework">With pre-commit framework<a class="headerlink" href="#with-pre-commit-framework" title="Permanent link">&para;</a></h3>
+<p>If you use the <a href="https://github.com/pre-commit/pre-commit">pre-commit framework</a>, you can add the following to your <code>.pre-commit-hooks.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nt">repos</span><span class="p">:</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/gauge-sh/tach-pre-commit</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="nt">rev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v0.30.0</span><span class="w"> </span><span class="c1"># change this to the latest tag!</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="nt">hooks</span><span class="p">:</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tach</span>
+</code></pre></div>
+<p>Note that you should specify the version you are using in the <code>rev</code> key.</p>
+<h3 id="standard-install">Standard install<a class="headerlink" href="#standard-install" title="Permanent link">&para;</a></h3>
+<p>If you don't already have pre-commit hooks set up, you can run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>tach<span class="w"> </span>install<span class="w"> </span>pre-commit
+</code></pre></div>
+<p>The command above will install <code>tach check</code> as a pre-commit hook, directly into <code>.git/hooks/pre-commit</code>.</p>
+<p>If that file already exists, you will need to manually add <code>tach check</code> to your existing <code>.git/hooks/pre-commit</code> file.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/gauge-sh/tach" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://x.com/gauge_sh" target="_blank" rel="noopener" title="x.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/company/gauge-sh/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
