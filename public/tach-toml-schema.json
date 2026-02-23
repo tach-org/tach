@@ -269,6 +269,11 @@
       },
       "additionalProperties": false
     },
+    "layers_explicit_depends_on": {
+      "type": "boolean",
+      "default": false,
+      "description": "When enabled, modules must explicitly declare dependencies on other layers using depends_on, even when those dependencies would be allowed by the layer hierarchy. Utility modules remain accessible without explicit declaration."
+    },
     "layers": {
       "type": "array",
       "items": {
