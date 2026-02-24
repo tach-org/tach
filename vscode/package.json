@@ -2,7 +2,7 @@
     "name": "dtach",
     "displayName": "DTach",
     "description": "Linting support for python files using `tach`.",
-    "version": "0.33.3",
+    "version": "0.33.4",
     "preview": true,
     "serverInfo": {
         "name": "Tach",
