@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 import sys
-from functools import lru_cache
+from functools import cache
 from typing import Any
 
 KNOWN_MODULE_SPECIAL_CASES = {
@@ -86,7 +86,7 @@ def _get_installed_modules(dist: Any) -> list[str]:
     return list(module_names)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_module_mappings() -> dict[str, list[str]]:
     if sys.version_info >= (3, 10):
         from importlib.metadata import packages_distributions

@@ -7,7 +7,7 @@ authors = [
 ]
 description = "A Python tool to maintain a modular package architecture."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -16,7 +16,6 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -100,7 +99,7 @@ default-groups = ["dev", "vscode", "docs"]
 [tool.ruff]
 src = ["python"]
 exclude = ["python/tests/example"]
-target-version = "py38"
+target-version = "py39"
 extend-exclude = [
     "pw",
 ]
@@ -120,7 +119,7 @@ include = ["python", "vscode"]
 ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
 exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
 executionEnvironments = [{ root = "python" }, { root = "vscode" }]
-pythonVersion = "3.8"
+pythonVersion = "3.9"
 reportImplicitStringConcatenation = false # conflicts with ruff formatter
 
 
