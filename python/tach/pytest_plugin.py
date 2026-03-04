@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Generator, cast
+from typing import TYPE_CHECKING, Generator, cast
 
 import pytest
 from pytest import Cache, Collector, Config, Item, StashKey
@@ -341,9 +341,6 @@ def _pluralize(word: str, count: int) -> str:
 
 def pytest_report_collectionfinish(
     config: Config,
-    start_path: Path,
-    startdir: Any,
-    items: list[pytest.Item],
 ) -> str | list[str]:
     """Report skipped/would-skip test files after collection.
 
