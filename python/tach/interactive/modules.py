@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Generator
+from typing import TYPE_CHECKING, Callable
 
 from prompt_toolkit import ANSI
 from prompt_toolkit.application import Application
@@ -31,6 +31,8 @@ from tach import filesystem as fs
 from tach.utils.exclude import is_path_excluded
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from prompt_toolkit.formatted_text import AnyFormattedText
 
     from tach.extension import ProjectConfig

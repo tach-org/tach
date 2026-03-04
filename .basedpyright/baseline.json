@@ -1582,16 +1582,16 @@
             {
                 "code": "reportUnknownMemberType",
                 "range": {
-                    "startColumn": 12,
-                    "endColumn": 26,
+                    "startColumn": 16,
+                    "endColumn": 30,
                     "lineCount": 1
                 }
             },
             {
                 "code": "reportUnknownMemberType",
                 "range": {
-                    "startColumn": 12,
-                    "endColumn": 26,
+                    "startColumn": 16,
+                    "endColumn": 30,
                     "lineCount": 1
                 }
             },

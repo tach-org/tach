@@ -6,7 +6,7 @@ import sys
 import threading
 from dataclasses import dataclass
 from queue import Queue
-from typing import IO, TYPE_CHECKING, Any, Tuple
+from typing import IO, TYPE_CHECKING, Any
 
 from tach.errors import TachSetupError
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from tach.extension import ProjectConfig
 
 
-def run_and_capture(cmd: list[str], **kwargs: Any) -> Tuple[int, str, str]:
+def run_and_capture(cmd: list[str], **kwargs: Any) -> tuple[int, str, str]:
     stdout_queue: Queue[str] = Queue()
     stderr_queue: Queue[str] = Queue()
 

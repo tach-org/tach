@@ -105,9 +105,9 @@ def generate_module_graph_dot_string(
         if dependency not in graph:
             graph.add_node(dependency)  # type: ignore
         if dashed:
-            graph.add_edge(module, dependency, style="dashed")  # type: ignore
+            _ = graph.add_edge(module, dependency, style="dashed")  # type: ignore
         else:
-            graph.add_edge(module, dependency)  # type: ignore
+            _ = graph.add_edge(module, dependency)  # type: ignore
 
     modules = project_config.filtered_modules(included_paths)
 

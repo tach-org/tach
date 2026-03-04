@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import os
 import stat
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
-from typing import Generator
+from typing import TYPE_CHECKING
 
 from tach.utils.display import BCOLORS, colorize
 from tach.utils.exclude import is_path_excluded
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 def write_file(path: Path, content: str, root: Path | None = None):
@@ -79,7 +82,7 @@ def walk_pyfiles(
                 yield dirpath / filepath
 
 
-@lru_cache(maxsize=None)
+@cache
 def file_to_module_path(source_roots: tuple[Path, ...], file_path: Path) -> str:
     # NOTE: source_roots are assumed to be absolute here
     matching_root: Path | None = None
@@ -101,7 +104,7 @@ def file_to_module_path(source_roots: tuple[Path, ...], file_path: Path) -> str:
     return "." if not module_path else module_path
 
 
-@lru_cache(maxsize=None)
+@cache
 def module_to_pyfile_or_dir_path(
     source_roots: tuple[Path, ...], module_path: str
 ) -> Path | None:
