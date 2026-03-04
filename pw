@@ -23,8 +23,8 @@ except ImportError:
     EnvBuilder = None
 
 
-VERSION = "3.2.9"
-UV_VERSION = "0.8.8"
+VERSION = "3.3.2"
+UV_VERSION = "0.9.16"
 
 PYPROJECTX_INSTALL_DIR_ENV_VAR = "PYPROJECTX_INSTALL_DIR"
 PYPROJECTX_PACKAGE_ENV_VAR = "PYPROJECTX_PACKAGE"
@@ -80,6 +80,7 @@ def get_options(args):
 
 def arg_parser():
     parser = argparse.ArgumentParser(
+        prog="pw",
         description="Execute commands or aliases defined in the [tool.pyprojectx] section of pyproject.toml. "
         "Use the -i or --info option to see available tools and aliases.",
         allow_abbrev=False,
@@ -164,7 +165,7 @@ def arg_parser():
     return parser
 
 
-def ensure_pyprojectx(options):  # noqa: C901
+def ensure_pyprojectx(options):  # noqa: C901, PLR0912
     venv_dir = (
         options.install_path / "pyprojectx" / f"{options.version}-py{sys.version_info.major}.{sys.version_info.minor}"
     )
@@ -236,6 +237,10 @@ def ensure_pyprojectx(options):  # noqa: C901
                 )
             pip_cmd.append("-e")
         subprocess.run([*pip_cmd, options.pyprojectx_package], stdout=out, check=True)
+        # create .gitignore file
+        gitignore_file = options.install_path / ".gitignore"
+        if not gitignore_file.is_file():
+            gitignore_file.write_text("*\n")
 
     return pyprojectx_script
 
@@ -244,7 +249,9 @@ def download_wrappers():
     latest = "https://github.com/pyprojectx/pyprojectx/releases/latest/download/wrappers.zip"
     zip_file, _ = request.urlretrieve(latest)  # noqa: S310
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
-        zip_ref.extractall(Path(__file__).parent)
+        for entry in zip_ref.namelist():
+            if Path(__file__).with_name(entry).is_file():
+                zip_ref.extract(entry, Path(__file__).parent)
 
 
 if __name__ == "__main__":
