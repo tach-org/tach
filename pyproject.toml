@@ -92,6 +92,9 @@ Issues = "https://github.com/gauge-sh/tach/issues"
 
 [tool.pyprojectx]
 cwd = "."
+main = [
+    "uv<0.9.16" # https://github.com/konstin/rustup-pypi/issues/7
+]
 
 [tool.uv]
 default-groups = ["dev", "vscode", "docs"]
