@@ -1940,7 +1940,7 @@ wheels = [
 
 [[package]]
 name = "tach"
-version = "0.33.4"
+version = "0.34.0"
 source = { editable = "." }
 dependencies = [
     { name = "gitpython" },
