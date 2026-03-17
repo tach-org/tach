@@ -28,6 +28,7 @@ jobs:
     needs: test
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         platform:
           - target: x86_64

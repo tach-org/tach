@@ -16,6 +16,7 @@ jobs:
   # Build the extension on all platforms.
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           # windows (no windows 32 bit build because that doesn't seem to be supported by vsce)
