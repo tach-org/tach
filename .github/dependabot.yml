@@ -15,6 +15,10 @@ updates:
     patterns:
       - '*'
     multi-ecosystem-group: "all"
+    ignore:
+      # these are versioned as 0.0.0 in the ruff repo which causes dependabot to crash
+      - dependency-name: "ruff_source_file"
+      - dependency-name: "ruff_text_size"
 
 multi-ecosystem-groups:
   all:
