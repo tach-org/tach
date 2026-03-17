@@ -68,7 +68,7 @@ dev = [
     "coverage==7.6.0",
     # Rust
     "maturin==1.10.2",
-    "rustup>=1.28.2.1 ; sys_platform != 'win32'", # https://github.com/konstin/rustup-pypi/issues/5
+    "rustup>=1.29.0.1 ; sys_platform != 'win32'", # https://github.com/konstin/rustup-pypi/issues/5
 ]
 vscode = [
     "nodejs-wheel>=22.20.0",
@@ -92,9 +92,6 @@ Issues = "https://github.com/gauge-sh/tach/issues"
 
 [tool.pyprojectx]
 cwd = "."
-main = [
-    "uv<0.9.16" # https://github.com/konstin/rustup-pypi/issues/7
-]
 
 [tool.uv]
 default-groups = ["dev", "vscode", "docs"]
