@@ -53,21 +53,21 @@ keywords = [
 [dependency-groups]
 dev = [
     # Setup
-    "pip==24.0",
+    "pip==26.0.1",
     # Code Quality
     "basedpyright>=1.31.7",
-    "ruff==0.14.6",
+    "ruff==0.15.6",
     # Build/Release
-    "setuptools==69.5.1",
-    "twine==5.1.1",
-    "build==1.2.1",
+    "setuptools==82.0.1",
+    "twine==6.2.0",
+    "build==1.4.0",
     "gnumake>=4.4.1",
     # Tests
-    "pytest==8.2.2",
-    "pytest-mock==3.14.0",
-    "coverage==7.6.0",
+    "pytest==8.4.2",
+    "pytest-mock==3.15.1",
+    "coverage==7.10.7",
     # Rust
-    "maturin==1.10.2",
+    "maturin==1.12.6",
     "rustup>=1.28.2.1 ; sys_platform != 'win32'", # https://github.com/konstin/rustup-pypi/issues/5
 ]
 vscode = [
