@@ -19,7 +19,10 @@ def _install_bundle(session: nox.Session) -> None:
         "./bundled/libs",
         external=True,
     )
-    session.install(
+    session.run(
+        "uv",
+        "pip",
+        "install",
         "-v",
         "--target",
         "./bundled/libs",
