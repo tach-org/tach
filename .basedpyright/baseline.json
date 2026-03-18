@@ -11357,6 +11357,14 @@
                 }
             },
             {
+                "code": "reportUnusedCallResult",
+                "range": {
+                    "startColumn": 4,
+                    "endColumn": 5,
+                    "lineCount": 9
+                }
+            },
+            {
                 "code": "reportAny",
                 "range": {
                     "startColumn": 4,
