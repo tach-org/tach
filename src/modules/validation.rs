@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::RandomState;
 
 use crate::config::ModuleConfig;
 use crate::config::root_module::{ROOT_MODULE_SENTINEL_TAG, RootModuleTreatment};
@@ -85,7 +86,7 @@ pub fn find_visibility_violations(
 }
 
 pub fn find_modules_with_cycles(modules: &[ModuleConfig]) -> Vec<&String> {
-    let mut graph = DiGraphMap::new();
+    let mut graph: DiGraphMap<&String, Option<()>, RandomState> = DiGraphMap::new();
 
     // Add nodes
     for module in modules {
