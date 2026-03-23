@@ -9,21 +9,21 @@ crate-type = ["cdylib", "lib"]
 bench = false
 
 [dependencies]
-pyo3 = { version = "0.27.1", features = ["abi3-py37"] }
+pyo3 = { version = "0.28.2", features = ["abi3-py37"] }
 regex = "1.11.1"
 once_cell = "1.21.3"
-ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_ast", tag = "0.14.3" }
-ruff_python_parser = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_parser", tag = "0.14.3" }
-ruff_linter = { git = "https://github.com/astral-sh/ruff.git", package="ruff_linter", tag = "0.14.3" }
+ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_ast", tag = "0.15.7" }
+ruff_python_parser = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_parser", tag = "0.15.7" }
+ruff_linter = { git = "https://github.com/astral-sh/ruff.git", package="ruff_linter", tag = "0.15.7" }
 ruff_source_file = { git = "https://github.com/astral-sh/ruff.git", package="ruff_source_file", tag = "0.14.3" }
 ruff_text_size = { git = "https://github.com/astral-sh/ruff.git", package="ruff_text_size", tag = "0.14.3" }
-cached = { version = "0.54.0", features = ["disk_store"] }
+cached = { version = "0.59.0", features = ["disk_store"] }
 globset = "0.4.15"
-toml = "0.8.19"
+toml = "1.0.6"
 thiserror = "2.0.7"
 serde = { version = "1.0.216", features = ["derive"] }
 glob = "0.3.2"
-petgraph = "0.7.1"
+petgraph = "0.8.3"
 serde_json = "1.0.134"
 tempfile = "3.17.0"
 lsp-server = "0.7.7"
@@ -33,8 +33,8 @@ ctrlc = "3.4.5"
 rayon = "1.10.0"
 parking_lot = "0.12.3"
 itertools = "0.14.0"
-toml_edit = "0.22.24"
-console = "0.15.11"
+toml_edit = "0.25.4"
+console = "0.16.3"
 ignore = "0.4.23"
 dashmap = { version = "6.1.0", features = ["serde", "rayon", "inline"] }
 
@@ -48,5 +48,5 @@ debug = true
 
 
 [dev-dependencies]
-rstest = "0.24.0"
+rstest = "0.26.1"
 serial_test = "3.2.0"
