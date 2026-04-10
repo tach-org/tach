@@ -78,7 +78,9 @@ def run_affected_tests(
     except ImportError:
         raise TachSetupError("Cannot run tests, could not find 'pytest'.")
 
-    cmd = ["pytest", "-p", "tach.pytest_plugin"]
+    # the tach pytest plugin is enabled by default, but we don't know whether the user has disabled it in their pytest config
+    # so we disable the default registered version of the plugin and re-enable it explicitly here
+    cmd = ["pytest", "-p", "no:tach", "-p", "tach.pytest_plugin"]
     if pytest_args:
         cmd.extend(pytest_args)
     if base:
@@ -88,14 +90,9 @@ def run_affected_tests(
 
     returncode, stdout, stderr = run_and_capture(cmd, cwd=project_root)
     tests_ran = returncode != pytest.ExitCode.NO_TESTS_COLLECTED
-    exit_code = (
-        pytest.ExitCode.OK
-        if returncode == pytest.ExitCode.NO_TESTS_COLLECTED
-        else returncode
-    )
 
     return AffectedTestsResult(
-        exit_code=exit_code,
+        exit_code=returncode,
         tests_ran_to_completion=tests_ran,
         stdout=stdout,
         stderr=stderr,

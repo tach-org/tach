@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import pytest
-from pytest import Cache, Collector, Config, Item, StashKey
+from pytest import Cache, Collector, Config, ExitCode, Item, Session, StashKey
 from rich.console import Console
 
 if TYPE_CHECKING:
@@ -513,3 +513,13 @@ def _record_test_durations(terminalreporter: TerminalReporter, config: Config) -
 
     # Save updated durations
     _save_durations(config, durations)
+
+
+def pytest_sessionfinish(session: Session, exitstatus: int | ExitCode):
+    tach_state = session.config.stash.get(tach_state_key, None)
+    if (
+        tach_state
+        and tach_state.handler.num_removed_items
+        and exitstatus == ExitCode.NO_TESTS_COLLECTED
+    ):
+        session.exitstatus = ExitCode.OK

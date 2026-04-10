@@ -71,6 +71,7 @@ class TestPytestPluginSkipping:
         result = run_pytest(tach_project, "--tach-base", "HEAD")
         result.assert_outcomes(passed=0)
         result.stdout.fnmatch_lines(["*Skipped 5 test* (2 file*"])
+        assert result.ret == pytest.ExitCode.OK
 
     def test_source_change_runs_dependent_tests(self, tach_project: pytest.Pytester):
         """When a source file changes, only tests that import it should run."""
