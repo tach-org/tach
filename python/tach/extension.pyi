@@ -1,8 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import Literal
-
-from typing_extensions import TypeAlias
+from typing import Literal, TypeAlias
 
 class PythonImport:
     module_path: str
