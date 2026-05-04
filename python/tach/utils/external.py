@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 import sys
 from functools import cache
-from typing import TYPE_CHECKING, Any
 
 KNOWN_MODULE_SPECIAL_CASES = {
     "__future__",
@@ -11,104 +10,29 @@ KNOWN_MODULE_SPECIAL_CASES = {
 }
 
 
-# we need to hide the stdlib_list from the type checker because it's only conditionally installed depending on the python version
-# resulting in different errors being reported depending on the python version
-def is_stdlib_module(module: str) -> bool:  # pyright: ignore[reportReturnType]
+def is_stdlib_module(module: str) -> bool:
     if module in KNOWN_MODULE_SPECIAL_CASES:
         return True
 
-    if sys.version_info >= (3, 10):
-        if module in sys.builtin_module_names:
-            return True
-        if module in sys.stdlib_module_names:
-            return True
-        return False
-    elif not TYPE_CHECKING:
-        from stdlib_list import in_stdlib  # type: ignore
-
-        return in_stdlib(module)  # type: ignore
+    if module in sys.builtin_module_names:
+        return True
+    if module in sys.stdlib_module_names:
+        return True
+    return False
 
 
-def get_stdlib_modules() -> list[str]:  # pyright: ignore[reportReturnType] see comment on is_stdlib_module
-    if sys.version_info >= (3, 10):
-        modules = set(sys.builtin_module_names)
-        modules.update(sys.stdlib_module_names)
-        modules.update(KNOWN_MODULE_SPECIAL_CASES)
-        return sorted(modules)
-    elif not TYPE_CHECKING:
-        from stdlib_list import stdlib_list  # type: ignore
-
-        modules: set[str] = set(stdlib_list())  # type: ignore
-        modules.update(KNOWN_MODULE_SPECIAL_CASES)
-        return list(sorted(modules))
-
-
-def _get_installed_modules(dist: Any) -> list[str]:
-    # This method is best-effort, and is only used for Python < 3.10
-    module_names: set[str] = set()
-
-    # Method 1: Check top_level.txt
-    try:
-        top_level = dist.read_text("top_level.txt")
-        if top_level:
-            module_names.update(
-                module_name.strip()
-                for module_name in top_level.splitlines()
-                if module_name.strip()
-            )
-            return list(module_names)
-    except Exception:
-        pass
-
-    # Method 2: Parse RECORD file
-    try:
-        record = dist.read_text("RECORD")
-        if record:
-            for line in record.splitlines():
-                base_name = line.split(",")[0].split("/")[0]
-                if (
-                    "/" in line
-                    and not base_name.startswith("_")
-                    and not base_name.endswith("dist-info")
-                    and "." not in base_name
-                ):
-                    module_names.add(base_name)
-            if module_names:
-                return list(module_names)
-    except Exception:
-        pass
-
-    # Method 3: Check entry points
-    for ep in dist.entry_points:
-        if ":" in ep.value:
-            entry_point = ep.value.split(":")[0]
-        else:
-            entry_point = ep.value
-        module_names.add(entry_point.split(".")[0])
-    return list(module_names)
+def get_stdlib_modules() -> list[str]:
+    modules = set(sys.builtin_module_names)
+    modules.update(sys.stdlib_module_names)
+    modules.update(KNOWN_MODULE_SPECIAL_CASES)
+    return sorted(modules)
 
 
 @cache
-def get_module_mappings() -> dict[str, list[str]]:
-    if sys.version_info >= (3, 10):
-        from importlib.metadata import packages_distributions
+def get_module_mappings():
+    from importlib.metadata import packages_distributions
 
-        return packages_distributions()  # type: ignore
-    else:
-        if sys.version_info >= (3, 8):  # noqa: UP036
-            from importlib.metadata import distributions
-        else:
-            from importlib_metadata import distributions  # type: ignore
-
-        result: dict[str, list[str]] = {}
-        for dist in distributions():
-            modules = _get_installed_modules(dist)
-            name = dist.metadata["Name"]
-            for module in modules:
-                if module not in result:
-                    result[module] = []
-                result[module].append(name)
-        return result
+    return packages_distributions()
 
 
 PYPI_PACKAGE_REGEX = re.compile(r"[-_.]+")
