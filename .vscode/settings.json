@@ -67,6 +67,7 @@
   "git.blame.editorDecoration.enabled": true,
   "yaml.customTags": [
     // for mkdocs config. see https://squidfunk.github.io/mkdocs-material/creating-your-site/?h=vscode#minimal-configuration
+    // TODO: switch to zensical.toml and delete this
     "!ENV scalar",
     "!ENV sequence",
     "!relative scalar",

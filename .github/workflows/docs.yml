@@ -21,25 +21,26 @@ jobs:
       - name: Install Dependencies
         run: ./pw uv sync --only-group docs
       - name: Build Documentation
-        run: ./pw uv run mkdocs build --strict
+        run: ./pw uv run zensical build --strict
   deploy:
     needs: build
     # Only deploy docs on pushes to main branch
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
+      - uses: actions/configure-pages@v5
       - uses: actions/checkout@v5
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v5
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v4
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
       - run: ./pw uv sync --only-group docs
-      - run: ./pw uv run mkdocs gh-deploy --force
+      - run: ./pw uv run zensical build --clean 
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
+        id: deployment

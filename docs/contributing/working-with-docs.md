@@ -1,6 +1,6 @@
 # Working with Documentation
 
-This guide explains how to work with Tach's documentation system, which uses MkDocs with the Material theme.
+This guide explains how to work with Tach's documentation system, which uses Zensical.
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ You need Python installed on your system and the documentation dependencies:
 To work on the documentation locally, run:
 
 ```bash
-mkdocs serve
+zensical serve
 ```
 
 This will start a local server at http://127.0.0.1:8000/ with live reloading.
@@ -54,7 +54,7 @@ nav:
 
 ## Formatting
 
-MkDocs uses Markdown for formatting. Some useful features with Material for MkDocs include:
+Zensical uses Markdown for formatting. Some useful features with Zensical include:
 
 ### Code Blocks
 

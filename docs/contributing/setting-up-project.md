@@ -16,11 +16,11 @@ make test
 ```
 
 ## 3. Setting up the docs
-Tach uses MkDocs with the Material theme for documentation. To work with the documentation:
+Tach uses Zensical for documentation. To work with the documentation:
 
 1. Start the local development server:
 ```bash
-mkdocs serve
+zensical serve
 ```
 
 2. Open your browser to http://127.0.0.1:8000/ to see the documentation.
