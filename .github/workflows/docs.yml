@@ -16,12 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup Python
-        uses: actions/setup-python@v5
-      - name: Install Dependencies
-        run: ./pw uv sync --only-group docs
       - name: Build Documentation
-        run: ./pw uv run zensical build --strict
+        run: ./pw uv run --only-group docs zensical build --strict
   deploy:
     needs: build
     # Only deploy docs on pushes to main branch
@@ -37,8 +33,7 @@ jobs:
     steps:
       - uses: actions/configure-pages@v5
       - uses: actions/checkout@v5
-      - run: ./pw uv sync --only-group docs
-      - run: ./pw uv run zensical build --clean 
+      - run: ./pw uv run --only-group docs zensical build --clean 
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
