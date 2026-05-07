@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
+
+from tach.pytest_plugin import pytest_collection_modifyitems
 
 pytest_plugins = ["pytester"]
 
@@ -205,6 +210,46 @@ class TestAnotherGroup:
         result.assert_outcomes(passed=0)
         # 3 (test_with_import) + 2 (test_no_import) + 3 (test_class) = 8
         result.stdout.fnmatch_lines(["*Skipped 8 test* (3 file*"])
+
+
+class TestPytestPluginResolveItemPath:
+    """Unit test that item.path is resolved before passing to should_remove_items.
+
+    pytester always provides absolute item.path, so it can't catch this bug.
+    We mock the handler to verify resolve() is called.
+    """
+
+    def test_should_remove_items_receives_resolved_path(self, tmp_path: Path):
+        # Create a real file so resolve() produces an absolute path
+        test_file = tmp_path / "tests" / "test_foo.py"
+        test_file.parent.mkdir()
+        test_file.touch()
+        relative_path = Path("tests/test_foo.py")
+
+        handler = MagicMock()
+        handler.should_remove_items.return_value = True  # pyright: ignore[reportAny]
+        handler.num_removed_items = 0
+
+        state = MagicMock()
+        state.handler = handler
+        state.skip_enabled = False
+
+        config = MagicMock()
+        config.stash.get.return_value = state  # pyright: ignore[reportAny]
+
+        item = MagicMock()
+        item.path = relative_path
+
+        with patch.object(Path, "resolve", return_value=test_file) as mock_resolve:
+            pytest_collection_modifyitems(config, [item])
+            mock_resolve.assert_called_once()
+
+        # The key assertion: should_remove_items must receive the resolved
+        # absolute path, not the relative item.path
+        called_path: Path = handler.should_remove_items.call_args.kwargs["file_path"]  # pyright: ignore[reportAny]
+        assert called_path == test_file, (
+            f"should_remove_items received {called_path}, expected resolved path {test_file}"
+        )
 
 
 class TestPytestPluginDurations:
