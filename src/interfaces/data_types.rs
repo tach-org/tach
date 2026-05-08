@@ -78,6 +78,14 @@ pub struct InterfaceMember {
     node: InterfaceMemberNode,
 }
 
+fn annotation_name(annotation: &Expr) -> Option<String> {
+    match annotation {
+        Expr::Name(name) => Some(name.id.to_string()),
+        Expr::StringLiteral(s) => Some(s.value.to_string()),
+        _ => None,
+    }
+}
+
 struct ModuleInterfaceVisitor<'a> {
     // all interfaces to check against
     all_interfaces: &'a CompiledInterfaces,
@@ -149,11 +157,18 @@ impl StatementVisitor<'_> for ModuleInterfaceVisitor<'_> {
                         _ => panic!("Expected Expr::Name"),
                     },
                     node: InterfaceMemberNode::Variable {
-                        annotation: match node.annotation.as_ref() {
-                            Expr::Name(name) => Some(name.id.to_string()),
-                            Expr::StringLiteral(s) => Some(s.value.to_string()),
-                            _ => None,
-                        },
+                        annotation: annotation_name(node.annotation.as_ref()),
+                    },
+                });
+            }
+            Stmt::TypeAlias(node) => {
+                self.current_interface_members.push(InterfaceMember {
+                    name: match node.name.as_ref() {
+                        Expr::Name(name) => name.id.to_string(),
+                        _ => panic!("Expected Expr::Name"),
+                    },
+                    node: InterfaceMemberNode::Variable {
+                        annotation: annotation_name(node.value.as_ref()),
                     },
                 });
             }
@@ -167,21 +182,13 @@ impl StatementVisitor<'_> for ModuleInterfaceVisitor<'_> {
                             .map(|p| FunctionParameter {
                                 _name: p.parameter.name.to_string(),
                                 annotation: match &p.parameter.annotation {
-                                    Some(annotation) => match annotation.as_ref() {
-                                        Expr::Name(name) => Some(name.id.to_string()),
-                                        Expr::StringLiteral(s) => Some(s.value.to_string()),
-                                        _ => None,
-                                    },
+                                    Some(annotation) => annotation_name(annotation.as_ref()),
                                     None => None,
                                 },
                             })
                             .collect(),
                         return_type: match node.returns.as_ref() {
-                            Some(r) => match r.as_ref() {
-                                Expr::Name(name) => Some(name.id.to_string()),
-                                Expr::StringLiteral(s) => Some(s.value.to_string()),
-                                _ => None,
-                            },
+                            Some(r) => annotation_name(r.as_ref()),
                             None => None,
                         },
                     },
@@ -444,6 +451,32 @@ def custom_func(a: CustomType) -> CustomType:
                 assert_eq!(expected, InterfaceDataTypes::Primitive)
             }
             _ => panic!("Expected DidNotMatchInterface for custom_func"),
+        }
+    }
+
+    #[rstest]
+    fn test_type_check_cache_includes_pep695_type_alias(
+        temp_dir: TempDir,
+        basic_interface: InterfaceConfig,
+    ) {
+        let source_files = [(
+            "my_module.py",
+            r#"
+type PublicAlias = int
+            "#,
+        )];
+
+        let source_roots = setup_test_files(&temp_dir, &source_files);
+        let interfaces = CompiledInterfaces::build(&[basic_interface]);
+        let modules = vec!["my_module".to_string()];
+
+        let cache = TypeCheckCache::build(&interfaces, &modules, &source_roots).unwrap();
+
+        match cache.get_result("PublicAlias") {
+            TypeCheckResult::MatchedInterface { expected } => {
+                assert_eq!(expected, InterfaceDataTypes::Primitive)
+            }
+            _ => panic!("Expected MatchedInterface for PEP 695 type alias"),
         }
     }
 }
