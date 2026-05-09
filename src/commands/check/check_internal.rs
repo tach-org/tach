@@ -223,8 +223,8 @@ pub fn check(
                             ),
                         )]
                     }
-                    Err(DiagnosticError::ImportParse(_)) => {
-                        vec![Diagnostic::new_global_warning(
+                    Err(DiagnosticError::ImportParse(_)) | Err(DiagnosticError::PythonParse(_)) => {
+                        vec![Diagnostic::new_global_error(
                             DiagnosticDetails::Configuration(
                                 ConfigurationDiagnostic::SkippedFileSyntaxError {
                                     file_path: file_path.display().to_string(),
