@@ -265,25 +265,11 @@ mod tests {
     use rstest::*;
 
     #[fixture]
-    fn multi_package_config() -> ProjectConfig {
+    fn syntax_error_config() -> ProjectConfig {
         use crate::config::ModuleConfig;
 
         ProjectConfig {
-            modules: vec![
-                ModuleConfig::from_path("myorg.pack_a"),
-            ],
-            source_roots: [
-                "src/pack-a/src",
-                "src/pack-b/src",
-                "src/pack-c/src",
-                "src/pack-d/src",
-                "src/pack-e/src",
-                "src/pack-f/src",
-                "src/pack-g/src",
-            ]
-            .iter()
-            .map(PathBuf::from)
-            .collect(),
+            modules: vec![ModuleConfig::from_path("mymodule")],
             ..Default::default()
         }
     }
@@ -291,10 +277,10 @@ mod tests {
     #[rstest]
     fn check_internal_syntax_error_reports_as_error(
         example_dir: PathBuf,
-        multi_package_config: ProjectConfig,
+        syntax_error_config: ProjectConfig,
     ) {
-        let project_root = example_dir.join("multi_package");
-        let result = check(&project_root, &multi_package_config, true, false).unwrap();
+        let project_root = example_dir.join("syntax_error_fixture");
+        let result = check(&project_root, &syntax_error_config, true, false).unwrap();
 
         // Find the syntax error diagnostic
         let syntax_error = result
