@@ -255,3 +255,66 @@ pub fn check(
 
     Ok(diagnostics)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::ProjectConfig;
+    use crate::diagnostics::Severity;
+    use crate::tests::fixtures::example_dir;
+    use rstest::*;
+
+    #[fixture]
+    fn multi_package_config() -> ProjectConfig {
+        use crate::config::ModuleConfig;
+
+        ProjectConfig {
+            modules: vec![
+                ModuleConfig::from_path("myorg.pack_a"),
+            ],
+            source_roots: [
+                "src/pack-a/src",
+                "src/pack-b/src",
+                "src/pack-c/src",
+                "src/pack-d/src",
+                "src/pack-e/src",
+                "src/pack-f/src",
+                "src/pack-g/src",
+            ]
+            .iter()
+            .map(PathBuf::from)
+            .collect(),
+            ..Default::default()
+        }
+    }
+
+    #[rstest]
+    fn check_internal_syntax_error_reports_as_error(
+        example_dir: PathBuf,
+        multi_package_config: ProjectConfig,
+    ) {
+        let project_root = example_dir.join("multi_package");
+        let result = check(&project_root, &multi_package_config, true, false).unwrap();
+
+        // Find the syntax error diagnostic
+        let syntax_error = result
+            .iter()
+            .find(|d| matches!(
+                d.details(),
+                DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileSyntaxError { .. })
+            ))
+            .expect("Expected a syntax error diagnostic");
+
+        // The diagnostic should be an error, not a warning
+        assert!(matches!(
+            syntax_error,
+            Diagnostic::Global {
+                severity: Severity::Error,
+                details: DiagnosticDetails::Configuration(
+                    ConfigurationDiagnostic::SkippedFileSyntaxError { .. }
+                )
+            }
+        ));
+    }
+}
+
