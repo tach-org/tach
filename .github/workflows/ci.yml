@@ -36,24 +36,32 @@ jobs:
           ./pw uv run ruff check
           ./pw uv run ruff format --check
       - name: Test with cargo
+        if: always()
         run: |
           ./pw uv run cargo test --no-default-features
       - name: Test with pytest and report coverage
+        if: always()
         run: |
           ./pw uv run coverage run --branch --source=python -m pytest
           ./pw uv run coverage report
       - name: Check types with basedpyright
+        if: always()
         run: |
           ./pw uv run basedpyright
       - name: Check tach
+        if: always()
         run: ./pw uv run tach check
       - name: Check Rust linting
+        if: always()
         run: ./pw uv run cargo clippy
       - name: Check Rust formatting
+        if: always()
         run: ./pw uv run cargo fmt --all --check
       - name: Check Rust
+        if: always()
         run: ./pw uv run cargo check
       - name: Check docs
+        if: always()
         run: make docs-build
 
   # for some insane reason it's impossible to configure github actions to require that all checks pass before merging.
