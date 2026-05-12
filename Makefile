@@ -40,7 +40,6 @@ fmt-python: ## Format Python code
 
 
 fmt-rust: ## Format Rust code
-	cargo clippy --fix --allow-dirty --allow-staged
 	cargo fmt --all
 
 
