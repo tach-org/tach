@@ -112,8 +112,8 @@ exempt-modules = ["typing", "typing_extensions"]
 [tool.pyright]
 include = ["python", "vscode"]
 # https://github.com/DetachHead/basedpyright/issues/31
-ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
-exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules"]
+ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules", "python/tests/example/syntax_error_fixture/**"]
+exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules", "python/tests/example/syntax_error_fixture/**"]
 executionEnvironments = [{ root = "python" }, { root = "vscode" }]
 pythonVersion = "3.10"
 reportImplicitStringConcatenation = false # conflicts with ruff formatter
