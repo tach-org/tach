@@ -664,9 +664,9 @@ dependencies = [
 
 [[package]]
 name = "get-size-derive2"
-version = "0.7.4"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2b6d1e2f75c16bfbcd0f95d84f99858a6e2f885c2287d1f5c3a96e8444a34b4"
+checksum = "dfd774e8175d3adb09c1742cb4697fb08490607fc02acfaa3b66b88254239d1d"
 dependencies = [
  "attribute-derive",
  "quote",
@@ -675,13 +675,14 @@ dependencies = [
 
 [[package]]
 name = "get-size2"
-version = "0.7.4"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49cf31a6d70300cf81461098f7797571362387ef4bf85d32ac47eaa59b3a5a1a"
+checksum = "d5b6f7d040889b1980e31d03585f0150223f44eeada7a69c525cbb74c38266f6"
 dependencies = [
  "compact_str",
  "get-size-derive2",
- "hashbrown 0.16.1",
+ "hashbrown 0.17.1",
+ "ordermap",
  "smallvec",
 ]
 
@@ -707,25 +708,13 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
-dependencies = [
- "cfg-if",
- "libc",
- "r-efi 5.3.0",
- "wasip2",
-]
-
-[[package]]
-name = "getrandom"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0de51e6874e94e7bf76d726fc5d13ba782deca734ff60d5bb2fb2607c7406555"
 dependencies = [
  "cfg-if",
  "libc",
- "r-efi 6.0.0",
+ "r-efi",
  "rand_core 0.10.0",
  "wasip2",
  "wasip3",
@@ -762,8 +751,6 @@ version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
 dependencies = [
- "allocator-api2",
- "equivalent",
  "foldhash 0.1.5",
 ]
 
@@ -772,6 +759,17 @@ name = "hashbrown"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
+dependencies = [
+ "allocator-api2",
+ "equivalent",
+ "foldhash 0.2.0",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 dependencies = [
  "allocator-api2",
  "equivalent",
@@ -935,12 +933,12 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "2.13.0"
+version = "2.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
+checksum = "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9"
 dependencies = [
  "equivalent",
- "hashbrown 0.16.1",
+ "hashbrown 0.17.1",
  "serde",
  "serde_core",
 ]
@@ -971,20 +969,11 @@ dependencies = [
 
 [[package]]
 name = "inventory"
-version = "0.3.22"
+version = "0.3.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "009ae045c87e7082cb72dab0ccd01ae075dd00141ddc108f43a0ea150a9e7227"
+checksum = "a4f0c30c76f2f4ccee3fe55a2435f691ca00c0e4bd87abe4f4a851b1d4dac39b"
 dependencies = [
  "rustversion",
-]
-
-[[package]]
-name = "is-docker"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "928bae27f42bc99b60d9ac7334e3a21d10ad8f1835a4e12ec3ec0464765ed1b3"
-dependencies = [
- "once_cell",
 ]
 
 [[package]]
@@ -997,16 +986,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "is-wsl"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "173609498df190136aa7dea1a91db051746d339e18476eed5ca40521f02d7aa5"
-dependencies = [
- "is-docker",
- "once_cell",
 ]
 
 [[package]]
@@ -1210,16 +1189,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "matches"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
-
-[[package]]
 name = "matchit"
-version = "0.8.6"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f926ade0c4e170215ae43342bf13b9310a437609c81f29f86c5df6657582ef9"
+checksum = "8863b587001c1b9a8a4e36008cebc6b3612cb1226fe2de94858e06092687b608"
 
 [[package]]
 name = "memchr"
@@ -1301,9 +1274,9 @@ checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
 
 [[package]]
 name = "ordermap"
-version = "0.5.12"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b100f7dd605611822d30e182214d3c02fdefce2d801d23993f6b6ba6ca1392af"
+checksum = "7f7476a5b122ff1fce7208e7ee9dccd0a516e835f5b8b19b8f3c98a34cf757c1"
 dependencies = [
  "indexmap",
 ]
@@ -1615,9 +1588,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3"
-version = "0.28.2"
+version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf85e27e86080aafd5a22eae58a162e133a589551542b3e5cee4beb27e54f8e1"
+checksum = "91fd8e38a3b50ed1167fb981cd6fd60147e091784c427b8f7183a7ee32c31c12"
 dependencies = [
  "libc",
  "once_cell",
@@ -1629,18 +1602,18 @@ dependencies = [
 
 [[package]]
 name = "pyo3-build-config"
-version = "0.28.2"
+version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bf94ee265674bf76c09fa430b0e99c26e319c945d96ca0d5a8215f31bf81cf7"
+checksum = "e368e7ddfdeb98c9bca7f8383be1648fd84ab466bf2bc015e94008db6d35611e"
 dependencies = [
  "target-lexicon",
 ]
 
 [[package]]
 name = "pyo3-ffi"
-version = "0.28.2"
+version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "491aa5fc66d8059dd44a75f4580a2962c1862a1c2945359db36f6c2818b748dc"
+checksum = "7f29e10af80b1f7ccaf7f69eace800a03ecd13e883acfacc1e5d0988605f651e"
 dependencies = [
  "libc",
  "pyo3-build-config",
@@ -1648,9 +1621,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros"
-version = "0.28.2"
+version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5d671734e9d7a43449f8480f8b38115df67bef8d21f76837fa75ee7aaa5e52e"
+checksum = "df6e520eff47c45997d2fc7dd8214b25dd1310918bbb2642156ef66a67f29813"
 dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
@@ -1660,9 +1633,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros-backend"
-version = "0.28.2"
+version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22faaa1ce6c430a1f71658760497291065e6450d7b5dc2bcf254d49f66ee700a"
+checksum = "c4cdc218d835738f81c2338f822078af45b4afdf8b2e33cbb5916f108b813acb"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -1687,9 +1660,9 @@ dependencies = [
 
 [[package]]
 name = "quick-junit"
-version = "0.5.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ee9342d671fae8d66b3ae9fd7a9714dfd089c04d2a8b1ec0436ef77aee15e5f"
+checksum = "e3e64c58c4c88fc1045e8fe98a1b7cec3643187e3dd678f9bbcdd8f12a6933d6"
 dependencies = [
  "chrono",
  "indexmap",
@@ -1742,12 +1715,6 @@ dependencies = [
 
 [[package]]
 name = "r-efi"
-version = "5.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
-
-[[package]]
-name = "r-efi"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
@@ -1759,18 +1726,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
 dependencies = [
  "libc",
- "rand_chacha 0.3.1",
+ "rand_chacha",
  "rand_core 0.6.4",
-]
-
-[[package]]
-name = "rand"
-version = "0.9.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6db2770f06117d490610c7488547d543617b21bfa07796d7a12f6f1bd53850d1"
-dependencies = [
- "rand_chacha 0.9.0",
- "rand_core 0.9.5",
 ]
 
 [[package]]
@@ -1795,16 +1752,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rand_chacha"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3022b5f1df60f26e1ffddd6c66e8aa15de382ae63b3a0c1bfc0e4d3e3f325cb"
-dependencies = [
- "ppv-lite86",
- "rand_core 0.9.5",
-]
-
-[[package]]
 name = "rand_core"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1815,24 +1762,15 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.9.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76afc826de14238e6e8c374ddcc1fa19e374fd8dd986b0d2af0d02377261d83c"
-dependencies = [
- "getrandom 0.3.4",
-]
-
-[[package]]
-name = "rand_core"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c8d0fd677905edcbeedbf2edb6494d676f0e98d54d5cf9bda0b061cb8fb8aba"
 
 [[package]]
 name = "rayon"
-version = "1.11.0"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "368f01d005bf8fd9b1206fb6fa653e6c4a81ceb1466406b81792d87c5677a58f"
+checksum = "fb39b166781f92d482534ef4b4b1b2568f42613b53e5b6c160e24cfbfa30926d"
 dependencies = [
  "either",
  "rayon-core",
@@ -1972,7 +1910,7 @@ dependencies = [
 [[package]]
 name = "ruff_annotate_snippets"
 version = "0.1.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "anstyle",
  "memchr",
@@ -1982,7 +1920,7 @@ dependencies = [
 [[package]]
 name = "ruff_cache"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "filetime",
  "glob",
@@ -1995,7 +1933,7 @@ dependencies = [
 [[package]]
 name = "ruff_db"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "anstyle",
  "arc-swap",
@@ -2004,7 +1942,6 @@ dependencies = [
  "dunce",
  "filetime",
  "get-size2",
- "glob",
  "matchit",
  "path-slash",
  "pathdiff",
@@ -2016,13 +1953,14 @@ dependencies = [
  "ruff_python_ast",
  "ruff_python_parser",
  "ruff_python_trivia",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "rustc-hash",
  "salsa",
  "serde",
  "serde_json",
  "similar",
+ "supports-hyperlinks",
  "thiserror 2.0.18",
  "tracing",
  "ty_static",
@@ -2033,18 +1971,18 @@ dependencies = [
 [[package]]
 name = "ruff_diagnostics"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "get-size2",
  "is-macro",
- "ruff_text_size",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "serde",
 ]
 
 [[package]]
 name = "ruff_index"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "get-size2",
  "ruff_macros",
@@ -2052,20 +1990,20 @@ dependencies = [
 
 [[package]]
 name = "ruff_linter"
-version = "0.14.3"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+version = "0.15.12"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "aho-corasick",
  "anyhow",
  "bitflags 2.11.0",
  "colored",
+ "compact_str",
  "fern",
  "glob",
  "globset",
- "hashbrown 0.16.1",
+ "hashbrown 0.17.1",
  "imperative",
  "is-macro",
- "is-wsl",
  "itertools 0.14.0",
  "jiff",
  "libcst",
@@ -2090,8 +2028,8 @@ dependencies = [
  "ruff_python_semantic",
  "ruff_python_stdlib",
  "ruff_python_trivia",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "rustc-hash",
  "serde",
  "serde_json",
@@ -2100,7 +2038,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "thiserror 2.0.18",
- "toml 0.9.12+spec-1.1.0",
+ "toml 1.0.6+spec-1.1.0",
  "typed-arena",
  "unicode-normalization",
  "unicode-width",
@@ -2111,12 +2049,13 @@ dependencies = [
 [[package]]
 name = "ruff_macros"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "heck",
  "itertools 0.14.0",
  "proc-macro2",
  "quote",
+ "regex",
  "ruff_python_trivia",
  "syn",
 ]
@@ -2124,23 +2063,22 @@ dependencies = [
 [[package]]
 name = "ruff_memory_usage"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "get-size2",
- "ordermap",
 ]
 
 [[package]]
 name = "ruff_notebook"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "anyhow",
  "itertools 0.14.0",
- "rand 0.9.2",
+ "rand 0.10.0",
  "ruff_diagnostics",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "serde",
  "serde_json",
  "serde_with",
@@ -2151,20 +2089,19 @@ dependencies = [
 [[package]]
 name = "ruff_python_ast"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "aho-corasick",
  "bitflags 2.11.0",
  "compact_str",
  "get-size2",
  "is-macro",
- "itertools 0.14.0",
  "memchr",
  "ruff_cache",
  "ruff_macros",
  "ruff_python_trivia",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "rustc-hash",
  "serde",
  "thiserror 2.0.18",
@@ -2173,57 +2110,55 @@ dependencies = [
 [[package]]
 name = "ruff_python_codegen"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "ruff_python_ast",
  "ruff_python_literal",
  "ruff_python_parser",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
 ]
 
 [[package]]
 name = "ruff_python_importer"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "anyhow",
  "ruff_diagnostics",
  "ruff_python_ast",
  "ruff_python_codegen",
- "ruff_python_parser",
  "ruff_python_trivia",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
 ]
 
 [[package]]
 name = "ruff_python_index"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "ruff_python_ast",
- "ruff_python_parser",
  "ruff_python_trivia",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
 ]
 
 [[package]]
 name = "ruff_python_literal"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "bitflags 2.11.0",
+ "icu_properties",
  "itertools 0.14.0",
  "ruff_python_ast",
- "unic-ucd-category",
 ]
 
 [[package]]
 name = "ruff_python_parser"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "bitflags 2.11.0",
  "bstr",
@@ -2232,7 +2167,7 @@ dependencies = [
  "memchr",
  "ruff_python_ast",
  "ruff_python_trivia",
- "ruff_text_size",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "rustc-hash",
  "static_assertions",
  "unicode-ident",
@@ -2243,7 +2178,7 @@ dependencies = [
 [[package]]
 name = "ruff_python_semantic"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "bitflags 2.11.0",
  "is-macro",
@@ -2253,7 +2188,7 @@ dependencies = [
  "ruff_python_ast",
  "ruff_python_parser",
  "ruff_python_stdlib",
- "ruff_text_size",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "rustc-hash",
  "smallvec",
 ]
@@ -2261,7 +2196,7 @@ dependencies = [
 [[package]]
 name = "ruff_python_stdlib"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "bitflags 2.11.0",
  "unicode-ident",
@@ -2270,11 +2205,11 @@ dependencies = [
 [[package]]
 name = "ruff_python_trivia"
 version = "0.0.0"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "itertools 0.14.0",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "unicode-ident",
 ]
 
@@ -2283,9 +2218,18 @@ name = "ruff_source_file"
 version = "0.0.0"
 source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
 dependencies = [
+ "memchr",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.14.3)",
+]
+
+[[package]]
+name = "ruff_source_file"
+version = "0.0.0"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
+dependencies = [
  "get-size2",
  "memchr",
- "ruff_text_size",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.15.12)",
  "serde",
 ]
 
@@ -2293,6 +2237,11 @@ dependencies = [
 name = "ruff_text_size"
 version = "0.0.0"
 source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+
+[[package]]
+name = "ruff_text_size"
+version = "0.0.0"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "get-size2",
  "serde",
@@ -2350,14 +2299,15 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "salsa"
-version = "0.24.0"
-source = "git+https://github.com/salsa-rs/salsa.git?rev=cdd0b85516a52c18b8a6d17a2279a96ed6c3e198#cdd0b85516a52c18b8a6d17a2279a96ed6c3e198"
+version = "0.26.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4612ff789805e65c87e9b38cb749a293212a615af065bed8a2001086801498c3"
 dependencies = [
  "boxcar",
  "compact_str",
  "crossbeam-queue",
  "crossbeam-utils",
- "hashbrown 0.15.5",
+ "hashbrown 0.17.1",
  "hashlink",
  "indexmap",
  "intrusive-collections",
@@ -2370,17 +2320,20 @@ dependencies = [
  "smallvec",
  "thin-vec",
  "tracing",
+ "typeid",
 ]
 
 [[package]]
 name = "salsa-macro-rules"
-version = "0.24.0"
-source = "git+https://github.com/salsa-rs/salsa.git?rev=cdd0b85516a52c18b8a6d17a2279a96ed6c3e198#cdd0b85516a52c18b8a6d17a2279a96ed6c3e198"
+version = "0.26.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58e354cbac6939b9b09cd9c11fb419a53e64b4a0f755d929f56a09f4cc752e41"
 
 [[package]]
 name = "salsa-macros"
-version = "0.24.0"
-source = "git+https://github.com/salsa-rs/salsa.git?rev=cdd0b85516a52c18b8a6d17a2279a96ed6c3e198#cdd0b85516a52c18b8a6d17a2279a96ed6c3e198"
+version = "0.26.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3067861075c2b80608f84ad49fb88f2c7610b94cdf8b4201e79ddee87f8980c8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2543,9 +2496,12 @@ dependencies = [
 
 [[package]]
 name = "similar"
-version = "2.7.0"
+version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbbb5d9659141646ae647b42fe094daf6c6192d1620870b449d9557f748b2daa"
+checksum = "04d93e861ede2e497b47833469b8ec9d5c07fa4c78ce7a00f6eb7dd8168b4b3f"
+dependencies = [
+ "bstr",
+]
 
 [[package]]
 name = "siphasher"
@@ -2610,24 +2566,30 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "strum"
-version = "0.27.2"
+version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af23d6f6c1a224baef9d3f61e287d2761385a5b88fdab4eb4c6f11aeb54c4bcf"
+checksum = "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd"
 dependencies = [
  "strum_macros",
 ]
 
 [[package]]
 name = "strum_macros"
-version = "0.27.2"
+version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7695ce3845ea4b33927c055a39dc438a45b059f7c1b3d91d38d10355fb8cbca7"
+checksum = "ab85eea0270ee17587ed4156089e10b9e6880ee688791d45a905f5b1ca36f664"
 dependencies = [
  "heck",
  "proc-macro2",
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "supports-hyperlinks"
+version = "3.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e396b6523b11ccb83120b115a0b7366de372751aa6edf19844dfb13a6af97e91"
 
 [[package]]
 name = "syn"
@@ -2676,8 +2638,8 @@ dependencies = [
  "ruff_linter",
  "ruff_python_ast",
  "ruff_python_parser",
- "ruff_source_file",
- "ruff_text_size",
+ "ruff_source_file 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.14.3)",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/ruff.git?tag=0.14.3)",
  "serde",
  "serde_json",
  "serial_test",
@@ -2887,7 +2849,7 @@ dependencies = [
 [[package]]
 name = "ty_static"
 version = "0.0.1"
-source = "git+https://github.com/astral-sh/ruff.git?tag=0.14.3#8737a2d5f5138d855ef4b3ff6982bd7684324eab"
+source = "git+https://github.com/astral-sh/ruff.git?tag=0.15.12#66f93cf7ed4d36325f35a452e4afa28268fbcd28"
 dependencies = [
  "ruff_macros",
 ]
@@ -2899,46 +2861,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6af6ae20167a9ece4bcb41af5b80f8a1f1df981f6391189ce00fd257af04126a"
 
 [[package]]
-name = "unic-char-property"
-version = "0.9.0"
+name = "typeid"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8c57a407d9b6fa02b4795eb81c5b6652060a15a7903ea981f3d723e6c0be221"
-dependencies = [
- "unic-char-range",
-]
-
-[[package]]
-name = "unic-char-range"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0398022d5f700414f6b899e10b8348231abf9173fa93144cbc1a43b9793c1fbc"
-
-[[package]]
-name = "unic-common"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80d7ff825a6a654ee85a63e80f92f054f904f21e7d12da4e22f9834a4aaa35bc"
-
-[[package]]
-name = "unic-ucd-category"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b8d4591f5fcfe1bd4453baaf803c40e1b1e69ff8455c47620440b46efef91c0"
-dependencies = [
- "matches",
- "unic-char-property",
- "unic-char-range",
- "unic-ucd-version",
-]
-
-[[package]]
-name = "unic-ucd-version"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96bd2f2237fe450fcd0a1d2f5f4e91711124f7857ba2e964247776ebeeb7b0c4"
-dependencies = [
- "unic-common",
-]
+checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
 
 [[package]]
 name = "unicode-ident"
