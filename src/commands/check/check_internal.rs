@@ -285,10 +285,14 @@ mod tests {
         // Find the syntax error diagnostic
         let syntax_error = result
             .iter()
-            .find(|d| matches!(
-                d.details(),
-                DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileSyntaxError { .. })
-            ))
+            .find(|d| {
+                matches!(
+                    d.details(),
+                    DiagnosticDetails::Configuration(
+                        ConfigurationDiagnostic::SkippedFileSyntaxError { .. }
+                    )
+                )
+            })
             .expect("Expected a syntax error diagnostic");
 
         // The diagnostic should be an error, not a warning
@@ -303,4 +307,3 @@ mod tests {
         ));
     }
 }
-
