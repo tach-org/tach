@@ -15,8 +15,8 @@ once_cell = "1.21.4"
 ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_ast", tag = "0.15.12" }
 ruff_python_parser = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_parser", tag = "0.15.12" }
 ruff_linter = { git = "https://github.com/astral-sh/ruff.git", package="ruff_linter", tag = "0.15.12" }
-ruff_source_file = { git = "https://github.com/astral-sh/ruff.git", package="ruff_source_file", tag = "0.14.3" }
-ruff_text_size = { git = "https://github.com/astral-sh/ruff.git", package="ruff_text_size", tag = "0.14.3" }
+ruff_source_file = { git = "https://github.com/astral-sh/ruff.git", package="ruff_source_file", tag = "0.15.12" }
+ruff_text_size = { git = "https://github.com/astral-sh/ruff.git", package="ruff_text_size", tag = "0.15.12" }
 cached = { version = "0.59.0", features = ["disk_store"] }
 globset = "0.4.18"
 toml = "1.0.6"
