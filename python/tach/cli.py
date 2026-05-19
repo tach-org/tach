@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from tach import __version__, cache, extension, icons
 from tach import filesystem as fs
@@ -230,6 +230,42 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format (default: text)",
     )
     add_base_arguments(check_parser)
+
+    ## tach deadcode
+    deadcode_parser = subparsers.add_parser(
+        "deadcode",
+        prog=f"{TOOL_NAME} deadcode",
+        help="Detect unreachable files and top-level symbols.",
+        description="Detect unreachable files and top-level symbols.",
+    )
+    _ = deadcode_parser.add_argument(
+        "--entry-point",
+        action="append",
+        default=[],
+        help="Entry point path, module, or module:symbol seed. May be repeated.",
+    )
+    _ = deadcode_parser.add_argument(
+        "--files",
+        action="store_true",
+        help="Detect unreachable files/modules only.",
+    )
+    _ = deadcode_parser.add_argument(
+        "--symbols",
+        action="store_true",
+        help="Detect unreachable top-level symbols only.",
+    )
+    _ = deadcode_parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Detect both files/modules and top-level symbols.",
+    )
+    _ = deadcode_parser.add_argument(
+        "--output",
+        choices=["text", "json"],
+        default="text",
+        help="Output format (default: text)",
+    )
+    add_base_arguments(deadcode_parser)
 
     ## tach check-external
     check_parser_external = subparsers.add_parser(
@@ -597,6 +633,70 @@ def tach_check(
     if exit_code == 0 and output_format == "text":
         console_err.print(f"{icons.SUCCESS} All modules validated!", style="green")
     sys.exit(exit_code)
+
+
+def tach_deadcode(
+    project_config: ProjectConfig,
+    project_root: Path,
+    entry_points: list[str] | None = None,
+    files: bool = False,
+    symbols: bool = False,
+    all: bool = False,
+    output_format: str = "text",
+):
+    logger.info(
+        "tach deadcode called",
+        extra={
+            "data": CallInfo(
+                function="tach_deadcode",
+                parameters={
+                    "entry_points": entry_points or [],
+                    "files": files,
+                    "symbols": symbols,
+                    "all": all,
+                    "output_format": output_format,
+                },
+            ),
+        },
+    )
+    if all:
+        files = True
+        symbols = True
+
+    try:
+        diagnostics = extension.check_deadcode(
+            project_root=project_root,
+            project_config=project_config,
+            entry_points=entry_points or [],
+            files=files,
+            symbols=symbols,
+        )
+        has_errors = any(diagnostic.is_error() for diagnostic in diagnostics)
+
+        if output_format == "json":
+            try:
+                print(
+                    extension.serialize_diagnostics_json(diagnostics, pretty_print=True)
+                )
+            except ValueError as e:
+                json.dump({"error": str(e)}, sys.stdout)
+            sys.exit(1 if has_errors else 0)
+
+        if diagnostics:
+            print(
+                extension.format_diagnostics(diagnostics=diagnostics),
+                file=sys.stderr,
+            )
+        elif output_format == "text":
+            console_err.print(f"{icons.SUCCESS} No dead code found!", style="green")
+    except Exception as e:
+        if output_format == "json":
+            json.dump({"error": str(e)}, sys.stdout)
+        else:
+            print(str(e))
+        sys.exit(1)
+
+    sys.exit(1 if has_errors else 0)
 
 
 def tach_check_external(
@@ -1263,6 +1363,16 @@ def main(argv: list[str] = sys.argv[1:]) -> None:
                 exact=args.exact,
                 output_format=args.output,
             )
+    elif args.command == "deadcode":
+        tach_deadcode(
+            project_config=project_config,
+            project_root=project_root,
+            entry_points=cast("list[str]", args.entry_point),
+            files=cast("bool", args.files),
+            symbols=cast("bool", args.symbols),
+            all=cast("bool", args.all),
+            output_format=cast("str", args.output),
+        )
     elif args.command == "check-external":
         tach_check_external(
             project_config=project_config,

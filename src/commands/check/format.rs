@@ -11,6 +11,7 @@ use itertools::Itertools;
 enum DiagnosticGroupKind {
     Other,
     Configuration,
+    Deadcode,
     ExternalDependency,
     Interface,
     InternalDependency,
@@ -34,6 +35,10 @@ impl From<&DiagnosticDetails> for DiagnosticGroupKind {
                 | CodeDiagnostic::ModuleUndeclaredExternalDependency { .. }
                 | CodeDiagnostic::ModuleForbiddenExternalDependency { .. }
                 | CodeDiagnostic::UnusedExternalDependency { .. } => Self::ExternalDependency,
+
+                CodeDiagnostic::DeadFile { .. } | CodeDiagnostic::DeadSymbol { .. } => {
+                    Self::Deadcode
+                }
 
                 CodeDiagnostic::UnnecessarilyIgnoredDependency { .. }
                 | CodeDiagnostic::UnusedIgnoreDirective()
@@ -68,6 +73,12 @@ impl<'a> DiagnosticGroup<'a> {
                 Some(style(
                     "Consider updating the corresponding pyproject.toml file,\n\
                     or add the dependencies to the 'external.exclude' list in tach.toml."
+                ).yellow()),
+            ),
+            DiagnosticGroupKind::Deadcode => (
+                style("Dead Code").red().bold(),
+                Some(style(
+                    "Adjust deadcode entry points, public API settings, or ignore patterns in tach.toml if this code is intentionally reachable."
                 ).yellow()),
             ),
             DiagnosticGroupKind::Interface => (

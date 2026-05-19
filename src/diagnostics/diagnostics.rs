@@ -65,6 +65,12 @@ pub enum ConfigurationDiagnostic {
 
     #[error("Skipped '{file_path}' due to an unknown error.")]
     SkippedUnknownError { file_path: String },
+
+    #[error("No deadcode entry points resolved; skipping deadcode detection.")]
+    DeadcodeNoEntryPoints(),
+
+    #[error("Deadcode entry point '{entry_point}' was not found.")]
+    DeadcodeEntryPointNotFound { entry_point: String },
 }
 
 #[derive(Error, Debug, Clone, Serialize, PartialEq)]
@@ -173,6 +179,18 @@ pub enum CodeDiagnostic {
         dependency: String,
         usage_module: String,
     },
+
+    #[error("Module '{module_path}' is unreachable from configured deadcode entry points.")]
+    DeadFile { module_path: String },
+
+    #[error(
+        "{symbol_kind} '{module_path}:{symbol_name}' is unreachable from configured deadcode entry points."
+    )]
+    DeadSymbol {
+        module_path: String,
+        symbol_name: String,
+        symbol_kind: String,
+    },
 }
 
 impl CodeDiagnostic {
@@ -205,6 +223,7 @@ impl CodeDiagnostic {
                 package_module_name,
                 ..
             } => Some(package_module_name),
+            CodeDiagnostic::DeadFile { .. } | CodeDiagnostic::DeadSymbol { .. } => None,
         }
     }
 
@@ -221,6 +240,8 @@ impl CodeDiagnostic {
             | CodeDiagnostic::ModuleForbiddenExternalDependency { usage_module, .. } => {
                 Some(usage_module)
             }
+            CodeDiagnostic::DeadFile { module_path } => Some(module_path),
+            CodeDiagnostic::DeadSymbol { module_path, .. } => Some(module_path),
             _ => None,
         }
     }
@@ -248,6 +269,8 @@ impl CodeDiagnostic {
             | CodeDiagnostic::ClosedLayerViolation {
                 definition_module, ..
             } => Some(definition_module),
+            CodeDiagnostic::DeadFile { module_path } => Some(module_path),
+            CodeDiagnostic::DeadSymbol { module_path, .. } => Some(module_path),
             _ => None,
         }
     }
@@ -494,6 +517,14 @@ impl Diagnostic {
             self.details(),
             DiagnosticDetails::Code(CodeDiagnostic::PrivateDependency { .. })
                 | DiagnosticDetails::Code(CodeDiagnostic::InvalidDataTypeExport { .. })
+        )
+    }
+
+    pub fn is_deadcode_error(&self) -> bool {
+        matches!(
+            self.details(),
+            DiagnosticDetails::Code(CodeDiagnostic::DeadFile { .. })
+                | DiagnosticDetails::Code(CodeDiagnostic::DeadSymbol { .. })
         )
     }
 

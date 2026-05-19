@@ -53,6 +53,13 @@ def check(
     dependencies: bool,
     interfaces: bool,
 ) -> list[Diagnostic]: ...
+def check_deadcode(
+    project_root: Path,
+    project_config: ProjectConfig,
+    entry_points: list[str] | None = None,
+    files: bool = False,
+    symbols: bool = False,
+) -> list[Diagnostic]: ...
 def check_external_dependencies(
     project_root: Path,
     project_config: ProjectConfig,
@@ -75,6 +82,7 @@ class Diagnostic:
     def is_configuration(self) -> bool: ...
     def is_dependency_error(self) -> bool: ...
     def is_interface_error(self) -> bool: ...
+    def is_deadcode_error(self) -> bool: ...
     def is_warning(self) -> bool: ...
     def is_error(self) -> bool: ...
     def is_deprecated(self) -> bool: ...
@@ -132,6 +140,8 @@ class UnusedDependencies:
 
 RuleSetting = Literal["error", "warn", "off"]
 
+DeadcodeDetection = Literal["files", "symbols"]
+
 RootModuleTreatment = Literal["allow", "ignore", "dependenciesonly", "forbid"]
 
 # ideally this should be using the new type alias syntax. see https://github.com/astral-sh/ruff/issues/21677
@@ -140,6 +150,20 @@ RespectGitIgnore: TypeAlias = bool | Literal["if_git_repo"]
 class RulesConfig:
     unused_ignore_directives: RuleSetting
     require_ignore_directive_reasons: RuleSetting
+
+class DeadcodeConfig:
+    entry_points: list[str]
+    detect: list[DeadcodeDetection]
+    exclude: list[str]
+    ignore: list[str]
+    public_modules: list[str]
+    public_symbols: list[str]
+    public_decorators: list[str]
+    severity: RuleSetting
+    protect_init_files: bool
+    respect_all: bool
+    include_test_usages: bool
+    ignore_dynamic_modules: bool
 
 class ProjectConfig:
     cache: CacheConfig
@@ -156,6 +180,7 @@ class ProjectConfig:
     use_regex_matching: bool
     rules: RulesConfig
     root_module: RootModuleTreatment
+    deadcode: DeadcodeConfig
 
     def __new__(cls) -> ProjectConfig: ...
     def serialize_json(self) -> str: ...
