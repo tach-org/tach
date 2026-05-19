@@ -168,7 +168,7 @@ In case you would like to explicitly allow a certain external module, this can b
 
 ## tach deadcode
 
-Tach can detect Python files and modules that are not reachable from your configured entry points.
+Tach can detect Python files/modules and top-level symbols that are not reachable from your configured entry points.
 
 ```
 usage: tach deadcode [-h] [--entry-point ENTRY_POINT] [--files] [--symbols]
@@ -190,7 +190,7 @@ options:
                         etc.
 ```
 
-By default, `tach deadcode` uses the detection modes configured in [`[deadcode]`](configuration.md#deadcode). If no detection mode is configured, Tach reports unreachable files and modules.
+By default, `tach deadcode` uses the detection modes configured in [`[deadcode]`](configuration.md#deadcode). If no detection mode is configured, Tach reports unreachable files and modules. Command-line detection flags override configured modes for that run.
 
 ### Entry Points
 
@@ -209,11 +209,26 @@ You can repeat `--entry-point` or configure `entry_points` in `tach.toml`. If no
 Use flags to override the configured detection modes for one run:
 
 - `--files`: report unreachable files and modules
-- `--symbols`: report unreachable top-level symbols when symbol detection is enabled
+- `--symbols`: report unreachable top-level symbols only
 - `--all`: report both files/modules and top-level symbols
 
 !!! note
-    File/module detection is the conservative default. Symbol detection uses the same entry points and is intended for top-level functions, classes, and variables.
+    File/module detection is the conservative default. Symbol detection still computes file reachability first so it only reports symbols in reachable files.
+
+### Symbol Detection
+
+Symbol detection reports unreachable module-level functions, classes, and simple variables. It traverses references inside methods and nested functions, but it does not report methods or nested functions as dead-code candidates.
+
+A top-level symbol is treated as live when it is:
+
+- Referenced from reachable module top-level code or from another live top-level symbol
+- Selected as a `module:symbol` entry point
+- Exported through `__all__` when `respect_all = true`
+- Matched by `public_modules`, `public_symbols`, or `public_decorators`
+
+Import aliases and `module.symbol` attribute references count as usages. When `ignore_dynamic_modules = true`, Tach suppresses symbol diagnostics in modules that use dynamic patterns such as module-level `__getattr__`, star imports, `globals()`, `locals()`, `getattr()`, `setattr()`, `__import__()`, or `importlib.import_module()`.
+
+When `--all` reports an unreachable file, Tach does not also report symbols from that same file.
 
 ### Examples
 
@@ -223,7 +238,7 @@ Run with configured entry points:
 tach deadcode
 ```
 
-Check a script entry point and return machine-readable diagnostics:
+Check a script entry point and return machine-readable file diagnostics:
 
 ```bash
 tach deadcode --entry-point app.py --files --output json
@@ -235,14 +250,59 @@ Treat multiple application roots as reachable:
 tach deadcode --entry-point web.app --entry-point worker.py
 ```
 
+Run symbol-only detection from a specific function entry point:
+
+```bash
+tach deadcode --entry-point pkg.cli:main --symbols
+```
+
+Run file and symbol detection together:
+
+```bash
+tach deadcode --all
+```
+
+Symbol diagnostics identify the symbol kind and fully qualified symbol path:
+
+```text
+Dead Code
+[WARN] path/to/pkg/api.py:17: function 'pkg.api:unused_function' is unreachable from configured deadcode entry points.
+[WARN] path/to/pkg/api.py:26: class 'pkg.api:UnusedClass' is unreachable from configured deadcode entry points.
+[WARN] path/to/pkg/service.py:2: variable 'pkg.service:UNUSED_VALUE' is unreachable from configured deadcode entry points.
+```
+
+JSON output includes a `DeadSymbol` detail with `module_path`, `symbol_name`, and `symbol_kind`:
+
+```json
+[
+  {
+    "Located": {
+      "file_path": "path/to/pkg/api.py",
+      "line_number": 17,
+      "severity": "Warning",
+      "details": {
+        "Code": {
+          "DeadSymbol": {
+            "module_path": "pkg.api",
+            "symbol_name": "unused_function",
+            "symbol_kind": "function"
+          }
+        }
+      }
+    }
+  }
+]
+```
+
 Configure defaults in `tach.toml`:
 
 ```toml
 [deadcode]
 entry_points = ["app.py", "pkg.cli:main"]
-detect = ["files"]
+detect = ["files", "symbols"]
 severity = "warn"
 ignore = ["pkg.legacy", "pkg/generated.py"]
+public_modules = ["pkg.api"]
 ```
 
 See [`[deadcode]`](configuration.md#deadcode) for all configuration options.

@@ -37,13 +37,15 @@ For [`tach deadcode`](commands.md#tach-deadcode), use the [`[deadcode].ignore`](
 ```toml
 [deadcode]
 ignore = [
-  "pkg.legacy",                 # module path
-  "pkg/generated.py",           # file path
-  "pkg.service:dynamic_handler", # symbol path
+  "pkg.legacy",                  # module path
+  "pkg/generated.py",            # file path
+  "pkg.service:dynamic_handler", # function symbol
+  "pkg.api:UnusedClass",         # class symbol
+  "pkg.constants:DEPRECATED",    # variable symbol
 ]
 ```
 
-Use `public_modules` or `public_symbols` instead when the code is part of your public API and should be treated as live, not ignored as an exception.
+Use `public_modules`, `public_symbols`, or `public_decorators` instead when the code is part of your public API and should be treated as live, not ignored as an exception.
 
 ## Reasons
 
