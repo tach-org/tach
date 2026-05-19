@@ -6,7 +6,10 @@ use crate::{
         DeadcodeDetection, ProjectConfig, project::DEFAULT_EXCLUDE_PATHS,
         root_module::ROOT_MODULE_SENTINEL_TAG,
     },
-    deadcode::{FileImportGraph, resolve_entry_points, types::DeadcodeFile, types::is_init_file},
+    deadcode::{
+        DeadSymbolAnalysisInput, FileImportGraph, find_dead_symbols, resolve_entry_points,
+        types::DeadcodeFile, types::is_init_file,
+    },
     diagnostics::{CodeDiagnostic, ConfigurationDiagnostic, Diagnostic, DiagnosticDetails},
     filesystem as fs,
     processors::import::get_normalized_imports_from_ast,
@@ -185,6 +188,22 @@ pub fn check_deadcode(
             &graph,
             &entry_file_roots,
             &parse_failures,
+        );
+    }
+
+    if detect_symbols {
+        emit_dead_symbol_diagnostics(
+            &mut diagnostics,
+            DeadSymbolDiagnosticContext {
+                project_config,
+                project_root: &project_root,
+                source_roots: &source_roots,
+                file_walker: &file_walker,
+                graph: &graph,
+                entry_file_roots: &entry_file_roots,
+                parse_failures: &parse_failures,
+                entry_points: &effective_entry_points,
+            },
         );
     }
 
@@ -428,6 +447,106 @@ fn emit_dead_file_diagnostics(
             None,
         ));
     }
+}
+
+struct DeadSymbolDiagnosticContext<'a> {
+    project_config: &'a ProjectConfig,
+    project_root: &'a Path,
+    source_roots: &'a [PathBuf],
+    file_walker: &'a fs::FSWalker,
+    graph: &'a FileImportGraph,
+    entry_file_roots: &'a [PathBuf],
+    parse_failures: &'a BTreeSet<PathBuf>,
+    entry_points: &'a [String],
+}
+
+fn emit_dead_symbol_diagnostics(
+    diagnostics: &mut Vec<Diagnostic>,
+    context: DeadSymbolDiagnosticContext<'_>,
+) {
+    let Ok(severity) = (&context.project_config.deadcode.severity).try_into() else {
+        return;
+    };
+
+    for symbol in find_dead_symbols(DeadSymbolAnalysisInput {
+        project_root: context.project_root,
+        project_config: context.project_config,
+        source_roots: context.source_roots,
+        file_walker: context.file_walker,
+        graph: context.graph,
+        entry_file_roots: context.entry_file_roots,
+        parse_failures: context.parse_failures,
+        entry_points: context.entry_points,
+    }) {
+        if should_ignore_symbol(
+            &context.project_config.deadcode.ignore,
+            context.project_root,
+            context.source_roots,
+            &symbol.file_path,
+            &symbol.module_path,
+            &symbol.symbol_name,
+        ) {
+            continue;
+        }
+        if is_unchecked_module(context.project_config, &symbol.module_path) {
+            continue;
+        }
+
+        diagnostics.push(Diagnostic::new_located(
+            severity,
+            DiagnosticDetails::Code(CodeDiagnostic::DeadSymbol {
+                module_path: symbol.module_path,
+                symbol_name: symbol.symbol_name,
+                symbol_kind: symbol.symbol_kind.as_str().to_string(),
+            }),
+            symbol.file_path,
+            symbol.line_number,
+            None,
+        ));
+    }
+}
+
+fn should_ignore_symbol(
+    ignore_rules: &[String],
+    project_root: &Path,
+    source_roots: &[PathBuf],
+    file_path: &Path,
+    module_path: &str,
+    symbol_name: &str,
+) -> bool {
+    if should_ignore_file(
+        ignore_rules,
+        project_root,
+        source_roots,
+        file_path,
+        Some(module_path),
+    ) {
+        return true;
+    }
+
+    for ignore in ignore_rules {
+        let Some((rule_module, rule_symbol)) = parse_symbol_ignore_rule(ignore) else {
+            continue;
+        };
+        if rule_module == module_path && rule_symbol == symbol_name {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn parse_symbol_ignore_rule(rule: &str) -> Option<(&str, &str)> {
+    if let Some((module_path, symbol_name)) = rule.split_once(':') {
+        return (!module_path.is_empty() && !symbol_name.is_empty())
+            .then_some((module_path, symbol_name));
+    }
+
+    rule.rsplit_once('.')
+        .and_then(|(module_path, symbol_name)| {
+            (!module_path.is_empty() && !symbol_name.is_empty())
+                .then_some((module_path, symbol_name))
+        })
 }
 
 fn should_ignore_file(

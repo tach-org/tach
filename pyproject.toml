@@ -119,6 +119,7 @@ ignore = [
     "vscode/node_modules",
     "python/tests/example/syntax_error_fixture/**",
     "python/tests/example/deadcode_phase1*/**",
+    "python/tests/example/deadcode_phase2*/**",
 ]
 exclude = [
     "pw",
@@ -127,6 +128,7 @@ exclude = [
     "vscode/node_modules",
     "python/tests/example/syntax_error_fixture/**",
     "python/tests/example/deadcode_phase1*/**",
+    "python/tests/example/deadcode_phase2*/**",
 ]
 executionEnvironments = [{ root = "python" }, { root = "vscode" }]
 pythonVersion = "3.10"

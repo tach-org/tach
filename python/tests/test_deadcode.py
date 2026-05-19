@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from unittest.mock import Mock
@@ -193,7 +194,11 @@ def test_deadcode_config_dump_omits_default_table() -> None:
 
 
 def _deadcode_diagnostics_for(
-    project_root: Path, *, entry_points: list[str] | None = None
+    project_root: Path,
+    *,
+    entry_points: list[str] | None = None,
+    files: bool = True,
+    symbols: bool = False,
 ):
     project_config = parse_project_config(project_root)
     assert project_config is not None
@@ -201,17 +206,76 @@ def _deadcode_diagnostics_for(
         project_root=project_root,
         project_config=project_config,
         entry_points=entry_points or [],
-        files=True,
-        symbols=False,
+        files=files,
+        symbols=symbols,
     )
 
 
+JsonObject = dict[str, object]
+
+
+def _diagnostic_payload(diagnostics: list[extension.Diagnostic]) -> list[JsonObject]:
+    payload = cast(
+        "object",
+        json.loads(
+            extension.serialize_diagnostics_json(diagnostics, pretty_print=False)
+        ),
+    )
+    assert isinstance(payload, list)
+    items = cast("list[object]", payload)
+    return [cast("JsonObject", item) for item in items if isinstance(item, dict)]
+
+
+def _json_object(value: object) -> JsonObject | None:
+    if isinstance(value, dict):
+        return cast("JsonObject", value)
+    return None
+
+
+def _deadcode_detail(
+    diagnostic: JsonObject,
+    kind: str,
+) -> JsonObject | None:
+    located = _json_object(diagnostic.get("Located"))
+    if located is None:
+        return None
+    details = _json_object(located.get("details"))
+    if details is None:
+        return None
+    code = _json_object(details.get("Code"))
+    if code is None:
+        return None
+    return _json_object(code.get(kind))
+
+
 def _dead_file_modules(diagnostics: list[extension.Diagnostic]) -> set[str]:
-    return {
-        cast("str", diagnostic.usage_module())
-        for diagnostic in diagnostics
-        if diagnostic.is_deadcode_error()
-    }
+    modules: set[str] = set()
+    for diagnostic in _diagnostic_payload(diagnostics):
+        dead_file = _deadcode_detail(diagnostic, "DeadFile")
+        if dead_file is None:
+            continue
+        module_path = dead_file.get("module_path")
+        if isinstance(module_path, str):
+            modules.add(module_path)
+    return modules
+
+
+def _dead_symbols(diagnostics: list[extension.Diagnostic]) -> set[tuple[str, str, str]]:
+    symbols: set[tuple[str, str, str]] = set()
+    for diagnostic in _diagnostic_payload(diagnostics):
+        dead_symbol = _deadcode_detail(diagnostic, "DeadSymbol")
+        if dead_symbol is None:
+            continue
+        module_path = dead_symbol.get("module_path")
+        symbol_name = dead_symbol.get("symbol_name")
+        symbol_kind = dead_symbol.get("symbol_kind")
+        if (
+            isinstance(module_path, str)
+            and isinstance(symbol_name, str)
+            and isinstance(symbol_kind, str)
+        ):
+            symbols.add((module_path, symbol_name, symbol_kind))
+    return symbols
 
 
 def test_deadcode_phase1_reports_unreachable_file(example_dir: Path) -> None:
@@ -332,3 +396,59 @@ def test_deadcode_phase1_syntax_error_is_skipped(example_dir: Path) -> None:
 
     assert _dead_file_modules(diagnostics) == set()
     assert any("syntax error" in diagnostic.to_string() for diagnostic in diagnostics)
+
+
+def test_deadcode_phase2_reports_only_dead_reachable_top_level_symbols(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase2",
+        files=False,
+        symbols=True,
+    )
+
+    assert _dead_symbols(diagnostics) == {
+        ("pkg.api", "UnusedClass", "class"),
+        ("pkg.api", "unused_function", "function"),
+        ("pkg.public_api", "_private_dead", "function"),
+        ("pkg.service", "UNUSED_VALUE", "variable"),
+        ("pkg.service", "unused_service", "function"),
+    }
+
+
+def test_deadcode_phase2_respects_public_and_dynamic_symbol_seeds(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase2",
+        files=False,
+        symbols=True,
+    )
+
+    dead_symbol_names = {
+        symbol_name for _, symbol_name, _ in _dead_symbols(diagnostics)
+    }
+    assert "configured_public" not in dead_symbol_names
+    assert "decorated_endpoint" not in dead_symbol_names
+    assert "exported_by_all" not in dead_symbol_names
+    assert "public_func" not in dead_symbol_names
+    assert "PublicClass" not in dead_symbol_names
+    assert "dynamic_dead" not in dead_symbol_names
+    assert "nested_unused" not in dead_symbol_names
+    assert "method" not in dead_symbol_names
+
+
+def test_deadcode_phase2_all_reports_dead_file_without_nested_dead_symbols(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase2",
+        files=True,
+        symbols=True,
+    )
+
+    assert "pkg.unused_file" in _dead_file_modules(diagnostics)
+    assert all(
+        symbol_name != "unused_in_dead_file"
+        for _, symbol_name, _ in _dead_symbols(diagnostics)
+    )
