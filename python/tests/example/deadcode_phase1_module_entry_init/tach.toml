@@ -1,0 +1,7 @@
+exclude = []
+source_roots = ["."]
+
+[deadcode]
+entry_points = ["pkg.used"]
+protect_init_files = false
+severity = "warn"

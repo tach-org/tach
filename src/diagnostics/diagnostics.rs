@@ -556,6 +556,38 @@ impl Diagnostic {
     pub fn pyline_number(&self) -> Option<usize> {
         self.line_number()
     }
+
+    #[pyo3(name = "usage_module")]
+    pub fn usage_module_py(&self) -> Option<String> {
+        self.usage_module().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "definition_module")]
+    pub fn definition_module_py(&self) -> Option<String> {
+        self.definition_module()
+            .map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "dependency")]
+    pub fn dependency_py(&self) -> Option<String> {
+        self.dependency().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "usage_layer")]
+    pub fn usage_layer_py(&self) -> Option<String> {
+        self.usage_layer().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "definition_layer")]
+    pub fn definition_layer_py(&self) -> Option<String> {
+        self.definition_layer()
+            .map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "closed_layer")]
+    pub fn closed_layer_py(&self) -> Option<String> {
+        self.closed_layer().map(std::string::ToString::to_string)
+    }
 }
 
 #[pyfunction(signature = (diagnostics, pretty_print = false))]

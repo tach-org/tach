@@ -4,6 +4,7 @@ pub mod cli;
 pub mod colors;
 pub mod commands;
 pub mod config;
+pub mod deadcode;
 pub mod dep_map;
 pub mod dependencies;
 pub mod diagnostics;
@@ -19,7 +20,7 @@ pub mod python;
 pub mod resolvers;
 pub mod tests;
 use crate::config::RespectGitIgnore;
-use commands::{check, deadcode, report, server, sync, test};
+use commands::{check, deadcode as command_deadcode, report, server, sync, test};
 use diagnostics::serialize_diagnostics_json;
 use pyo3::{prelude::*, types::PyTuple};
 use std::path::PathBuf;
@@ -299,7 +300,7 @@ fn check_deadcode(
     files: bool,
     symbols: bool,
 ) -> Result<Vec<diagnostics::Diagnostic>, check::CheckError> {
-    deadcode::check_deadcode(&project_root, project_config, entry_points, files, symbols)
+    command_deadcode::check_deadcode(&project_root, project_config, entry_points, files, symbols)
 }
 
 #[pyfunction]

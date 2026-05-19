@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from tach import cli
+from tach import cli, extension
 from tach.extension import ProjectConfig
 from tach.parsing import dump_project_config_to_toml, parse_project_config
 
@@ -190,3 +190,145 @@ def test_deadcode_config_dump_omits_default_table() -> None:
     dumped = dump_project_config_to_toml(ProjectConfig())
 
     assert "[deadcode]" not in dumped
+
+
+def _deadcode_diagnostics_for(
+    project_root: Path, *, entry_points: list[str] | None = None
+):
+    project_config = parse_project_config(project_root)
+    assert project_config is not None
+    return extension.check_deadcode(
+        project_root=project_root,
+        project_config=project_config,
+        entry_points=entry_points or [],
+        files=True,
+        symbols=False,
+    )
+
+
+def _dead_file_modules(diagnostics: list[extension.Diagnostic]) -> set[str]:
+    return {
+        cast("str", diagnostic.usage_module())
+        for diagnostic in diagnostics
+        if diagnostic.is_deadcode_error()
+    }
+
+
+def test_deadcode_phase1_reports_unreachable_file(example_dir: Path) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1")
+
+    assert _dead_file_modules(diagnostics) == {"pkg.dead"}
+    assert all(diagnostic.is_warning() for diagnostic in diagnostics)
+    assert any(
+        (path := diagnostic.pyfile_path()) is not None and path.endswith("pkg/dead.py")
+        for diagnostic in diagnostics
+        if diagnostic.is_deadcode_error()
+    )
+
+
+def test_deadcode_phase1_entry_point_override_marks_file_reachable(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase1",
+        entry_points=["pkg.dead"],
+    )
+
+    assert "pkg.dead" not in _dead_file_modules(diagnostics)
+
+
+def test_deadcode_phase1_module_symbol_entry_point_marks_file_reachable(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase1",
+        entry_points=["pkg.dead:unused"],
+    )
+
+    assert "pkg.dead" not in _dead_file_modules(diagnostics)
+
+
+def test_deadcode_phase1_duplicate_entry_points_do_not_warn(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase1",
+        entry_points=["app.py"],
+    )
+
+    assert not any(
+        "Deadcode entry point 'app.py' was not found" in diagnostic.to_string()
+        for diagnostic in diagnostics
+    )
+
+
+def test_deadcode_phase1_json_includes_dead_file(example_dir: Path) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1")
+
+    payload = extension.serialize_diagnostics_json(diagnostics, pretty_print=False)
+
+    assert '"DeadFile":{"module_path":"pkg.dead"}' in payload
+
+
+def test_deadcode_phase1_unresolved_entry_point_warns_and_continues(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase1",
+        entry_points=["missing.py"],
+    )
+
+    assert _dead_file_modules(diagnostics) == {"pkg.dead"}
+    assert any("missing.py" in diagnostic.to_string() for diagnostic in diagnostics)
+
+
+def test_deadcode_phase1_no_entry_points_warns_without_dead_files(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1_no_entry")
+
+    assert _dead_file_modules(diagnostics) == set()
+    assert any(
+        "No deadcode entry points resolved" in d.to_string() for d in diagnostics
+    )
+
+
+def test_deadcode_phase1_ignore_suppresses_file(example_dir: Path) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1_ignore")
+
+    assert _dead_file_modules(diagnostics) == set()
+
+
+def test_deadcode_phase1_imported_package_init_is_reachable(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1_init")
+
+    assert "pkg" not in _dead_file_modules(diagnostics)
+    assert _dead_file_modules(diagnostics) == {"pkg.dead"}
+
+
+def test_deadcode_phase1_module_entry_point_marks_parent_init_reachable(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(
+        example_dir / "deadcode_phase1_module_entry_init"
+    )
+
+    assert "pkg" not in _dead_file_modules(diagnostics)
+    assert _dead_file_modules(diagnostics) == {"pkg.dead"}
+
+
+def test_deadcode_phase1_source_root_relative_ignore_suppresses_file(
+    example_dir: Path,
+) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1_src_ignore")
+
+    assert _dead_file_modules(diagnostics) == set()
+
+
+def test_deadcode_phase1_syntax_error_is_skipped(example_dir: Path) -> None:
+    diagnostics = _deadcode_diagnostics_for(example_dir / "deadcode_phase1_syntax")
+
+    assert _dead_file_modules(diagnostics) == set()
+    assert any("syntax error" in diagnostic.to_string() for diagnostic in diagnostics)

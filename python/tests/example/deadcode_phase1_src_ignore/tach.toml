@@ -1,0 +1,7 @@
+exclude = []
+source_roots = ["src"]
+
+[deadcode]
+entry_points = ["app.py"]
+ignore = ["pkg/dead.py"]
+severity = "warn"
