@@ -861,41 +861,57 @@ fn should_skip_symbol_candidate(name: &str) -> bool {
 }
 
 fn parse_symbol_rule(rule: &str) -> Option<SymbolKey> {
+    parse_symbol_rule_parts(rule).map(|(module_path, symbol_name)| {
+        SymbolKey::new(module_path.to_string(), symbol_name.to_string())
+    })
+}
+
+pub fn parse_symbol_rule_parts(rule: &str) -> Option<(&str, &str)> {
     if let Some((module_path, symbol_name)) = rule.split_once(':') {
-        return (!module_path.is_empty() && !symbol_name.is_empty())
-            .then(|| SymbolKey::new(module_path.to_string(), symbol_name.to_string()));
+        return valid_symbol_rule_parts(module_path, symbol_name);
     }
 
     rule.rsplit_once('.')
-        .and_then(|(module_path, symbol_name)| {
-            (!module_path.is_empty() && !symbol_name.is_empty())
-                .then(|| SymbolKey::new(module_path.to_string(), symbol_name.to_string()))
-        })
+        .and_then(|(module_path, symbol_name)| valid_symbol_rule_parts(module_path, symbol_name))
+}
+
+fn valid_symbol_rule_parts<'a>(
+    module_path: &'a str,
+    symbol_name: &'a str,
+) -> Option<(&'a str, &'a str)> {
+    (!module_path.is_empty() && !symbol_name.is_empty()).then_some((module_path, symbol_name))
 }
 
 fn collect_function_shadowed_names(
     parameters: &ruff_python_ast::Parameters,
     body: &[Stmt],
 ) -> BTreeSet<String> {
+    collect_shadowed_names(body, Some(parameters))
+}
+
+fn collect_class_shadowed_names(body: &[Stmt]) -> BTreeSet<String> {
+    collect_shadowed_names(body, None)
+}
+
+fn collect_shadowed_names(
+    body: &[Stmt],
+    parameters: Option<&ruff_python_ast::Parameters>,
+) -> BTreeSet<String> {
     let mut names = BTreeSet::new();
-    for parameter in parameters.iter() {
-        match parameter {
-            AnyParameterRef::NonVariadic(parameter) => {
-                names.insert(parameter.name().to_string());
-            }
-            AnyParameterRef::Variadic(parameter) => {
-                names.insert(parameter.name().to_string());
-            }
+    if let Some(parameters) = parameters {
+        for parameter in parameters.iter() {
+            names.insert(parameter_name(parameter).to_string());
         }
     }
     collect_statement_bound_names(body, &mut names);
     names
 }
 
-fn collect_class_shadowed_names(body: &[Stmt]) -> BTreeSet<String> {
-    let mut names = BTreeSet::new();
-    collect_statement_bound_names(body, &mut names);
-    names
+fn parameter_name(parameter: AnyParameterRef<'_>) -> &str {
+    match parameter {
+        AnyParameterRef::NonVariadic(parameter) => parameter.name().as_str(),
+        AnyParameterRef::Variadic(parameter) => parameter.name().as_str(),
+    }
 }
 
 fn collect_statement_bound_names(body: &[Stmt], names: &mut BTreeSet<String>) {

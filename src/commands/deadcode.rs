@@ -7,10 +7,12 @@ use crate::{
         root_module::ROOT_MODULE_SENTINEL_TAG,
     },
     deadcode::{
-        DeadSymbolAnalysisInput, FileImportGraph, find_dead_symbols, resolve_entry_points,
-        types::DeadcodeFile, types::is_init_file,
+        DeadSymbolAnalysisInput, FileImportGraph, find_dead_symbols, parse_symbol_rule_parts,
+        resolve_entry_points, types::DeadcodeFile, types::is_init_file,
     },
-    diagnostics::{CodeDiagnostic, ConfigurationDiagnostic, Diagnostic, DiagnosticDetails},
+    diagnostics::{
+        CodeDiagnostic, ConfigurationDiagnostic, Diagnostic, DiagnosticDetails, Severity,
+    },
     filesystem as fs,
     processors::import::get_normalized_imports_from_ast,
     python::{error::ParsingError, parsing::parse_python_source},
@@ -247,12 +249,15 @@ fn push_skipped_file_syntax_error(
     parse_failures: &mut BTreeSet<PathBuf>,
     file_path: &Path,
 ) {
-    parse_failures.insert(file_path.to_path_buf());
-    diagnostics.push(Diagnostic::new_global_error(
-        DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileSyntaxError {
+    push_skipped_file_diagnostic(
+        diagnostics,
+        parse_failures,
+        file_path,
+        Severity::Error,
+        ConfigurationDiagnostic::SkippedFileSyntaxError {
             file_path: file_path.display().to_string(),
-        }),
-    ));
+        },
+    );
 }
 
 fn push_skipped_file_io_warning(
@@ -260,11 +265,28 @@ fn push_skipped_file_io_warning(
     parse_failures: &mut BTreeSet<PathBuf>,
     file_path: &Path,
 ) {
-    parse_failures.insert(file_path.to_path_buf());
-    diagnostics.push(Diagnostic::new_global_warning(
-        DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileIoError {
+    push_skipped_file_diagnostic(
+        diagnostics,
+        parse_failures,
+        file_path,
+        Severity::Warning,
+        ConfigurationDiagnostic::SkippedFileIoError {
             file_path: file_path.display().to_string(),
-        }),
+        },
+    );
+}
+
+fn push_skipped_file_diagnostic(
+    diagnostics: &mut Vec<Diagnostic>,
+    parse_failures: &mut BTreeSet<PathBuf>,
+    file_path: &Path,
+    severity: Severity,
+    diagnostic: ConfigurationDiagnostic,
+) {
+    parse_failures.insert(file_path.to_path_buf());
+    diagnostics.push(Diagnostic::new_global(
+        severity,
+        DiagnosticDetails::Configuration(diagnostic),
     ));
 }
 
@@ -525,7 +547,7 @@ fn should_ignore_symbol(
     }
 
     for ignore in ignore_rules {
-        let Some((rule_module, rule_symbol)) = parse_symbol_ignore_rule(ignore) else {
+        let Some((rule_module, rule_symbol)) = parse_symbol_rule_parts(ignore) else {
             continue;
         };
         if rule_module == module_path && rule_symbol == symbol_name {
@@ -534,19 +556,6 @@ fn should_ignore_symbol(
     }
 
     false
-}
-
-fn parse_symbol_ignore_rule(rule: &str) -> Option<(&str, &str)> {
-    if let Some((module_path, symbol_name)) = rule.split_once(':') {
-        return (!module_path.is_empty() && !symbol_name.is_empty())
-            .then_some((module_path, symbol_name));
-    }
-
-    rule.rsplit_once('.')
-        .and_then(|(module_path, symbol_name)| {
-            (!module_path.is_empty() && !symbol_name.is_empty())
-                .then_some((module_path, symbol_name))
-        })
 }
 
 fn should_ignore_file(
