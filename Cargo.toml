@@ -12,9 +12,9 @@ bench = false
 pyo3 = { version = "0.28.3", features = ["abi3-py37"] }
 regex = "1.12.3"
 once_cell = "1.21.4"
-ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_ast", tag = "0.15.12" }
-ruff_python_parser = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_parser", tag = "0.15.12" }
-ruff_linter = { git = "https://github.com/astral-sh/ruff.git", package="ruff_linter", tag = "0.15.12" }
+ruff_python_ast = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_ast", tag = "0.15.13" }
+ruff_python_parser = { git = "https://github.com/astral-sh/ruff.git", package="ruff_python_parser", tag = "0.15.13" }
+ruff_linter = { git = "https://github.com/astral-sh/ruff.git", package="ruff_linter", tag = "0.15.13" }
 ruff_source_file = { git = "https://github.com/astral-sh/ruff.git", package="ruff_source_file", tag = "0.15.12" }
 ruff_text_size = { git = "https://github.com/astral-sh/ruff.git", package="ruff_text_size", tag = "0.15.12" }
 cached = { version = "0.59.0", features = ["disk_store"] }
@@ -36,7 +36,7 @@ itertools = "0.14.0"
 toml_edit = "0.25.4"
 console = "0.16.3"
 ignore = "0.4.25"
-dashmap = { version = "6.1.0", features = ["serde", "rayon", "inline"] }
+dashmap = { version = "6.2.1", features = ["serde", "rayon", "inline"] }
 
 [features]
 extension-module = ["pyo3/extension-module"]
