@@ -1,0 +1,2 @@
+def help() -> None:
+    pass

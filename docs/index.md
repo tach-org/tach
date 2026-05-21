@@ -20,6 +20,7 @@ Dependencies can be additionally marked as 'deprecated', in which case Tach will
 
 - [`tach init`](usage/commands.md#tach-init) - Interactively define module boundaries.
 - [`tach check`](usage/commands.md#tach-check) - Check that boundaries and interfaces are respected.
+- [`tach deadcode`](usage/commands.md#tach-deadcode) - Find unreachable files, modules, and top-level symbols.
 - [`tach sync`](usage/commands.md#tach-sync) - Sync constraints with the actual dependencies in your project.
 - [`tach show`](usage/commands.md#tach-show) - Visualize your project's dependency graph.
 

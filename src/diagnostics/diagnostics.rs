@@ -65,6 +65,12 @@ pub enum ConfigurationDiagnostic {
 
     #[error("Skipped '{file_path}' due to an unknown error.")]
     SkippedUnknownError { file_path: String },
+
+    #[error("No deadcode entry points resolved; skipping deadcode detection.")]
+    DeadcodeNoEntryPoints(),
+
+    #[error("Deadcode entry point '{entry_point}' was not found.")]
+    DeadcodeEntryPointNotFound { entry_point: String },
 }
 
 #[derive(Error, Debug, Clone, Serialize, PartialEq)]
@@ -173,6 +179,18 @@ pub enum CodeDiagnostic {
         dependency: String,
         usage_module: String,
     },
+
+    #[error("Module '{module_path}' is unreachable from configured deadcode entry points.")]
+    DeadFile { module_path: String },
+
+    #[error(
+        "{symbol_kind} '{module_path}:{symbol_name}' is unreachable from configured deadcode entry points."
+    )]
+    DeadSymbol {
+        module_path: String,
+        symbol_name: String,
+        symbol_kind: String,
+    },
 }
 
 impl CodeDiagnostic {
@@ -205,6 +223,7 @@ impl CodeDiagnostic {
                 package_module_name,
                 ..
             } => Some(package_module_name),
+            CodeDiagnostic::DeadFile { .. } | CodeDiagnostic::DeadSymbol { .. } => None,
         }
     }
 
@@ -221,6 +240,8 @@ impl CodeDiagnostic {
             | CodeDiagnostic::ModuleForbiddenExternalDependency { usage_module, .. } => {
                 Some(usage_module)
             }
+            CodeDiagnostic::DeadFile { module_path } => Some(module_path),
+            CodeDiagnostic::DeadSymbol { module_path, .. } => Some(module_path),
             _ => None,
         }
     }
@@ -248,6 +269,8 @@ impl CodeDiagnostic {
             | CodeDiagnostic::ClosedLayerViolation {
                 definition_module, ..
             } => Some(definition_module),
+            CodeDiagnostic::DeadFile { module_path } => Some(module_path),
+            CodeDiagnostic::DeadSymbol { module_path, .. } => Some(module_path),
             _ => None,
         }
     }
@@ -497,6 +520,14 @@ impl Diagnostic {
         )
     }
 
+    pub fn is_deadcode_error(&self) -> bool {
+        matches!(
+            self.details(),
+            DiagnosticDetails::Code(CodeDiagnostic::DeadFile { .. })
+                | DiagnosticDetails::Code(CodeDiagnostic::DeadSymbol { .. })
+        )
+    }
+
     pub fn is_deprecated(&self) -> bool {
         matches!(
             self.details(),
@@ -524,6 +555,38 @@ impl Diagnostic {
 
     pub fn pyline_number(&self) -> Option<usize> {
         self.line_number()
+    }
+
+    #[pyo3(name = "usage_module")]
+    pub fn usage_module_py(&self) -> Option<String> {
+        self.usage_module().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "definition_module")]
+    pub fn definition_module_py(&self) -> Option<String> {
+        self.definition_module()
+            .map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "dependency")]
+    pub fn dependency_py(&self) -> Option<String> {
+        self.dependency().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "usage_layer")]
+    pub fn usage_layer_py(&self) -> Option<String> {
+        self.usage_layer().map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "definition_layer")]
+    pub fn definition_layer_py(&self) -> Option<String> {
+        self.definition_layer()
+            .map(std::string::ToString::to_string)
+    }
+
+    #[pyo3(name = "closed_layer")]
+    pub fn closed_layer_py(&self) -> Option<String> {
+        self.closed_layer().map(std::string::ToString::to_string)
     }
 }
 

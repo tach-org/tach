@@ -598,6 +598,44 @@ The available rules and their defaults are listed below.
 - `require_ignore_directive_reasons` (**default**: `off`): require every `tach-ignore` comment to have a reason
 - `unused_external_dependencies` (**default**: `error`): catch declared 3rd party dependencies which are not imported in your code
 
+## Deadcode
+
+The `[deadcode]` section configures [`tach deadcode`](commands.md#tach-deadcode), which finds files/modules and top-level symbols that are not reachable from application entry points.
+
+```toml
+[deadcode]
+entry_points = ["app.py", "pkg.cli:main"]
+detect = ["files"]
+severity = "warn"
+exclude = ["generated/**"]
+ignore = ["pkg.legacy", "pkg.service:unused"]
+public_modules = ["pkg.api"]
+public_symbols = ["pkg.service:exported"]
+public_decorators = ["fastapi.get"]
+protect_init_files = true
+respect_all = true
+include_test_usages = false
+ignore_dynamic_modules = true
+```
+
+- `entry_points` (**default**: `[]`): file paths, module paths, or `module:symbol` roots used to seed reachability. Command-line `--entry-point` values are added to this list for that run.
+- `detect` (**default**: `["files"]`): detection modes to run when no `--files`, `--symbols`, or `--all` flag is supplied. Valid values are `"files"` and `"symbols"`; command-line detection flags override this setting for the current run.
+- `severity` (**default**: `"warn"`): severity for dead-code findings. Valid values are `"error"`, `"warn"`, and `"off"`.
+- `exclude` (**default**: `[]`): additional path or glob patterns to exclude from dead-code analysis. These are combined with the top-level `exclude` setting.
+- `ignore` (**default**: `[]`): modules, paths, or symbols to suppress. Examples include `"pkg.legacy"`, `"pkg/legacy.py"`, `"pkg.service:unused"`, and `"pkg.service.unused"`.
+- `public_modules` (**default**: `[]`): modules whose public non-underscore top-level symbols should be treated as live when symbol detection runs.
+- `public_symbols` (**default**: `[]`): specific `module:symbol` entries that should be treated as live when symbol detection runs.
+- `public_decorators` (**default**: `[]`): decorators that mark functions or classes as live when symbol detection runs.
+- `protect_init_files` (**default**: `true`): suppress dead-file diagnostics for `__init__.py` files, which often contain package side effects.
+- `respect_all` (**default**: `true`): treat names exported through `__all__` as live when symbol detection runs.
+- `include_test_usages` (**default**: `false`): include default-excluded test directories as usage sources when Tach is using its default excludes. User-configured excludes are still respected.
+- `ignore_dynamic_modules` (**default**: `true`): suppress symbol diagnostics in modules that rely on dynamic imports or reflection when symbol detection runs, including modules with `__getattr__`, star imports, `globals()`, `locals()`, `getattr()`, `setattr()`, `__import__()`, or `importlib.import_module()`.
+
+Public symbol settings are seeding rules, not suppressions. Use `public_modules`, `public_symbols`, and `public_decorators` for API surfaces that are intentionally reachable from outside the analyzed entry-point graph; use `ignore` for known exceptions that should be hidden from dead-code output.
+
+!!! warning
+    Dead-code detection is best-effort static analysis. Dynamic imports, plugin systems, command-line entry points, and public library APIs may need explicit `entry_points`, `public_modules`, `public_symbols`, or `ignore` entries.
+
 
 ## Cache
 

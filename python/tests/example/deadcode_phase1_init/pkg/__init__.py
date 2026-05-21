@@ -1,0 +1,1 @@
+SIDE_EFFECT = True

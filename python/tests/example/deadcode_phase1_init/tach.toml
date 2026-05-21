@@ -1,0 +1,7 @@
+exclude = []
+source_roots = ["."]
+
+[deadcode]
+entry_points = ["app.py"]
+protect_init_files = false
+severity = "warn"
