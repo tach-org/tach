@@ -325,7 +325,9 @@ def pytest_collection_modifyitems(config: Config, items: list[Item]):
     if state is None:
         return
     items_to_remove = [
-        item for item in items if state.handler.should_remove_items(file_path=item.path)
+        item
+        for item in items
+        if state.handler.should_remove_items(file_path=item.path.resolve())
     ]
     state.handler.num_removed_items = len(items_to_remove)
 
