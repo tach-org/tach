@@ -29,6 +29,8 @@ from tach.mcp.testing import tach_test
 __all__ = [
     "mcp",
     "MCP_PROTOCOL_VERSION",
+    "diagnose_tach_boundaries",
+    "plan_tach_modularization",
     "run",
     "tach_configure",
     "tach_graph",
