@@ -385,6 +385,15 @@ The MCP server exposes nine practical tools rather than one tool per CLI command
 Large modes return compact summaries by default and include resource URIs or
 explicit full/export modes for larger payloads.
 
+This design is what keeps agent context budgets intact on real codebases.
+Benchmarked over an MCP stdio session against a fresh Django clone
+(~2,900 Python files, 9,534 file-level dependency edges): the dependency map
+summary is 5.8 KB versus 520.7 KB for the full file-level map (90x, roughly
+1.4K versus 130K tokens), the project summary is 2.5 KB versus 14.0 KB for the
+full config view, a 386-diagnostic lint run pages at 19.8 KB (or 5.2 KB with
+`limit=10`) versus ~150 KB unpaginated, and the blast radius of editing one
+ORM file — 2,078 affected files — comes back as a 2.9 KB paginated delta.
+
 - `tach_onboard` - start here. Returns Tach/MCP versions, install/use hints, resource URIs, configured state, compact project summary, and recommended next actions.
 - `tach_lint` - strong lint entrypoint. Runs boundary, public-interface, external dependency, and unused dependency checks with counts, paginated diagnostics, and focused next actions.
 - `tach_configure` - one controlled write tool for the whole config surface: create config, edit modules/dependencies, set layers (`set_layers`, `set_module_layer`), set module visibility, add/remove public interfaces, deprecate dependencies during migrations, sync dependencies, or install the pre-commit hook.
