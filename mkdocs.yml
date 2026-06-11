@@ -55,6 +55,7 @@ nav:
   - Contributing:
     - Setting Up Project: contributing/setting-up-project.md
     - Working with Docs: contributing/working-with-docs.md
+    - AI Code Policy: contributing/ai-code-policy.md
 
 markdown_extensions:
   - pymdownx.highlight:
