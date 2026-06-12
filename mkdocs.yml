@@ -43,6 +43,7 @@ nav:
     - Getting Started: getting-started/getting-started.md
   - Usage:
     - Commands: usage/commands.md
+    - MCP Benchmark: usage/mcp-benchmark.md
     - Configuration: usage/configuration.md
     - Interfaces: usage/interfaces.md
     - Layers: usage/layers.md

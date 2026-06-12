@@ -98,6 +98,126 @@ depends_on = [
 layer = "core"
 
 [[modules]]
+path = "tach.mcp"
+depends_on = [
+    "tach.mcp.configuration",
+    "tach.mcp.dependency_map",
+    "tach.mcp.imports",
+    "tach.mcp.linting",
+    "tach.mcp.modularity",
+    "tach.mcp.module_graph",
+    "tach.mcp.onboarding",
+    "tach.mcp.reporting",
+    "tach.mcp.server",
+    "tach.mcp.testing",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.server"
+depends_on = []
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.payloads"
+depends_on = []
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.project"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.modularity",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.onboarding"
+depends_on = [
+    "tach",
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.configuration"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.linting"
+depends_on = [
+    "tach.check_external",
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.imports"
+depends_on = [
+    "tach.mcp.project",
+    "tach.mcp.server",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.reporting"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+    "tach.report",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.dependency_map"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.module_graph"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+    "tach.show",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.modularity"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+    "tach.modularity",
+]
+layer = "commands"
+
+[[modules]]
+path = "tach.mcp.testing"
+depends_on = [
+    "tach.mcp.payloads",
+    "tach.mcp.project",
+    "tach.mcp.server",
+    "tach.test",
+]
+layer = "commands"
+
+[[modules]]
 path = "tach.parsing"
 depends_on = [
     "tach.extension",
@@ -144,6 +264,7 @@ expose = [
     "Module",
     "Usage",
     "build_.*",
+    "generate_modularity_report",
     "serialize_.*",
 ]
 from = [

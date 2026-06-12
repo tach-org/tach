@@ -432,6 +432,15 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to the config file",
     )
+
+    ## tach mcp
+    subparsers.add_parser(
+        "mcp",
+        prog=f"{TOOL_NAME} mcp",
+        help="Start the Model Context Protocol (MCP) server",
+        description="Start the Model Context Protocol (MCP) server over stdio",
+    )
+
     ## tach init
     init_parser = subparsers.add_parser(
         "init",
@@ -1063,6 +1072,18 @@ def tach_server(
         sys.exit(1)
 
 
+def tach_mcp() -> None:
+    logger.info(
+        "tach mcp called",
+        extra={
+            "data": CallInfo(function="tach_mcp"),
+        },
+    )
+    from tach.mcp import run
+
+    run()
+
+
 def tach_map(
     project_config: ProjectConfig,
     project_root: Path,
@@ -1198,6 +1219,9 @@ def main(argv: list[str] = sys.argv[1:]) -> None:
             print(f"{args.target} is not a valid installation target.")
             sys.exit(1)
         tach_install(project_root=project_root, target=install_target)
+        return
+    elif args.command == "mcp":
+        tach_mcp()
         return
     elif args.command == "map":
         tach_map(

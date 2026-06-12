@@ -130,6 +130,47 @@ python/tach/cache/setup.py[L7]: Import 'tach.filesystem.find_project_config_root
 ...
 ```
 
+### AI agents (MCP server)
+
+Tach runs as a [Model Context Protocol](https://modelcontextprotocol.io/) server, so AI agents can inspect, lint, configure, and report on your project boundaries without shelling out to individual commands:
+
+```bash
+tach mcp
+```
+
+Configure your MCP client (Claude Code, Claude Desktop, Codex CLI, etc.):
+
+```json
+{
+  "mcpServers": {
+    "tach": {
+      "command": "tach",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+The server exposes nine compact, paginated tools (`tach_onboard`, `tach_lint`, `tach_configure`, `tach_imports`, `tach_report`, `tach_map`, `tach_graph`, `tach_modularity`, `tach_test`), plus resources and prompts. The full configuration surface — modules, dependencies, layers, visibility, public interfaces, deprecations — is writable through `tach_configure`, so agents can manage boundaries end to end.
+
+An [Agent Skill](https://agentskills.io) that teaches agents the efficient workflow ships at [`skills/tach/SKILL.md`](skills/tach/SKILL.md) — copy it into your agent's skills directory:
+
+```bash
+# Claude Code                          # Codex CLI
+cp -r skills/tach .claude/skills/      cp -r skills/tach ~/.agents/skills/
+```
+
+**Why MCP instead of letting the agent run the CLI?** Token cost. Benchmarked over a real MCP stdio session against a fresh Django clone (~2,900 Python files, 9,534 file-level dependency edges):
+
+| Query | MCP default response | Naive alternative | Savings |
+|---|---|---|---|
+| Dependency map | 5.8 KB (~1.4K tokens) | 520.7 KB full map (~130K tokens) | **90x** |
+| Project summary | 2.5 KB | 14.0 KB full config | 5.5x |
+| 386 lint diagnostics | 19.8 KB first page (5.2 KB at `limit=10`) | ~150 KB unpaginated | 8–29x |
+| Blast radius of editing one ORM file | 2.9 KB (2,078 affected files, paginated) | reading the full closure | — |
+
+Every default response is summary-first with digests, pagination, and `tach://` resource URIs for opt-in full payloads — the full dependency map alone would exceed most agent context budgets. See the [MCP docs](https://docs.gauge.sh/usage/commands#tach-mcp) for tools, resources, hooks, and client setup.
+
 Tach also supports:
 
 - [Public interfaces for modules](https://docs.gauge.sh/usage/interfaces/)

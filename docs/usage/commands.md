@@ -305,6 +305,246 @@ Example output with closure:
 
 The output includes the target file itself and all files that are either directly or indirectly required by it. In this example, if `src/core.py` imports `config.py` which in turn imports `constants.py`, all of these files will appear in the closure.
 
+## tach mcp
+
+Tach can run as a [Model Context Protocol](https://modelcontextprotocol.io/) server.
+This lets MCP-compatible agents inspect, check, edit, and report on Tach projects
+without shelling out to individual Tach commands.
+
+```
+usage: tach mcp [-h]
+
+Start the Model Context Protocol (MCP) server over stdio
+
+options:
+  -h, --help  show this help message and exit
+```
+
+The server uses stdio transport. Configure your MCP client to run:
+
+```bash
+tach mcp
+```
+
+If you are working from this repository checkout before installing Tach, use:
+
+```bash
+uv run tach mcp
+```
+
+### Client configuration examples
+
+For Claude Desktop or other clients using JSON MCP server configuration:
+
+```json
+{
+  "mcpServers": {
+    "tach": {
+      "command": "tach",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+For a local development checkout:
+
+```json
+{
+  "mcpServers": {
+    "tach": {
+      "command": "uv",
+      "args": ["run", "tach", "mcp"],
+      "cwd": "/path/to/tach"
+    }
+  }
+}
+```
+
+For Codex CLI, add a stdio MCP server entry:
+
+```toml
+[mcp_servers.tach]
+command = "tach"
+args = ["mcp"]
+enabled = true
+```
+
+For a local development checkout:
+
+```toml
+[mcp_servers.tach]
+command = "uv"
+args = ["run", "tach", "mcp"]
+enabled = true
+```
+
+### Available tools
+
+The MCP server exposes nine practical tools rather than one tool per CLI command.
+Large modes return compact summaries by default and include resource URIs or
+explicit full/export modes for larger payloads.
+
+This design is what keeps agent context budgets intact on real codebases.
+Benchmarked over an MCP stdio session against a fresh Django clone
+(~2,900 Python files, 9,534 file-level dependency edges): the dependency map
+summary is 5.8 KB versus 520.7 KB for the full file-level map (90x, roughly
+1.4K versus 130K tokens), the project summary is 2.5 KB versus 14.0 KB for the
+full config view, a 386-diagnostic lint run pages at 19.8 KB (or 5.2 KB with
+`limit=10`) versus ~150 KB unpaginated, and the blast radius of editing one
+ORM file — 2,078 affected files — comes back as a 2.9 KB paginated delta.
+Full methodology and a reproducible driver script are in the
+[MCP benchmark](mcp-benchmark.md) page.
+
+- `tach_onboard` - start here. Returns Tach/MCP versions, install/use hints, resource URIs, configured state, compact project summary, and recommended next actions.
+- `tach_lint` - strong lint entrypoint. Runs boundary, public-interface, external dependency, and unused dependency checks with counts, paginated diagnostics, and focused next actions.
+- `tach_configure` - one controlled write tool for the whole config surface: create config, edit modules/dependencies, set layers (`set_layers`, `set_module_layer`), set module visibility, add/remove public interfaces, deprecate dependencies during migrations, sync dependencies, or install the pre-commit hook.
+- `tach_imports` - inspect first-party or external imports Tach sees in one Python file.
+- `tach_report` - produce dependency, usage, and optional external dependency reports for a file or directory.
+- `tach_map` - inspect dependency maps, closures, changed files, and changed-file deltas.
+- `tach_graph` - generate a module graph as Mermaid or DOT, compact by default.
+- `tach_modularity` - generate or export the local Gauge modularity report.
+- `tach_test` - run pytest with Tach affected-test filtering and compact stdout/stderr tails.
+
+### Resources and prompts
+
+The server exposes these resources:
+
+- `tach://version` - Tach and MCP protocol version JSON.
+- `tach://project-config/{project_ref}` - full project configuration JSON.
+- `tach://project-summary/{project_ref}` - compact project summary JSON.
+- `tach://project-graph/{project_ref}` - project graph as Mermaid text.
+- `tach://dependency-map/{project_ref}?view=summary|full` - dependency map summary or full JSON.
+- `tach://modularity-report/{project_ref}?view=summary|full` - modularity report summary or full JSON.
+- `tach://delta/{project_ref}/{snapshot_or_ref}` - compact dependency delta JSON.
+
+It also exposes prompts for common agent workflows:
+
+- `diagnose_tach_boundaries` - investigate boundary violations and suggest focused fixes.
+- `plan_tach_modularization` - plan module, utility, dependency, and interface boundaries for a project.
+
+### Example workflows
+
+Inspect a project and check its boundaries:
+
+```text
+Use the tach MCP server. Call tach_onboard for this repository, then
+tach_lint. Summarize any errors by file and module. If dependency rules look
+stale, call tach_configure action="sync_dependencies".
+```
+
+Create a starter config for a small project:
+
+```text
+Use tach_configure action="create_config" with project_root=/path/to/project,
+source_roots=["src"], modules=["api", "services", "models"], and
+dependencies=[{"path": "api", "dependency": "services"},
+{"path": "services", "dependency": "models"}].
+```
+
+Introduce layered architecture rules:
+
+```text
+Use tach_configure action="set_layers" with layers=["ui", "commands", "core"],
+then action="set_module_layer" per module. Re-run tach_lint to see which
+imports violate the layering.
+```
+
+Expose a public interface and deprecate a legacy edge:
+
+```text
+Use tach_configure action="add_interface" with interface_expose=["get_user",
+"UserDTO"] and interface_from=["accounts"]. Then
+action="deprecate_dependency" with path="billing", dependency="legacy_db" to
+warn on remaining usages while migrating.
+```
+
+Find the dependency closure for one file:
+
+```text
+Use tach_map mode="closure" with direction="dependencies" and
+path="src/api/handler.py". Return the closure as a sorted list.
+```
+
+Generate a graph for documentation:
+
+```text
+Use tach_graph with format="mermaid" and include_full=true.
+Put the returned graph in a Markdown code block for review.
+```
+
+Find affected files without loading the full map:
+
+```text
+Use tach_map mode="delta" with changed=["src/api/handler.py"]. Return
+changed_files, affected_count, and affected.items.
+```
+
+Run affected tests through an agent:
+
+```text
+Use tach_test with base="main" and pytest_args=["-q"]. Report the
+exit code and stdout_tail/stderr_tail.
+```
+
+### Agent skill
+
+Tach ships an [Agent Skill](https://agentskills.io) at
+[`skills/tach/SKILL.md`](https://github.com/gauge-sh/tach/blob/main/skills/tach/SKILL.md)
+that teaches agents the efficient workflow on top of the MCP server: onboard
+first, prefer compact/paginated modes, diagnose with `tach_report`/`tach_map`,
+fix code before loosening rules, and verify with `tach_lint` plus `tach_test`.
+
+`SKILL.md` is a cross-tool format supported by Claude Code, Codex CLI, and
+other agents. Install it by copying the skill directory into your agent's
+skills location:
+
+```bash
+# Claude Code (per project)
+mkdir -p .claude/skills && cp -r skills/tach .claude/skills/
+
+# Claude Code (personal, all projects)
+mkdir -p ~/.claude/skills && cp -r skills/tach ~/.claude/skills/
+
+# Codex CLI
+mkdir -p ~/.agents/skills && cp -r skills/tach ~/.agents/skills/
+```
+
+Once installed, the skill activates automatically when the agent works in a
+repository containing a `tach.toml`, or when asked to enforce or fix module
+boundaries.
+
+### Hooks
+
+For Claude Code, you can add a `PostToolUse` hook so that boundary violations
+introduced while an agent edits code are fed straight back to it, instead of
+surfacing later in CI. Add to your project's `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && output=$(tach check 2>&1) || { echo \"$output\" >&2; exit 2; }"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Exit code 2 returns the diagnostics to the agent as feedback, so it fixes the
+violation immediately.
+
+For agents and environments without hooks,
+`tach_configure action="install_pre_commit"` (or `tach install pre-commit`)
+provides the same guarantee at commit time.
+
 
 ## tach test
 
