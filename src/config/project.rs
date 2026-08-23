@@ -9,6 +9,7 @@ use crate::filesystem::{self, module_path_is_included_in_paths};
 use crate::resolvers::SourceRootResolver;
 
 use super::cache::CacheConfig;
+use super::deadcode::DeadCodeConfig;
 use super::domain::LocatedDomainConfig;
 use super::edit::{ConfigEdit, ConfigEditor, EditError};
 use super::error::ConfigError;
@@ -102,6 +103,9 @@ pub struct ProjectConfig {
     pub rules: RulesConfig,
     #[serde(default, skip_serializing_if = "utils::is_default")]
     #[pyo3(get)]
+    pub deadcode: DeadCodeConfig,
+    #[serde(default, skip_serializing_if = "utils::is_default")]
+    #[pyo3(get)]
     pub plugins: PluginsConfig,
     #[serde(skip)]
     pub domains: Vec<LocatedDomainConfig>,
@@ -152,6 +156,7 @@ impl Default for ProjectConfig {
             use_regex_matching: Default::default(),
             root_module: Default::default(),
             rules: Default::default(),
+            deadcode: Default::default(),
             plugins: Default::default(),
             domains: Default::default(),
             pending_edits: Default::default(),

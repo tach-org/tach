@@ -14,6 +14,7 @@ enum DiagnosticGroupKind {
     ExternalDependency,
     Interface,
     InternalDependency,
+    DeadCode,
 }
 
 impl From<&DiagnosticDetails> for DiagnosticGroupKind {
@@ -38,6 +39,8 @@ impl From<&DiagnosticDetails> for DiagnosticGroupKind {
                 CodeDiagnostic::UnnecessarilyIgnoredDependency { .. }
                 | CodeDiagnostic::UnusedIgnoreDirective()
                 | CodeDiagnostic::MissingIgnoreDirectiveReason() => Self::Other,
+
+                CodeDiagnostic::UnreachableFile { .. } => Self::DeadCode,
             },
         }
     }
@@ -75,6 +78,13 @@ impl<'a> DiagnosticGroup<'a> {
                 Some(style(
                     "If you intended to change an interface, edit the '[[interfaces]]' section of tach.toml.\n\
                     Otherwise, remove any disallowed imports and consider refactoring."
+                ).yellow()),
+            ),
+            DiagnosticGroupKind::DeadCode => (
+                style("Dead Code").red().bold(),
+                Some(style(
+                    "If a file is loaded dynamically or by an external tool (e.g. a plugin entry point),\n\
+                    add it to 'entry_points' or 'ignore' in the '[deadcode]' section of tach.toml."
                 ).yellow()),
             ),
             DiagnosticGroupKind::Other => (style("General").red().bold(), None),

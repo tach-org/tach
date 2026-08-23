@@ -1,0 +1,4 @@
+source_roots = ["src"]
+
+[deadcode]
+entry_points = ["myapp.cli:main"]

@@ -231,6 +231,36 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_base_arguments(check_parser)
 
+    ## tach deadcode
+    deadcode_parser = subparsers.add_parser(
+        "deadcode",
+        prog=f"{TOOL_NAME} deadcode",
+        help="Find Python files which cannot be reached from your entry points",
+        description="Find Python files which cannot be reached from your entry points",
+    )
+    deadcode_parser.add_argument(
+        "--entry-point",
+        action="append",
+        default=[],
+        metavar="path_glob_or_module",
+        help="Entry point to treat as reachable: a file path (relative to the project root),"
+        " a glob pattern, or a module path. May be repeated;"
+        " extends 'entry_points' from the [deadcode] section of tach.toml.",
+    )
+    deadcode_parser.add_argument(
+        "--severity",
+        choices=["error", "warn", "off"],
+        help="Severity of findings for this run; overrides [deadcode] severity in tach.toml."
+        " With 'error', findings fail the command.",
+    )
+    deadcode_parser.add_argument(
+        "--output",
+        choices=["text", "json"],
+        default="text",
+        help="Output format (default: text)",
+    )
+    add_base_arguments(deadcode_parser)
+
     ## tach check-external
     check_parser_external = subparsers.add_parser(
         "check-external",
@@ -597,6 +627,66 @@ def tach_check(
     if exit_code == 0 and output_format == "text":
         console_err.print(f"{icons.SUCCESS} All modules validated!", style="green")
     sys.exit(exit_code)
+
+
+def tach_deadcode(
+    project_config: ProjectConfig,
+    project_root: Path,
+    entry_points: list[str] | None = None,
+    severity: str | None = None,
+    output_format: str = "text",
+):
+    logger.info(
+        "tach deadcode called",
+        extra={
+            "data": CallInfo(
+                function="tach_deadcode",
+                parameters={
+                    "entry_points": entry_points or [],
+                    "severity": severity,
+                    "output_format": output_format,
+                },
+            ),
+        },
+    )
+    try:
+        diagnostics = extension.check_deadcode(
+            project_root=project_root,
+            project_config=project_config,
+            entry_points=entry_points,
+            severity=severity,
+        )
+        has_errors = any(diagnostic.is_error() for diagnostic in diagnostics)
+
+        if output_format == "json":
+            try:
+                print(
+                    extension.serialize_diagnostics_json(diagnostics, pretty_print=True)
+                )
+            except ValueError as e:
+                json.dump({"error": str(e)}, sys.stdout)
+                sys.exit(1)
+            sys.exit(1 if has_errors else 0)
+
+        if diagnostics:
+            print(
+                extension.format_diagnostics(diagnostics=diagnostics),
+                file=sys.stderr,
+            )
+        elif (severity or project_config.deadcode.severity) == "off":
+            console_err.print(
+                "Dead code detection is disabled (severity is 'off').",
+                style="yellow",
+            )
+        else:
+            console_err.print(f"{icons.SUCCESS} No dead code found!", style="green")
+        sys.exit(1 if has_errors else 0)
+    except Exception as e:
+        if output_format == "json":
+            json.dump({"error": str(e)}, sys.stdout)
+        else:
+            print(str(e))
+        sys.exit(1)
 
 
 def tach_check_external(
@@ -1263,6 +1353,14 @@ def main(argv: list[str] = sys.argv[1:]) -> None:
                 exact=args.exact,
                 output_format=args.output,
             )
+    elif args.command == "deadcode":
+        tach_deadcode(
+            project_config=project_config,
+            project_root=project_root,
+            entry_points=args.entry_point,
+            severity=args.severity,
+            output_format=args.output,
+        )
     elif args.command == "check-external":
         tach_check_external(
             project_config=project_config,

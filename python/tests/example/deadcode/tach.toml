@@ -1,0 +1,5 @@
+exclude = ["vendored"]
+
+[deadcode]
+entry_points = ["main.py"]
+ignore = ["scratch/**"]

@@ -19,7 +19,7 @@ pub mod python;
 pub mod resolvers;
 pub mod tests;
 use crate::config::RespectGitIgnore;
-use commands::{check, report, server, sync, test};
+use commands::{check, deadcode, report, server, sync, test};
 use diagnostics::serialize_diagnostics_json;
 use pyo3::{prelude::*, types::PyTuple};
 use std::path::PathBuf;
@@ -290,6 +290,18 @@ fn check_internal(
     check::check_internal(&project_root, project_config, dependencies, interfaces)
 }
 
+/// Detect Python files which cannot be reached from the configured entry points
+#[pyfunction]
+#[pyo3(signature = (project_root, project_config, entry_points = None, severity = None))]
+fn check_deadcode(
+    project_root: PathBuf,
+    project_config: &config::ProjectConfig,
+    entry_points: Option<Vec<String>>,
+    severity: Option<String>,
+) -> Result<Vec<diagnostics::Diagnostic>, check::CheckError> {
+    deadcode::check_deadcode(&project_root, project_config, entry_points, severity)
+}
+
 #[pyfunction]
 pub fn format_diagnostics(diagnostics: Vec<diagnostics::Diagnostic>) -> String {
     check::format::format_diagnostics(&diagnostics)
@@ -333,6 +345,7 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<config::ModuleConfig>()?;
     m.add_class::<config::InterfaceConfig>()?;
     m.add_class::<config::RulesConfig>()?;
+    m.add_class::<config::DeadCodeConfig>()?;
     m.add_class::<config::DependencyConfig>()?;
     m.add_class::<config::MapConfig>()?;
     m.add_class::<diagnostics::Diagnostic>()?;
@@ -350,6 +363,7 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(update_computation_cache, m)?)?;
     m.add_function(wrap_pyfunction!(dump_project_config_to_toml, m)?)?;
     m.add_function(wrap_pyfunction!(check_internal, m)?)?;
+    m.add_function(wrap_pyfunction!(check_deadcode, m)?)?;
     m.add_function(wrap_pyfunction!(format_diagnostics, m)?)?;
     m.add_function(wrap_pyfunction!(detect_unused_dependencies, m)?)?;
     m.add_function(wrap_pyfunction!(sync_project, m)?)?;

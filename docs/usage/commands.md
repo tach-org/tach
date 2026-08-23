@@ -131,6 +131,57 @@ Example:
 
 NOTE: If your terminal supports hyperlinks, you can click on the failing file path to go directly to the error.
 
+## tach deadcode
+
+Tach can find Python files which cannot be reached from your entry points. Starting from the entry points, imports are followed transitively (including imports guarded by `if TYPE_CHECKING:`, since deleting a typing-only module would still break your code), and any project file outside the reachable set is reported.
+
+```
+usage: tach deadcode [-h] [--entry-point path_glob_or_module] [--severity {error,warn,off}]
+                     [--output {text,json}] [-e file_or_path,...]
+
+Find Python files which cannot be reached from your entry points
+
+options:
+  -h, --help            show this help message and exit
+  --entry-point path_glob_or_module
+                        Entry point to treat as reachable: a file path (relative to the project
+                        root), a glob pattern, or a module path. May be repeated; extends
+                        'entry_points' from the [deadcode] section of tach.toml.
+  --severity {error,warn,off}
+                        Severity of findings for this run; overrides [deadcode] severity in
+                        tach.toml. With 'error', findings fail the command.
+  --output {text,json}  Output format (default: text)
+  -e file_or_path,..., --exclude file_or_path,...
+                        Comma separated path list to exclude. tests/, ci/, etc.
+```
+
+Entry points can be configured in [`tach.toml`](configuration.md#deadcode) or passed with `--entry-point`, in three forms:
+
+- A file path relative to the project root or a source root, such as `main.py`
+- A glob pattern, such as `scripts/*.py` (matched relative to the project root and each source root)
+- A module path, such as `myapp.cli` (a trailing `:symbol` qualifier is accepted and ignored)
+
+An entry point which matches no project files produces a warning rather than being silently dropped.
+
+Example:
+
+```bash
+> tach deadcode
+Dead Code
+⚠️ pkg/dead.py[L1]: Module 'pkg.dead' cannot be reached from any entry point.
+```
+
+Findings are warnings by default, so the command exits 0; set `severity = "error"` in the `[deadcode]` section of `tach.toml` (or pass `--severity error`) to fail the command when dead code is found, e.g. in CI.
+
+Because Python is dynamic, a reported file is a candidate for deletion, not a guarantee. Files loaded outside the import graph — plugin entry points declared in `pyproject.toml`, files executed directly by external tools, `importlib` targets built from variables — should be added to `entry_points`, or suppressed with the `ignore` list.
+
+Some behaviors to be aware of:
+
+- `__init__.py` files are never reported; they are flagged implicitly when the rest of their package is dead.
+- If a file reachable from an entry point cannot be parsed, detection is skipped for that run (reachability cannot be trusted), and a diagnostic explains why. Syntax errors in unreachable files are reported without blocking detection.
+- Paths excluded by the global `exclude` configuration (or `-e`) are not analyzed at all.
+- String literals which look like module paths are treated as imports, which errs toward keeping dynamically-imported files alive.
+
 ## tach check-external
 
 Tach can validate that the external imports in your Python packages match your declared package dependencies in `pyproject.toml` or `requirements.txt`.

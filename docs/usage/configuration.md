@@ -599,6 +599,21 @@ The available rules and their defaults are listed below.
 - `unused_external_dependencies` (**default**: `error`): catch declared 3rd party dependencies which are not imported in your code
 
 
+## Deadcode
+
+Tach can [find Python files which cannot be reached from your entry points](commands.md#tach-deadcode). The `[deadcode]` table configures this detection:
+
+```toml
+[deadcode]
+entry_points = ["main.py", "scripts/*.py", "myapp.cli"]
+ignore = ["generated/**"]
+severity = "warn"
+```
+
+- `entry_points`: the places your code starts from — file paths (relative to the project root or a source root), glob patterns, or module paths. Everything importable from an entry point is considered alive.
+- `ignore`: glob patterns (matched against project-root-relative file paths) whose matches are never reported. Use this for files that are loaded dynamically or kept intentionally.
+- `severity` (**default**: `warn`): `error`, `warn`, or `off`. With `error`, findings fail the `tach deadcode` command; with `off`, detection is disabled.
+
 ## Cache
 
 Tach allows configuration of the [computation cache](caching.md) it uses to speed up tasks like [testing](commands.md#tach-test).

@@ -53,6 +53,12 @@ def check(
     dependencies: bool,
     interfaces: bool,
 ) -> list[Diagnostic]: ...
+def check_deadcode(
+    project_root: Path,
+    project_config: ProjectConfig,
+    entry_points: list[str] | None = None,
+    severity: str | None = None,
+) -> list[Diagnostic]: ...
 def check_external_dependencies(
     project_root: Path,
     project_config: ProjectConfig,
@@ -75,6 +81,7 @@ class Diagnostic:
     def is_configuration(self) -> bool: ...
     def is_dependency_error(self) -> bool: ...
     def is_interface_error(self) -> bool: ...
+    def is_deadcode(self) -> bool: ...
     def is_warning(self) -> bool: ...
     def is_error(self) -> bool: ...
     def is_deprecated(self) -> bool: ...
@@ -141,6 +148,11 @@ class RulesConfig:
     unused_ignore_directives: RuleSetting
     require_ignore_directive_reasons: RuleSetting
 
+class DeadCodeConfig:
+    entry_points: list[str]
+    ignore: list[str]
+    severity: RuleSetting
+
 class ProjectConfig:
     cache: CacheConfig
     external: ExternalDependencyConfig
@@ -155,6 +167,7 @@ class ProjectConfig:
     # [DEPRECATED] Just reading this to print a warning
     use_regex_matching: bool
     rules: RulesConfig
+    deadcode: DeadCodeConfig
     root_module: RootModuleTreatment
 
     def __new__(cls) -> ProjectConfig: ...

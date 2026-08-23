@@ -65,6 +65,19 @@ pub enum ConfigurationDiagnostic {
 
     #[error("Skipped '{file_path}' due to an unknown error.")]
     SkippedUnknownError { file_path: String },
+
+    #[error(
+        "No dead code entry points matched any project files. Configure 'entry_points' in the '[deadcode]' section of tach.toml, or pass '--entry-point'."
+    )]
+    DeadCodeNoEntryPoints(),
+
+    #[error("Dead code entry point '{entry_point}' did not match any project files.")]
+    DeadCodeEntryPointNotFound { entry_point: String },
+
+    #[error(
+        "Dead code detection was skipped because a file reachable from an entry point could not be parsed."
+    )]
+    DeadCodeSkippedUnparsableFiles(),
 }
 
 #[derive(Error, Debug, Clone, Serialize, PartialEq)]
@@ -173,6 +186,9 @@ pub enum CodeDiagnostic {
         dependency: String,
         usage_module: String,
     },
+
+    #[error("Module '{module_path}' cannot be reached from any entry point.")]
+    UnreachableFile { module_path: String },
 }
 
 impl CodeDiagnostic {
@@ -205,6 +221,7 @@ impl CodeDiagnostic {
                 package_module_name,
                 ..
             } => Some(package_module_name),
+            CodeDiagnostic::UnreachableFile { .. } => None,
         }
     }
 
@@ -494,6 +511,13 @@ impl Diagnostic {
             self.details(),
             DiagnosticDetails::Code(CodeDiagnostic::PrivateDependency { .. })
                 | DiagnosticDetails::Code(CodeDiagnostic::InvalidDataTypeExport { .. })
+        )
+    }
+
+    pub fn is_deadcode(&self) -> bool {
+        matches!(
+            self.details(),
+            DiagnosticDetails::Code(CodeDiagnostic::UnreachableFile { .. })
         )
     }
 
