@@ -69,12 +69,24 @@ pub fn check_deadcode(
         &entry_points,
     )?;
 
+    // A misconfigured entry point is reported at the configured severity: with
+    // 'error' the command is a gate, and a gate whose entry points no longer
+    // resolve must fail rather than silently checking nothing.
     let mut diagnostics: Vec<Diagnostic> = unmatched_entry_points
         .into_iter()
-        .map(|entry_point| {
-            Diagnostic::new_global_warning(DiagnosticDetails::Configuration(
-                ConfigurationDiagnostic::DeadCodeEntryPointNotFound { entry_point },
-            ))
+        .map(|unmatched| {
+            Diagnostic::new_global(
+                severity,
+                DiagnosticDetails::Configuration(match unmatched.existing_file {
+                    Some(file) => ConfigurationDiagnostic::DeadCodeEntryPointNotAnalyzed {
+                        entry_point: unmatched.entry_point,
+                        file_path: relative_display_path(&project_root, &file),
+                    },
+                    None => ConfigurationDiagnostic::DeadCodeEntryPointNotFound {
+                        entry_point: unmatched.entry_point,
+                    },
+                }),
+            )
         })
         .collect();
 
@@ -107,7 +119,8 @@ pub fn check_deadcode(
     }
 
     if entry_files.is_empty() {
-        diagnostics.push(Diagnostic::new_global_warning(
+        diagnostics.push(Diagnostic::new_global(
+            severity,
             DiagnosticDetails::Configuration(ConfigurationDiagnostic::DeadCodeNoEntryPoints()),
         ));
         return Ok(diagnostics);
@@ -203,6 +216,14 @@ fn validate_glob(pattern: &str, setting: &str) -> Result<Glob, CheckError> {
 enum ParseFailure {
     Syntax,
     Io,
+}
+
+/// An entry point spec which matched no analyzed file.
+#[derive(Debug)]
+struct UnmatchedEntryPoint {
+    entry_point: String,
+    /// Set when the spec does name a real file, which was simply not analyzed.
+    existing_file: Option<PathBuf>,
 }
 
 /// The analyzed Python files, keyed by absolute path, with a case-insensitive
@@ -400,7 +421,7 @@ fn resolve_entry_points(
     file_walker: &fs::FSWalker,
     files: &ProjectFiles,
     raw_entry_points: &[String],
-) -> Result<(BTreeSet<PathBuf>, Vec<String>), CheckError> {
+) -> Result<(BTreeSet<PathBuf>, Vec<UnmatchedEntryPoint>), CheckError> {
     let mut entry_files = BTreeSet::new();
     let mut unmatched = Vec::new();
 
@@ -416,7 +437,10 @@ fn resolve_entry_points(
             None => "",
         };
         if spec.is_empty() {
-            unmatched.push(raw_entry_point.clone());
+            unmatched.push(UnmatchedEntryPoint {
+                entry_point: raw_entry_point.clone(),
+                existing_file: None,
+            });
             continue;
         }
 
@@ -441,7 +465,16 @@ fn resolve_entry_points(
         }
 
         if matched.is_empty() {
-            unmatched.push(raw_entry_point.clone());
+            unmatched.push(UnmatchedEntryPoint {
+                entry_point: raw_entry_point.clone(),
+                // Distinguish "names nothing on disk" (a typo) from "names a
+                // real file the analysis never saw" (outside every source
+                // root, or excluded) — the fixes are completely different.
+                existing_file: candidate_roots
+                    .iter()
+                    .map(|root| root.join(spec))
+                    .find(|path| path.is_file()),
+            });
         } else {
             entry_files.extend(matched);
         }
@@ -708,6 +741,104 @@ mod tests {
             ) if entry_point == "missing.py"
         )));
         assert_eq!(unreachable_modules(&diagnostics), modules(&["other"]));
+    }
+
+    #[test]
+    fn entry_point_outside_source_roots_says_so() {
+        // A real file that the analysis never saw (outside every source root)
+        // is a different mistake from a typo, and needs a different fix.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("src/myapp/__init__.py", ""),
+                ("src/myapp/cli.py", "def main(): ...\n"),
+                ("src/myapp/only_script_uses.py", "def g(): ...\n"),
+                (
+                    "scripts/backfill.py",
+                    "from myapp.only_script_uses import g\ng()\n",
+                ),
+            ],
+        );
+        let mut config = config_with_entry_points(&["myapp.cli", "scripts/backfill.py"]);
+        config.source_roots = vec![PathBuf::from("src")];
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeEntryPointNotAnalyzed { entry_point, file_path }
+            ) if entry_point == "scripts/backfill.py" && file_path == "scripts/backfill.py"
+        )));
+        // A genuine typo still reports as "not found".
+        let mut config = config_with_entry_points(&["myapp.cli", "scripts/typo.py"]);
+        config.source_roots = vec![PathBuf::from("src")];
+        let diagnostics = run(temp.path(), &config);
+        assert!(diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeEntryPointNotFound { entry_point }
+            ) if entry_point == "scripts/typo.py"
+        )));
+    }
+
+    #[test]
+    fn misconfigured_entry_points_fail_under_error_severity() {
+        // A gate whose entry points no longer resolve must fail, rather than
+        // silently passing while checking nothing.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[("app.py", "x = 1\n"), ("dead.py", "y = 2\n")],
+        );
+        let mut config = config_with_entry_points(&["renamed_main.py"]);
+        config.deadcode.severity = RuleSetting::Error;
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_error()));
+
+        // Default severity keeps these as warnings.
+        let config = config_with_entry_points(&["renamed_main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_warning()));
+    }
+
+    #[test]
+    fn relative_imports_keep_files_alive() {
+        // The dominant intra-package import form, including the __init__.py
+        // case where `from .x` is relative to the package itself.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "import pkg\n"),
+                (
+                    "pkg/__init__.py",
+                    "from . import mod\nfrom .used import run\nfrom .sub import deeper\n",
+                ),
+                ("pkg/mod.py", "x = 1\n"),
+                (
+                    "pkg/used.py",
+                    "from .helper import h\n\ndef run():\n    h()\n",
+                ),
+                ("pkg/helper.py", "def h(): ...\n"),
+                ("pkg/sub/__init__.py", ""),
+                (
+                    "pkg/sub/deeper.py",
+                    "from ..helper import h\nfrom .leaf import l\n",
+                ),
+                ("pkg/sub/leaf.py", "def l(): ...\n"),
+                ("pkg/orphan.py", "z = 3\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["pkg.orphan"]));
     }
 
     #[test]

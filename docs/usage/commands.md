@@ -161,7 +161,7 @@ Entry points can be configured in [`tach.toml`](configuration.md#deadcode) or pa
 - A glob pattern, such as `scripts/*.py` (matched relative to the project root and each source root)
 - A module path, such as `myapp.cli` (a trailing `:symbol` qualifier is accepted and ignored)
 
-An entry point which matches no project files produces a warning rather than being silently dropped.
+An entry point which matches no project files is reported rather than silently dropped, and the message distinguishes a spec that names nothing on disk from one that names a real file outside every source root (or an excluded one). These are reported at the configured `severity`, so a CI gate whose entry points stop resolving fails instead of quietly checking nothing.
 
 Example:
 

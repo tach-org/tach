@@ -75,6 +75,14 @@ pub enum ConfigurationDiagnostic {
     DeadCodeEntryPointNotFound { entry_point: String },
 
     #[error(
+        "Dead code entry point '{entry_point}' matched '{file_path}', which is not analyzed: it is outside every source root, or excluded. Add its directory to 'source_roots', or remove it from 'exclude'."
+    )]
+    DeadCodeEntryPointNotAnalyzed {
+        entry_point: String,
+        file_path: String,
+    },
+
+    #[error(
         "Dead code detection was skipped because a file reachable from an entry point could not be parsed."
     )]
     DeadCodeSkippedUnparsableFiles(),
