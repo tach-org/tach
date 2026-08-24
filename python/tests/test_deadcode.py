@@ -257,7 +257,9 @@ def test_deadcode_main_dispatch_passes_cli_flags(example_dir, monkeypatch, capfd
     assert "pkg/dead.py" in captured.err
 
 
-def test_deadcode_main_dispatch_honors_shared_exclude_flag(example_dir, monkeypatch, capfd):
+def test_deadcode_main_dispatch_honors_shared_exclude_flag(
+    example_dir, monkeypatch, capfd
+):
     monkeypatch.chdir(example_dir / "deadcode")
 
     with pytest.raises(SystemExit) as exc_info:

@@ -29,6 +29,7 @@ Tach is:
 - [`tach mod`](../usage/commands.md#tach-mod) - Interactively edit module boundaries.
 - [`tach check`](../usage/commands.md#tach-check) - Check that boundaries and interfaces are respected.
 - [`tach check-external`](../usage/commands.md#tach-check-external) - Check 3rd party imports match dependencies in your packages.
+- [`tach deadcode`](../usage/commands.md#tach-deadcode) - Find Python files which cannot be reached from your entry points.
 - [`tach sync`](../usage/commands.md#tach-sync) - Sync constraints with the actual dependencies in your project.
 - [`tach show`](../usage/commands.md#tach-show) - Visualize your project's dependency graph.
 - [`tach map`](../usage/commands.md#tach-map) - Generate a JSON dependency map between files in your codebase.

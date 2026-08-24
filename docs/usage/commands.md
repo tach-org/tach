@@ -158,7 +158,7 @@ options:
 Entry points can be configured in [`tach.toml`](configuration.md#deadcode) or passed with `--entry-point`, in three forms:
 
 - A file path relative to the project root or a source root, such as `main.py`
-- A glob pattern, such as `scripts/*.py` (matched relative to the project root and each source root)
+- A glob pattern, such as `scripts/*.py` (matched relative to the project root and each source root). As elsewhere in Tach, `*` does not cross a path separator — use `scripts/**/*.py` to include nested directories.
 - A module path, such as `myapp.cli` (a trailing `:symbol` qualifier is accepted and ignored)
 
 An entry point which matches no project files is reported rather than silently dropped, and the message distinguishes a spec that names nothing on disk from one that names a real file outside every source root (or an excluded one). These are reported at the configured `severity`, so a CI gate whose entry points stop resolving fails instead of quietly checking nothing.
@@ -177,8 +177,9 @@ Because Python is dynamic, a reported file is a candidate for deletion, not a gu
 
 Some behaviors to be aware of:
 
-- `__init__.py` files are never reported; they are flagged implicitly when the rest of their package is dead.
-- If a file reachable from an entry point cannot be parsed, detection is skipped for that run (reachability cannot be trusted), and a diagnostic explains why. Syntax errors in unreachable files are reported without blocking detection.
+- A package's `__init__.py` is not reported alongside the rest of the package, since deleting the package removes both — but a package that contains nothing else *is* reported, so a re-export-only package cannot hide.
+- If a file reachable from an entry point cannot be parsed or read, detection is skipped for that run (reachability cannot be trusted), and a diagnostic explains why. Files that cannot be analyzed are reported without blocking detection when they are unreachable.
+- Diagnostics about gaps in the analysis — an unparsable file, an import into excluded code, an entry point that does not resolve — carry the configured `severity`. At the default `warn` they inform; at `error` they fail the command, because a gate should not pass having checked less than it claims.
 - Paths excluded by the global `exclude` configuration (or `-e`), and paths hidden by `.gitignore`, are not analyzed at all. If a live import chain passes *through* such a file, files reachable only through it are reported as dead — so a warning names any excluded file that other files import.
 - When the same module path exists under more than one source root, the first configured source root wins, mirroring how Python resolves imports along `sys.path`.
 - String literals which look like module paths with at least two dots (e.g. `"myapp.plugins.emailer"`) are treated as imports, which errs toward keeping dynamically-imported files alive. Shorter strings, f-strings, and module names built at runtime are not followed — declare those targets as entry points or ignore them.

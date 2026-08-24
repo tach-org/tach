@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::path::{Path, PathBuf};
 
-use globset::{Glob, GlobSet, GlobSetBuilder};
+use globset::{Glob, GlobBuilder, GlobMatcher, GlobSet, GlobSetBuilder};
 use rayon::prelude::*;
 
 use crate::{
@@ -61,13 +61,8 @@ pub fn check_deadcode(
 
     let mut entry_points = project_config.deadcode.entry_points.clone();
     entry_points.extend(cli_entry_points.unwrap_or_default());
-    let (entry_files, unmatched_entry_points) = resolve_entry_points(
-        &project_root,
-        &source_roots,
-        &file_walker,
-        &files,
-        &entry_points,
-    )?;
+    let (entry_files, unmatched_entry_points) =
+        resolve_entry_points(&project_root, &source_roots, &files, &entry_points)?;
 
     // A misconfigured entry point is reported at the configured severity: with
     // 'error' the command is a gate, and a gate whose entry points no longer
@@ -77,10 +72,15 @@ pub fn check_deadcode(
         .map(|unmatched| {
             Diagnostic::new_global(
                 severity,
-                DiagnosticDetails::Configuration(match unmatched.existing_file {
-                    Some(file) => ConfigurationDiagnostic::DeadCodeEntryPointNotAnalyzed {
+                DiagnosticDetails::Configuration(match unmatched.existing_path {
+                    Some(path) if path.is_dir() => {
+                        ConfigurationDiagnostic::DeadCodeEntryPointIsDirectory {
+                            entry_point: unmatched.entry_point,
+                        }
+                    }
+                    Some(path) => ConfigurationDiagnostic::DeadCodeEntryPointNotAnalyzed {
                         entry_point: unmatched.entry_point,
-                        file_path: relative_display_path(&project_root, &file),
+                        file_path: relative_display_path(&project_root, &path),
                     },
                     None => ConfigurationDiagnostic::DeadCodeEntryPointNotFound {
                         entry_point: unmatched.entry_point,
@@ -90,26 +90,27 @@ pub fn check_deadcode(
         })
         .collect();
 
+    // Everything below reports at the configured severity. These diagnostics
+    // describe gaps in the analysis rather than dead code, but a gap is exactly
+    // what makes the result untrustworthy: at 'warn' they inform, and at
+    // 'error' they fail the gate instead of letting it pass having checked less
+    // than it claims.
     for (file, failure) in &unparsable_files {
         let file_path = relative_display_path(&project_root, file);
-        let (failure_severity, details) = match failure {
-            ParseFailure::Syntax => (
-                Severity::Error,
-                ConfigurationDiagnostic::SkippedFileSyntaxError { file_path },
-            ),
-            ParseFailure::Io => (
-                Severity::Warning,
-                ConfigurationDiagnostic::SkippedFileIoError { file_path },
-            ),
-        };
         diagnostics.push(Diagnostic::new_global(
-            failure_severity,
-            DiagnosticDetails::Configuration(details),
+            severity,
+            DiagnosticDetails::Configuration(match failure {
+                ParseFailure::Syntax => {
+                    ConfigurationDiagnostic::SkippedFileSyntaxError { file_path }
+                }
+                ParseFailure::Io => ConfigurationDiagnostic::SkippedFileIoError { file_path },
+            }),
         ));
     }
 
     for file in &graph.unanalyzed_targets {
-        diagnostics.push(Diagnostic::new_global_warning(
+        diagnostics.push(Diagnostic::new_global(
+            severity,
             DiagnosticDetails::Configuration(
                 ConfigurationDiagnostic::DeadCodeUnanalyzedImportTarget {
                     file_path: relative_display_path(&project_root, file),
@@ -132,7 +133,8 @@ pub fn check_deadcode(
     if unparsable_files.keys().any(|file| reachable.contains(file)) {
         // Imports of a reachable file are unknown, so reachability cannot be
         // trusted; report nothing rather than false positives.
-        diagnostics.push(Diagnostic::new_global_warning(
+        diagnostics.push(Diagnostic::new_global(
+            severity,
             DiagnosticDetails::Configuration(
                 ConfigurationDiagnostic::DeadCodeSkippedUnparsableFiles(),
             ),
@@ -141,16 +143,19 @@ pub fn check_deadcode(
     }
 
     for (file, module_path) in files.iter() {
-        if reachable.contains(file)
-            || unparsable_files.contains_key(file)
-            // A package `__init__.py` exists to make its live siblings importable;
-            // it is only reported once the rest of the package is gone.
-            || is_init_file(file)
-        {
+        if reachable.contains(file) || unparsable_files.contains_key(file) {
+            continue;
+        }
+        // A package `__init__.py` exists to make the rest of the package
+        // importable, so reporting it alongside that content is noise —
+        // deleting the package removes both. When the package holds nothing
+        // else, there is no content to report in its place, and skipping it
+        // would hide the package entirely.
+        if is_init_file(file) && files.package_has_other_files(file) {
             continue;
         }
 
-        let relative_path = fs::relative_to(file, &project_root).unwrap_or_else(|_| file.clone());
+        let relative_path = relative_path(&project_root, file);
         if ignore_matcher.is_match(&relative_path) {
             continue;
         }
@@ -194,21 +199,30 @@ fn effective_severity(
 fn build_ignore_matcher(patterns: &[String]) -> Result<GlobSet, CheckError> {
     let mut builder = GlobSetBuilder::new();
     for pattern in patterns {
-        builder.add(validate_glob(pattern, "ignore")?);
+        builder.add(build_glob(pattern, "ignore")?);
     }
     builder
         .build()
         .map_err(|_| CheckError::Configuration("Failed to build '[deadcode]' ignore.".to_string()))
 }
 
+fn build_glob_matcher(pattern: &str, setting: &str) -> Result<GlobMatcher, CheckError> {
+    Ok(build_glob(pattern, setting)?.compile_matcher())
+}
+
 /// Compile a user-supplied glob, reporting a configuration error rather than
-/// panicking (`FSWalker::walk_globbed_files` unwraps invalid patterns).
-fn validate_glob(pattern: &str, setting: &str) -> Result<Glob, CheckError> {
-    Glob::new(pattern).map_err(|err| {
-        CheckError::Configuration(format!(
-            "Invalid glob pattern '{pattern}' in '[deadcode]' {setting}: {err}"
-        ))
-    })
+/// panicking. `literal_separator` matches the rest of tach (and gitignore
+/// semantics): `*` does not cross a path separator, so `scripts/*.py` means
+/// the files directly in `scripts`, and `scripts/**/*.py` includes nested ones.
+fn build_glob(pattern: &str, setting: &str) -> Result<Glob, CheckError> {
+    GlobBuilder::new(pattern)
+        .literal_separator(true)
+        .build()
+        .map_err(|err| {
+            CheckError::Configuration(format!(
+                "Invalid glob pattern '{pattern}' in '[deadcode]' {setting}: {err}"
+            ))
+        })
 }
 
 /// Why a file could not be contributed to the import graph.
@@ -222,8 +236,9 @@ enum ParseFailure {
 #[derive(Debug)]
 struct UnmatchedEntryPoint {
     entry_point: String,
-    /// Set when the spec does name a real file, which was simply not analyzed.
-    existing_file: Option<PathBuf>,
+    /// Set when the spec does name a real path, which was simply not analyzed
+    /// (a directory, or a file outside every source root).
+    existing_path: Option<PathBuf>,
 }
 
 /// The analyzed Python files, keyed by absolute path, with a case-insensitive
@@ -256,6 +271,26 @@ impl ProjectFiles {
     fn iter(&self) -> impl Iterator<Item = (&PathBuf, &String)> {
         self.modules.iter()
     }
+
+    fn par_iter(&self) -> impl rayon::iter::ParallelIterator<Item = (&PathBuf, &String)> {
+        self.modules.par_iter()
+    }
+
+    fn module_path(&self, file_path: &Path) -> Option<&String> {
+        self.modules.get(file_path)
+    }
+
+    /// Whether any other analyzed file sits anywhere under `file`'s directory,
+    /// including in subpackages.
+    fn package_has_other_files(&self, file: &Path) -> bool {
+        let Some(directory) = file.parent() else {
+            return false;
+        };
+        self.modules
+            .range(directory.to_path_buf()..)
+            .take_while(|(candidate, _)| candidate.starts_with(directory))
+            .any(|(candidate, _)| candidate != file)
+    }
 }
 
 /// All Python files under the source roots, mapped to their module paths.
@@ -276,7 +311,6 @@ fn collect_project_files(source_roots: &[PathBuf], file_walker: &fs::FSWalker) -
 /// Returns the import edges and the files which could not be parsed.
 fn parse_import_edges(files: &ProjectFiles, source_roots: &[PathBuf]) -> ImportGraph {
     let results: Vec<(PathBuf, Result<ImportTargets, ParseFailure>)> = files
-        .modules
         .par_iter()
         .map(|(file, _)| {
             if check_interrupt().is_err() {
@@ -414,7 +448,6 @@ fn is_init_file(path: &Path) -> bool {
 fn resolve_entry_points(
     project_root: &Path,
     source_roots: &[PathBuf],
-    file_walker: &fs::FSWalker,
     files: &ProjectFiles,
     raw_entry_points: &[String],
 ) -> Result<(BTreeSet<PathBuf>, Vec<UnmatchedEntryPoint>), CheckError> {
@@ -423,31 +456,38 @@ fn resolve_entry_points(
 
     // Paths and globs are resolved against the project root and every source
     // root, so that both 'src/app.py' and 'app.py' work under source_roots=["src"].
-    let candidate_roots: Vec<&Path> = std::iter::once(project_root)
+    // Deduplicated: with the default source_roots = ["."] the project root and
+    // the source root are the same directory.
+    let mut candidate_roots: Vec<&Path> = std::iter::once(project_root)
         .chain(source_roots.iter().map(PathBuf::as_path))
         .collect();
+    candidate_roots.dedup();
 
     for raw_entry_point in raw_entry_points {
-        let spec = match raw_entry_point.split(':').next() {
-            Some(spec) => spec.trim(),
-            None => "",
-        };
+        let spec = raw_entry_point
+            .split(':')
+            .next()
+            .unwrap_or(raw_entry_point)
+            .trim();
         if spec.is_empty() {
             unmatched.push(UnmatchedEntryPoint {
                 entry_point: raw_entry_point.clone(),
-                existing_file: None,
+                existing_path: None,
             });
             continue;
         }
 
         let mut matched = BTreeSet::new();
         if has_glob_syntax(spec) {
-            validate_glob(spec, "entry_points")?;
-            for root in &candidate_roots {
-                for path in file_walker
-                    .walk_globbed_files(&root.display().to_string(), std::iter::once(spec))
-                {
-                    matched.extend(project_file_for(files, &path));
+            // Matched against the files already collected rather than by
+            // re-walking the filesystem: no duplicate walks, and '*' stops at
+            // a path separator like everywhere else in tach.
+            let matcher = build_glob_matcher(spec, "entry_points")?;
+            for (file, _) in files.iter() {
+                if candidate_roots.iter().any(|root| {
+                    fs::relative_to(file, root).is_ok_and(|relative| matcher.is_match(relative))
+                }) {
+                    matched.insert(file.clone());
                 }
             }
         } else {
@@ -464,12 +504,16 @@ fn resolve_entry_points(
             unmatched.push(UnmatchedEntryPoint {
                 entry_point: raw_entry_point.clone(),
                 // Distinguish "names nothing on disk" (a typo) from "names a
-                // real file the analysis never saw" (outside every source
-                // root, or excluded) — the fixes are completely different.
-                existing_file: candidate_roots
-                    .iter()
-                    .map(|root| root.join(spec))
-                    .find(|path| path.is_file()),
+                // real path the analysis never saw" (a directory, or a file
+                // outside every source root) — the fixes are different.
+                existing_path: if has_glob_syntax(spec) {
+                    None
+                } else {
+                    candidate_roots
+                        .iter()
+                        .map(|root| root.join(spec))
+                        .find(|path| path.exists())
+                },
             });
         } else {
             entry_files.extend(matched);
@@ -488,7 +532,7 @@ fn expand_entry_roots(
 ) -> BTreeSet<PathBuf> {
     let mut roots = entry_files.clone();
     for entry_file in entry_files {
-        if let Some(module_path) = files.modules.get(entry_file) {
+        if let Some(module_path) = files.module_path(entry_file) {
             roots.extend(ancestor_init_files(files, source_roots, module_path));
         }
     }
@@ -514,11 +558,14 @@ fn reachable_files(
     reachable
 }
 
+/// A file path relative to the project root, falling back to the absolute path
+/// when the file lies outside it.
+fn relative_path(project_root: &Path, file: &Path) -> PathBuf {
+    fs::relative_to(file, project_root).unwrap_or_else(|_| file.to_path_buf())
+}
+
 fn relative_display_path(project_root: &Path, file: &Path) -> String {
-    fs::relative_to(file, project_root)
-        .unwrap_or_else(|_| file.to_path_buf())
-        .display()
-        .to_string()
+    relative_path(project_root, file).display().to_string()
 }
 
 #[cfg(test)]
@@ -897,7 +944,7 @@ mod tests {
     }
 
     #[test]
-    fn init_files_are_never_reported() {
+    fn init_file_is_not_reported_alongside_the_package_it_exposes() {
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
@@ -905,13 +952,141 @@ mod tests {
                 ("app.py", "x = 1\n"),
                 ("deadpkg/__init__.py", ""),
                 ("deadpkg/mod.py", "y = 2\n"),
+                ("deadpkg/nested/__init__.py", ""),
+                ("deadpkg/nested/deep.py", "z = 3\n"),
             ],
         );
         let config = config_with_entry_points(&["app.py"]);
 
         let diagnostics = run(temp.path(), &config);
 
-        assert_eq!(unreachable_modules(&diagnostics), modules(&["deadpkg.mod"]));
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["deadpkg.mod", "deadpkg.nested.deep"])
+        );
+    }
+
+    #[test]
+    fn package_containing_only_an_init_file_is_still_reported() {
+        // Skipping __init__.py unconditionally made a re-export-only package
+        // invisible: there is no sibling to report in its place.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("app.py", "x = 1\n"),
+                ("deadpkg/__init__.py", "LEFTOVER = True\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["app.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["deadpkg"]));
+    }
+
+    #[test]
+    fn globs_do_not_cross_path_separators() {
+        // `*` stops at a separator, as it does everywhere else in tach and in
+        // gitignore: `scripts/*.py` is the files directly in scripts.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "x = 1\n"),
+                ("scripts/flat.py", "a = 1\n"),
+                ("scripts/deep/nested/way_down.py", "b = 2\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["main.py", "scripts/*.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["scripts.deep.nested.way_down"])
+        );
+
+        // `**` is how you ask for the nested ones.
+        let config = config_with_entry_points(&["main.py", "scripts/**/*.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+
+        // Same rule for ignore globs.
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.deadcode.ignore = vec!["scripts/*".to_string()];
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["scripts.deep.nested.way_down"])
+        );
+    }
+
+    #[test]
+    fn analysis_gaps_follow_the_configured_severity() {
+        // A syntax error in an unreachable file is a coverage gap, not a
+        // violation: at the default severity the command still exits clean,
+        // and at 'error' it fails because the analysis was incomplete.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "x = 1\n"),
+                ("broken.py", "def f(:\n"),
+                ("dead.py", "y = 2\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
+        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_warning()));
+
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.deadcode.severity = RuleSetting::Error;
+        let diagnostics = run(temp.path(), &config);
+        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_error()));
+    }
+
+    #[test]
+    fn unparsable_reachable_file_fails_an_error_severity_gate() {
+        // Detection is skipped; at 'error' that must not pass as success.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[("main.py", "import broken\n"), ("broken.py", "def f(:\n")],
+        );
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.deadcode.severity = RuleSetting::Error;
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+        assert!(diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeSkippedUnparsableFiles()
+            )
+        )));
+        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_error()));
+    }
+
+    #[test]
+    fn directory_entry_point_says_it_is_a_directory() {
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[("main.py", "x = 1\n"), ("scripts/a.py", "a = 1\n")],
+        );
+        let config = config_with_entry_points(&["main.py", "scripts"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeEntryPointIsDirectory { entry_point }
+            ) if entry_point == "scripts"
+        )));
     }
 
     #[test]

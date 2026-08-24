@@ -83,6 +83,11 @@ pub enum ConfigurationDiagnostic {
     },
 
     #[error(
+        "Dead code entry point '{entry_point}' is a directory. Use a glob to name the files inside it, such as '{entry_point}/**/*.py'."
+    )]
+    DeadCodeEntryPointIsDirectory { entry_point: String },
+
+    #[error(
         "Dead code detection was skipped because a file reachable from an entry point could not be parsed."
     )]
     DeadCodeSkippedUnparsableFiles(),
