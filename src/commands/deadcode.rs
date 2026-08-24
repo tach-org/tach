@@ -127,7 +127,7 @@ pub fn check_deadcode(
         return Ok(diagnostics);
     }
 
-    for (file, module_path) in &files {
+    for (file, module_path) in files.iter() {
         if reachable.contains(file)
             || unparsable_files.contains_key(file)
             // A package `__init__.py` exists to make its live siblings importable;
@@ -205,12 +205,45 @@ enum ParseFailure {
     Io,
 }
 
+/// The analyzed Python files, keyed by absolute path, with a case-insensitive
+/// index used to resolve imports on case-insensitive filesystems.
+#[derive(Debug, Default)]
+struct ProjectFiles {
+    modules: BTreeMap<PathBuf, String>,
+    by_lowercase: BTreeMap<String, PathBuf>,
+}
+
+impl ProjectFiles {
+    fn insert(&mut self, file_path: PathBuf, module_path: String) {
+        self.by_lowercase
+            .entry(file_path.to_string_lossy().to_lowercase())
+            .or_insert_with(|| file_path.clone());
+        self.modules.insert(file_path, module_path);
+    }
+
+    fn contains(&self, file_path: &Path) -> bool {
+        self.modules.contains_key(file_path)
+    }
+
+    /// The analyzed file for `file_path`, tolerating a case mismatch. On macOS
+    /// and Windows an import can resolve to a differently-cased path than the
+    /// one the walker reported; at runtime those are the same file.
+    fn get(&self, file_path: &Path) -> Option<&PathBuf> {
+        if let Some((key, _)) = self.modules.get_key_value(file_path) {
+            return Some(key);
+        }
+        self.by_lowercase
+            .get(&file_path.to_string_lossy().to_lowercase())
+    }
+
+    fn iter(&self) -> impl Iterator<Item = (&PathBuf, &String)> {
+        self.modules.iter()
+    }
+}
+
 /// All Python files under the source roots, mapped to their module paths.
-fn collect_project_files(
-    source_roots: &[PathBuf],
-    file_walker: &fs::FSWalker,
-) -> BTreeMap<PathBuf, String> {
-    let mut files = BTreeMap::new();
+fn collect_project_files(source_roots: &[PathBuf], file_walker: &fs::FSWalker) -> ProjectFiles {
+    let mut files = ProjectFiles::default();
     for source_root in source_roots {
         for relative_path in file_walker.walk_pyfiles(&source_root.display().to_string()) {
             let file_path = source_root.join(&relative_path);
@@ -224,8 +257,9 @@ fn collect_project_files(
 
 /// Parse every file and resolve its imports to project files, in parallel.
 /// Returns the import edges and the files which could not be parsed.
-fn parse_import_edges(files: &BTreeMap<PathBuf, String>, source_roots: &[PathBuf]) -> ImportGraph {
+fn parse_import_edges(files: &ProjectFiles, source_roots: &[PathBuf]) -> ImportGraph {
     let results: Vec<(PathBuf, Result<ImportTargets, ParseFailure>)> = files
+        .modules
         .par_iter()
         .map(|(file, _)| {
             if check_interrupt().is_err() {
@@ -260,7 +294,7 @@ struct ImportGraph {
 }
 
 fn file_import_targets(
-    files: &BTreeMap<PathBuf, String>,
+    files: &ProjectFiles,
     source_roots: &[PathBuf],
     file: &Path,
 ) -> Result<ImportTargets, ParseFailure> {
@@ -323,14 +357,13 @@ struct ImportTargets {
 /// Map a resolved import target to the project file that represents it in the
 /// graph. Stub files (`.pyi`) resolve to their sibling implementation, since
 /// only `.py` files participate in the analysis.
-fn project_file_for(files: &BTreeMap<PathBuf, String>, resolved: &Path) -> Option<PathBuf> {
-    if files.contains_key(resolved) {
-        return Some(resolved.to_path_buf());
+fn project_file_for(files: &ProjectFiles, resolved: &Path) -> Option<PathBuf> {
+    if let Some(file) = files.get(resolved) {
+        return Some(file.clone());
     }
     if resolved.extension().is_some_and(|ext| ext == "pyi") {
-        let sibling = resolved.with_extension("py");
-        if files.contains_key(&sibling) {
-            return Some(sibling);
+        if let Some(file) = files.get(&resolved.with_extension("py")) {
+            return Some(file.clone());
         }
     }
     None
@@ -338,7 +371,7 @@ fn project_file_for(files: &BTreeMap<PathBuf, String>, resolved: &Path) -> Optio
 
 /// The `__init__.py` files of every ancestor package of `module_path`.
 fn ancestor_init_files(
-    files: &BTreeMap<PathBuf, String>,
+    files: &ProjectFiles,
     source_roots: &[PathBuf],
     module_path: &str,
 ) -> Vec<PathBuf> {
@@ -365,7 +398,7 @@ fn resolve_entry_points(
     project_root: &Path,
     source_roots: &[PathBuf],
     file_walker: &fs::FSWalker,
-    files: &BTreeMap<PathBuf, String>,
+    files: &ProjectFiles,
     raw_entry_points: &[String],
 ) -> Result<(BTreeSet<PathBuf>, Vec<String>), CheckError> {
     let mut entry_files = BTreeSet::new();
@@ -420,13 +453,13 @@ fn resolve_entry_points(
 /// Entry files plus the `__init__.py` of each of their ancestor packages
 /// (running `python -m pkg.app` imports `pkg` first).
 fn expand_entry_roots(
-    files: &BTreeMap<PathBuf, String>,
+    files: &ProjectFiles,
     source_roots: &[PathBuf],
     entry_files: &BTreeSet<PathBuf>,
 ) -> BTreeSet<PathBuf> {
     let mut roots = entry_files.clone();
     for entry_file in entry_files {
-        if let Some(module_path) = files.get(entry_file) {
+        if let Some(module_path) = files.modules.get(entry_file) {
             roots.extend(ancestor_init_files(files, source_roots, module_path));
         }
     }
@@ -962,6 +995,41 @@ mod tests {
                 .filter_map(|d| d.file_path().cloned())
                 .collect();
             assert_eq!(paths, vec![PathBuf::from("libdir/util.py")]);
+        }
+    }
+
+    #[test]
+    fn case_mismatched_import_resolves_on_case_insensitive_filesystems() {
+        // On macOS/Windows `module_to_file_path` can resolve to a differently
+        // cased path than the walker reported (both name the same file), which
+        // must not sever reachability and must not be mistaken for an
+        // unanalyzed target. On a case-sensitive filesystem the import simply
+        // does not resolve, and the file is reported dead instead.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from pkg.Toolset import Tool\nTool()\n"),
+                ("pkg/__init__.py", ""),
+                ("pkg/toolset.py", "class Tool: ...\n"),
+                ("pkg/dead.py", "x = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        let unreachable = unreachable_modules(&diagnostics);
+        assert!(unreachable.contains("pkg.dead"));
+        // Never a spurious "unanalyzed import target" warning for a case twin.
+        assert!(!diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeUnanalyzedImportTarget { .. }
+            )
+        )));
+        if cfg!(any(target_os = "macos", target_os = "windows")) {
+            assert!(!unreachable.contains("pkg.toolset"));
         }
     }
 
