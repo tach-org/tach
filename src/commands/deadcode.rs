@@ -1231,6 +1231,109 @@ mod tests {
     }
 
     #[test]
+    fn importer_inside_an_excluded_tree_does_not_keep_its_target_alive() {
+        // A migration runner (excluded from analysis, as migrations usually are)
+        // is the only importer of a live helper. The helper is reported: the
+        // importing file is outside the analyzed set, so the edge is invisible.
+        // The remedy is to declare the migration tree as an entry point.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "print(\"serve\")\n"),
+                ("app/__init__.py", ""),
+                ("app/ddl_gen.py", "def view_sql(): return \"CREATE VIEW\"\n"),
+                (
+                    "migrations/001_add_view.py",
+                    "from app.ddl_gen import view_sql\n\ndef upgrade(): view_sql()\n",
+                ),
+            ],
+        );
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.exclude = vec!["migrations".to_string()];
+
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["app.ddl_gen"]));
+
+        // Declaring the excluded runner as an entry point cannot help while it
+        // is excluded from the walk; un-excluding it and seeding it does.
+        let mut config = config_with_entry_points(&["main.py", "migrations/*.py"]);
+        config.exclude = vec![];
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn module_path_inside_a_non_python_config_file_is_not_followed() {
+        // Plugin wiring that lives in YAML/TOML consumed by an external tool is
+        // outside the import graph entirely.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "import subprocess\n\nsubprocess.run([\"external-tool\", \"--conf\", \"conf/profiles.yml\"])\n",
+                ),
+                ("plugins/__init__.py", ""),
+                ("plugins/fancy_writer.py", "class Plugin: ...\n"),
+                (
+                    "conf/profiles.yml",
+                    "plugins:\n  - module: plugins.fancy_writer\n",
+                ),
+            ],
+        );
+
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["plugins.fancy_writer"])
+        );
+
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.deadcode.ignore = vec!["plugins/**".to_string()];
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn statically_registered_versions_are_all_alive() {
+        // The healthy variant of v1/v2 parallelism: a factory imports every
+        // version explicitly and picks at runtime. Older versions look
+        // superseded but are alive, and must never be reported.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "from domain.builder import build\nbuild(\"2025-02-01\")\n",
+                ),
+                ("domain/__init__.py", ""),
+                ("domain/versions/__init__.py", ""),
+                (
+                    "domain/versions/v1.py",
+                    "class QV1:\n    min_version = \"2025-01-01\"\n",
+                ),
+                (
+                    "domain/versions/v2.py",
+                    "class QV2:\n    min_version = \"2025-06-01\"\n",
+                ),
+                (
+                    "domain/builder.py",
+                    "from domain.versions.v1 import QV1\nfrom domain.versions.v2 import QV2\n\nFACTORY = [QV2, QV1]\n\ndef build(v):\n    return next(c for c in FACTORY if v >= c.min_version)()\n",
+                ),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
     fn console_script_module_must_be_declared_as_an_entry_point() {
         // pyproject.toml [project.scripts] targets have no importer; tach does
         // not read pyproject entry points, so they are declared explicitly.
