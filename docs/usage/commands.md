@@ -178,8 +178,8 @@ Because Python is dynamic, a reported file is a candidate for deletion, not a gu
 Some behaviors to be aware of:
 
 - A package's `__init__.py` is not reported alongside the rest of the package, since deleting the package removes both — but a package that contains nothing else *is* reported, so a re-export-only package cannot hide.
-- If a file reachable from an entry point cannot be parsed or read, detection is skipped for that run (reachability cannot be trusted), and a diagnostic explains why. Files that cannot be analyzed are reported without blocking detection when they are unreachable.
-- Diagnostics about gaps in the analysis — an unparsable file, an import into excluded code, an entry point that does not resolve — carry the configured `severity`. At the default `warn` they inform; at `error` they fail the command, because a gate should not pass having checked less than it claims.
+- A file that cannot be read or parsed is reported as an error, as it is for [`tach check`](#tach-check). If such a file is reachable from an entry point, detection is skipped for that run, since its imports are unknown and reachability cannot be trusted.
+- An entry point that does not resolve, and an import into excluded code, are reported at the configured `severity`. At `error` they fail the command, so a gate cannot pass while silently checking less than it claims.
 - Paths excluded by the global `exclude` configuration (or `-e`), and paths hidden by `.gitignore`, are not analyzed at all. If a live import chain passes *through* such a file, files reachable only through it are reported as dead — so a warning names any excluded file that other files import.
 - When the same module path exists under more than one source root, the first configured source root wins, mirroring how Python resolves imports along `sys.path`.
 - String literals which look like module paths with at least two dots (e.g. `"myapp.plugins.emailer"`) are treated as imports, which errs toward keeping dynamically-imported files alive. Shorter strings, f-strings, and module names built at runtime are not followed — declare those targets as entry points or ignore them.

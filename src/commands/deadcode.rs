@@ -90,15 +90,11 @@ pub fn check_deadcode(
         })
         .collect();
 
-    // Everything below reports at the configured severity. These diagnostics
-    // describe gaps in the analysis rather than dead code, but a gap is exactly
-    // what makes the result untrustworthy: at 'warn' they inform, and at
-    // 'error' they fail the gate instead of letting it pass having checked less
-    // than it claims.
+    // A file tach was asked to analyze but could not read or parse is an error,
+    // matching `tach check`.
     for (file, failure) in &unparsable_files {
         let file_path = relative_display_path(&project_root, file);
-        diagnostics.push(Diagnostic::new_global(
-            severity,
+        diagnostics.push(Diagnostic::new_global_error(
             DiagnosticDetails::Configuration(match failure {
                 ParseFailure::Syntax => {
                     ConfigurationDiagnostic::SkippedFileSyntaxError { file_path }
@@ -108,6 +104,8 @@ pub fn check_deadcode(
         ));
     }
 
+    // Excluding code is intentional, so this reports at the configured
+    // severity alongside the findings it explains.
     for file in &graph.unanalyzed_targets {
         diagnostics.push(Diagnostic::new_global(
             severity,
@@ -133,8 +131,7 @@ pub fn check_deadcode(
     if unparsable_files.keys().any(|file| reachable.contains(file)) {
         // Imports of a reachable file are unknown, so reachability cannot be
         // trusted; report nothing rather than false positives.
-        diagnostics.push(Diagnostic::new_global(
-            severity,
+        diagnostics.push(Diagnostic::new_global_error(
             DiagnosticDetails::Configuration(
                 ConfigurationDiagnostic::DeadCodeSkippedUnparsableFiles(),
             ),
@@ -1022,10 +1019,9 @@ mod tests {
     }
 
     #[test]
-    fn analysis_gaps_follow_the_configured_severity() {
-        // A syntax error in an unreachable file is a coverage gap, not a
-        // violation: at the default severity the command still exits clean,
-        // and at 'error' it fails because the analysis was incomplete.
+    fn unanalyzable_files_are_errors_regardless_of_severity() {
+        // A file tach was asked to analyze but could not parse is an error, as
+        // it is for `tach check`, independent of the dead-code severity.
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
@@ -1035,28 +1031,41 @@ mod tests {
                 ("dead.py", "y = 2\n"),
             ],
         );
-
         let config = config_with_entry_points(&["main.py"]);
-        let diagnostics = run(temp.path(), &config);
-        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
-        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_warning()));
 
-        let mut config = config_with_entry_points(&["main.py"]);
-        config.deadcode.severity = RuleSetting::Error;
         let diagnostics = run(temp.path(), &config);
-        assert!(diagnostics.iter().all(|diagnostic| diagnostic.is_error()));
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
+        let skipped = diagnostics
+            .iter()
+            .find(|diagnostic| {
+                matches!(
+                    diagnostic.details(),
+                    DiagnosticDetails::Configuration(
+                        ConfigurationDiagnostic::SkippedFileSyntaxError { .. }
+                    )
+                )
+            })
+            .expect("syntax error is reported");
+        assert!(skipped.is_error());
+        // The dead-code findings themselves still follow the configured severity.
+        assert!(
+            diagnostics
+                .iter()
+                .filter(|diagnostic| diagnostic.is_deadcode())
+                .all(|diagnostic| diagnostic.is_warning())
+        );
     }
 
     #[test]
-    fn unparsable_reachable_file_fails_an_error_severity_gate() {
-        // Detection is skipped; at 'error' that must not pass as success.
+    fn unparsable_reachable_file_fails_the_run() {
+        // Detection is skipped; that must not pass as success.
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
             &[("main.py", "import broken\n"), ("broken.py", "def f(:\n")],
         );
-        let mut config = config_with_entry_points(&["main.py"]);
-        config.deadcode.severity = RuleSetting::Error;
+        let config = config_with_entry_points(&["main.py"]);
 
         let diagnostics = run(temp.path(), &config);
 
