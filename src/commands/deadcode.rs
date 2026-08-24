@@ -1522,27 +1522,69 @@ mod tests {
 
     #[test]
     fn wide_init_facade_keeps_siblings_alive_at_file_level() {
-        // Boundary of file-level analysis, pinned deliberately: importing a
-        // package executes its __init__.py, which imports every sibling — so
-        // a sibling nothing actually uses is still alive at file granularity.
-        // Detecting THAT requires symbol-level analysis (out of scope).
+        // Boundary of file-level analysis, pinned from both sides: a sibling
+        // the facade does NOT re-export is reported, and adding the re-export
+        // silences the report for exactly the same dead code. Distinguishing
+        // those requires symbol-level analysis (out of scope).
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
             &[
-                ("main.py", "import pkg\n"),
-                (
-                    "pkg/__init__.py",
-                    "from pkg.used import a\nfrom pkg.unused_export import b\n",
-                ),
-                ("pkg/used.py", "a = 1\n"),
-                ("pkg/unused_export.py", "b = 2\n"),
+                ("main.py", "from pkg import UsedThing\nUsedThing()\n"),
+                ("pkg/__init__.py", "from pkg.used import UsedThing\n"),
+                ("pkg/used.py", "class UsedThing: ...\n"),
+                // Consumed by nobody, and not re-exported by the facade.
+                ("pkg/legacy.py", "PALETTE = {}\n"),
             ],
         );
         let config = config_with_entry_points(&["main.py"]);
 
         let diagnostics = run(temp.path(), &config);
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["pkg.legacy"]));
 
+        // Same dead code, now re-exported: the file-level graph can no longer
+        // see that nothing consumes it.
+        write_files(
+            temp.path(),
+            &[(
+                "pkg/__init__.py",
+                "from pkg.used import UsedThing\nfrom pkg.legacy import PALETTE\n",
+            )],
+        );
+
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn packaging_metadata_plugin_needs_an_entry_point_and_takes_its_subtree_with_it() {
+        // A module loaded through installed-package entry-point metadata (a
+        // pytest11 plugin, for example) has no importer at all, and everything
+        // only it imports goes down with it.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("app/__init__.py", ""),
+                ("app/main.py", "print(\"app\")\n"),
+                ("testkit/__init__.py", ""),
+                (
+                    "testkit/fixtures.py",
+                    "from testkit.db import make_db\n\ndef db(): return make_db()\n",
+                ),
+                ("testkit/db.py", "def make_db(): ...\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["app/main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["testkit.fixtures", "testkit.db"])
+        );
+
+        let config = config_with_entry_points(&["app/main.py", "testkit.fixtures"]);
+        let diagnostics = run(temp.path(), &config);
         assert!(unreachable_modules(&diagnostics).is_empty());
     }
 
