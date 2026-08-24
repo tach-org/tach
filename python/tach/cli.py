@@ -243,8 +243,8 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         metavar="path_glob_or_module",
-        help="Entry point to treat as reachable: a file path (relative to the project root),"
-        " a glob pattern, or a module path. May be repeated;"
+        help="Entry point to treat as reachable: a file path (relative to the project root"
+        " or a source root), a glob pattern, or a module path. May be repeated;"
         " extends 'entry_points' from the [deadcode] section of tach.toml.",
     )
     deadcode_parser.add_argument(
