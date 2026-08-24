@@ -242,10 +242,6 @@ impl ProjectFiles {
         self.modules.insert(file_path, module_path);
     }
 
-    fn contains(&self, file_path: &Path) -> bool {
-        self.modules.contains_key(file_path)
-    }
-
     /// The analyzed file for `file_path`, tolerating a case mismatch. On macOS
     /// and Windows an import can resolve to a differently-cased path than the
     /// one the walker reported; at runtime those are the same file.
@@ -382,10 +378,10 @@ fn project_file_for(files: &ProjectFiles, resolved: &Path) -> Option<PathBuf> {
     if let Some(file) = files.get(resolved) {
         return Some(file.clone());
     }
-    if resolved.extension().is_some_and(|ext| ext == "pyi") {
-        if let Some(file) = files.get(&resolved.with_extension("py")) {
-            return Some(file.clone());
-        }
+    if resolved.extension().is_some_and(|ext| ext == "pyi")
+        && let Some(file) = files.get(&resolved.with_extension("py"))
+    {
+        return Some(file.clone());
     }
     None
 }
@@ -1722,6 +1718,40 @@ mod tests {
 
         let diagnostics = run(temp.path(), &config);
         assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn permanently_disabled_feature_still_counts_as_alive() {
+        // The other boundary of file-level analysis: code imported at module
+        // scope behind a feature flag that is hard-coded off is never executed,
+        // but the import edge is real and whether the flag can ever be true is
+        // not statically decidable. Reporting it would be a false positive, so
+        // it stays alive — pinned so the tradeoff is deliberate.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("settings.py", "ENABLE_LEGACY_BILLING = False\n"),
+                (
+                    "main.py",
+                    "import settings\nfrom legacy_billing import run\n\nif settings.ENABLE_LEGACY_BILLING:\n    run()\n",
+                ),
+                (
+                    "legacy_billing.py",
+                    "from billing_util import fmt\n\ndef run(): fmt()\n",
+                ),
+                ("billing_util.py", "def fmt(): ...\n"),
+                ("truly_orphaned.py", "x = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["truly_orphaned"])
+        );
     }
 
     #[test]
