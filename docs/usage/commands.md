@@ -177,7 +177,7 @@ Because Python is dynamic, a reported file is a candidate for deletion, not a gu
 
 Some behaviors to be aware of:
 
-- A package's `__init__.py` is not reported alongside the rest of the package, since deleting the package removes both — but a package that contains nothing else *is* reported, so a re-export-only package cannot hide.
+- Importing anything inside a package marks that package's `__init__.py` as used, so an unreachable `__init__.py` means the whole package is unreachable. Such a package is reported in full, rather than as a handful of scattered files.
 - A file that cannot be read or parsed is reported as an error, as it is for [`tach check`](#tach-check). If such a file is reachable from an entry point, detection is skipped for that run, since its imports are unknown and reachability cannot be trusted.
 - An entry point that does not resolve, and an import into excluded code, are reported at the configured `severity`. At `error` they fail the command, so a gate cannot pass while silently checking less than it claims.
 - Paths excluded by the global `exclude` configuration (or `-e`), and paths hidden by `.gitignore`, are not analyzed at all. If a live import chain passes *through* such a file, files reachable only through it are reported as dead — so a warning names any excluded file that other files import.

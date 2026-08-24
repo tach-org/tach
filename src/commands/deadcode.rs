@@ -140,15 +140,11 @@ pub fn check_deadcode(
     }
 
     for (file, module_path) in files.iter() {
+        // A package's `__init__.py` is reported like any other file. Importing
+        // anything inside a package marks its `__init__.py` reachable, so an
+        // unreachable one means the whole package is unreachable, and omitting
+        // it would report a dead package as a handful of scattered leaves.
         if reachable.contains(file) || unparsable_files.contains_key(file) {
-            continue;
-        }
-        // A package `__init__.py` exists to make the rest of the package
-        // importable, so reporting it alongside that content is noise —
-        // deleting the package removes both. When the package holds nothing
-        // else, there is no content to report in its place, and skipping it
-        // would hide the package entirely.
-        if is_init_file(file) && files.package_has_other_files(file) {
             continue;
         }
 
@@ -275,18 +271,6 @@ impl ProjectFiles {
 
     fn module_path(&self, file_path: &Path) -> Option<&String> {
         self.modules.get(file_path)
-    }
-
-    /// Whether any other analyzed file sits anywhere under `file`'s directory,
-    /// including in subpackages.
-    fn package_has_other_files(&self, file: &Path) -> bool {
-        let Some(directory) = file.parent() else {
-            return false;
-        };
-        self.modules
-            .range(directory.to_path_buf()..)
-            .take_while(|(candidate, _)| candidate.starts_with(directory))
-            .any(|(candidate, _)| candidate != file)
     }
 }
 
@@ -941,13 +925,17 @@ mod tests {
     }
 
     #[test]
-    fn init_file_is_not_reported_alongside_the_package_it_exposes() {
+    fn a_dead_package_reports_every_file_including_its_init() {
+        // A dead package must not be reported as a handful of scattered
+        // leaves: importing anything inside a package marks its `__init__.py`
+        // reachable, so an unreachable one means the whole package is dead,
+        // and the report says so at every level including nested packages.
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
             &[
                 ("app.py", "x = 1\n"),
-                ("deadpkg/__init__.py", ""),
+                ("deadpkg/__init__.py", "FACADE = 1\n"),
                 ("deadpkg/mod.py", "y = 2\n"),
                 ("deadpkg/nested/__init__.py", ""),
                 ("deadpkg/nested/deep.py", "z = 3\n"),
@@ -959,14 +947,50 @@ mod tests {
 
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["deadpkg.mod", "deadpkg.nested.deep"])
+            modules(&[
+                "deadpkg",
+                "deadpkg.mod",
+                "deadpkg.nested",
+                "deadpkg.nested.deep"
+            ])
         );
     }
 
     #[test]
-    fn package_containing_only_an_init_file_is_still_reported() {
-        // Skipping __init__.py unconditionally made a re-export-only package
-        // invisible: there is no sibling to report in its place.
+    fn a_live_package_never_reports_its_init_even_when_siblings_are_dead() {
+        // The counterpart invariant: any reachable module inside a package
+        // keeps that package's `__init__.py` alive, so a partially-used
+        // package reports only the unused modules.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from livepkg.used import go\ngo()\n"),
+                ("livepkg/__init__.py", ""),
+                ("livepkg/used.py", "def go(): ...\n"),
+                ("livepkg/unused.py", "z = 1\n"),
+                ("livepkg/nested/__init__.py", ""),
+                ("livepkg/nested/also_unused.py", "w = 2\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        // `livepkg` itself is alive; the nested package is entirely dead, so
+        // its own `__init__.py` is reported.
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&[
+                "livepkg.nested",
+                "livepkg.nested.also_unused",
+                "livepkg.unused"
+            ])
+        );
+    }
+
+    #[test]
+    fn package_containing_only_an_init_file_is_reported() {
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
@@ -1383,7 +1407,7 @@ mod tests {
 
         let diagnostics = run(temp.path(), &config);
 
-        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
+        assert_eq!(unreachable_modules(&diagnostics), modules(&[".", "dead"]));
     }
 
     #[test]
@@ -1564,7 +1588,10 @@ mod tests {
         config.exclude = vec!["migrations".to_string()];
 
         let diagnostics = run(temp.path(), &config);
-        assert_eq!(unreachable_modules(&diagnostics), modules(&["app.ddl_gen"]));
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["app", "app.ddl_gen"])
+        );
 
         // Declaring the excluded runner as an entry point cannot help while it
         // is excluded from the walk; un-excluding it and seeding it does.
@@ -1599,7 +1626,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["plugins.fancy_writer"])
+            modules(&["plugins", "plugins.fancy_writer"])
         );
 
         let mut config = config_with_entry_points(&["main.py"]);
@@ -1706,7 +1733,13 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["clients.acme.script", "shared", "truly_dead"])
+            modules(&[
+                "clients",
+                "clients.acme",
+                "clients.acme.script",
+                "shared",
+                "truly_dead"
+            ])
         );
 
         // Declaring the dynamic targets as entry points revives them AND their
@@ -1741,7 +1774,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["scripts.driver", "app.core_logic"])
+            modules(&["app", "app.core_logic", "scripts.driver"])
         );
 
         // Entry-pointing the script rescues the script only.
@@ -1749,7 +1782,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["app.core_logic"])
+            modules(&["app", "app.core_logic"])
         );
     }
 
@@ -1805,7 +1838,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["plugins.emailer"])
+            modules(&["plugins", "plugins.emailer"])
         );
 
         let mut config = config_with_entry_points(&["main.py"]);
@@ -1962,7 +1995,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["testkit.fixtures", "testkit.db"])
+            modules(&["testkit", "testkit.db", "testkit.fixtures"])
         );
 
         let config = config_with_entry_points(&["app/main.py", "testkit.fixtures"]);
@@ -1992,7 +2025,7 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
         assert_eq!(
             unreachable_modules(&diagnostics),
-            modules(&["jobs.nightly", "jobs.shared"])
+            modules(&["jobs", "jobs.nightly", "jobs.shared"])
         );
 
         let config = config_with_entry_points(&["main.py", "jobs/nightly.py"]);
@@ -2019,6 +2052,12 @@ mod tests {
             .iter()
             .filter_map(|d| d.file_path().cloned())
             .collect();
-        assert_eq!(paths, vec![PathBuf::from("pkg/dead.py")]);
+        assert_eq!(
+            paths,
+            vec![
+                PathBuf::from("pkg/__init__.py"),
+                PathBuf::from("pkg/dead.py")
+            ]
+        );
     }
 }
