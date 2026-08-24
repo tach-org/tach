@@ -1537,6 +1537,43 @@ mod tests {
     }
 
     #[test]
+    fn entry_pointing_a_loader_does_not_rescue_what_it_loads_by_file_path() {
+        // Two layers outside the import graph: a CI-run script (invisible
+        // runner) itself loads a module by file path (invisible edge).
+        // Declaring the script as an entry point fixes only the first layer —
+        // its file-path target must still be reported, so the limit of the
+        // remedy is explicit rather than surprising.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "print(\"service\")\n"),
+                (
+                    "scripts/driver.py",
+                    "import importlib.util\nfrom pathlib import Path\n\nTARGET = Path(__file__).parent.parent / \"app\" / \"core_logic.py\"\nspec = importlib.util.spec_from_file_location(\"core_logic\", TARGET)\n",
+                ),
+                ("app/__init__.py", ""),
+                ("app/core_logic.py", "def run(): ...\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["scripts.driver", "app.core_logic"])
+        );
+
+        // Entry-pointing the script rescues the script only.
+        let config = config_with_entry_points(&["main.py", "scripts/driver.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["app.core_logic"])
+        );
+    }
+
+    #[test]
     fn two_dot_string_reference_keeps_target_alive_transitively() {
         // String literals with >= 2 dots are treated as imports (conservative);
         // shorter strings are not.
