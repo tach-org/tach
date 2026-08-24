@@ -32,36 +32,47 @@ impl<'a> SourceRootResolver<'a> {
         &self,
         source_roots: &[PathBuf],
     ) -> Result<Vec<PathBuf>, SourceRootResolverError> {
-        Ok(source_roots
-            .iter()
-            .map(|root| {
-                if root.as_os_str().to_str() == Some(".") {
-                    // Don't want to construct a path like: "<project_root>/."
-                    Ok(vec![self.project_root.to_path_buf()])
-                } else {
-                    match root.as_os_str().to_str() {
-                        Some(s) => {
-                            if glob::has_glob_syntax(s) {
-                                glob::find_matching_directories(
-                                    self.project_root,
-                                    s,
-                                    self.file_walker,
-                                )
-                                .map_err(SourceRootResolverError::GlobError)
-                            } else {
-                                Ok(vec![self.project_root.join(root)])
-                            }
+        // Configured order is preserved: when the same module path exists under
+        // more than one source root, the first configured root wins (mirroring
+        // how Python resolves imports along 'sys.path'). Duplicates are removed.
+        let mut seen = HashSet::new();
+        let mut resolved = Vec::new();
+        for root in source_roots {
+            let expanded = if root.as_os_str().to_str() == Some(".") {
+                // Don't want to construct a path like: "<project_root>/."
+                vec![self.project_root.to_path_buf()]
+            } else {
+                match root.as_os_str().to_str() {
+                    Some(s) => {
+                        if glob::has_glob_syntax(s) {
+                            let mut matches = glob::find_matching_directories(
+                                self.project_root,
+                                s,
+                                self.file_walker,
+                            )
+                            .map_err(SourceRootResolverError::GlobError)?;
+                            // Walk order is not guaranteed; sort for determinism.
+                            matches.sort();
+                            matches
+                        } else {
+                            vec![self.project_root.join(root)]
                         }
-                        None => Err(SourceRootResolverError::InvalidSourceRoot(
+                    }
+                    None => {
+                        return Err(SourceRootResolverError::InvalidSourceRoot(
                             root.display().to_string(),
-                        )),
+                        ));
                     }
                 }
-            })
-            .collect::<Result<HashSet<_>, _>>()? // This propagates errors and deduplicates
-            .into_iter()
-            .flatten()
-            .collect())
+            };
+
+            for path in expanded {
+                if seen.insert(path.clone()) {
+                    resolved.push(path);
+                }
+            }
+        }
+        Ok(resolved)
     }
 }
 

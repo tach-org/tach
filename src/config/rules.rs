@@ -11,11 +11,11 @@ pub enum RuleSetting {
 
 impl RuleSetting {
     // These are just necessary for serde macros
-    fn warn() -> Self {
+    pub(crate) fn warn() -> Self {
         Self::Warn
     }
 
-    fn is_warn(&self) -> bool {
+    pub(crate) fn is_warn(&self) -> bool {
         *self == Self::Warn
     }
 

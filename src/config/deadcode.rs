@@ -3,14 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use super::RuleSetting;
 
-fn default_severity() -> RuleSetting {
-    RuleSetting::Warn
-}
-
-fn is_default_severity(severity: &RuleSetting) -> bool {
-    *severity == RuleSetting::Warn
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(default, deny_unknown_fields)]
 #[pyclass(get_all, module = "tach.extension")]
@@ -20,8 +12,8 @@ pub struct DeadCodeConfig {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub ignore: Vec<String>,
     #[serde(
-        default = "default_severity",
-        skip_serializing_if = "is_default_severity"
+        default = "RuleSetting::warn",
+        skip_serializing_if = "RuleSetting::is_warn"
     )]
     pub severity: RuleSetting,
 }
@@ -31,7 +23,7 @@ impl Default for DeadCodeConfig {
         Self {
             entry_points: vec![],
             ignore: vec![],
-            severity: default_severity(),
+            severity: RuleSetting::warn(),
         }
     }
 }

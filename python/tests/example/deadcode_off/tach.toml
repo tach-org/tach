@@ -1,0 +1,3 @@
+[deadcode]
+entry_points = ["main.py"]
+severity = "off"

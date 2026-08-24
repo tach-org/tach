@@ -78,6 +78,11 @@ pub enum ConfigurationDiagnostic {
         "Dead code detection was skipped because a file reachable from an entry point could not be parsed."
     )]
     DeadCodeSkippedUnparsableFiles(),
+
+    #[error(
+        "Imports of '{file_path}' were not followed because it is excluded or ignored; files reachable only through it may be reported as dead."
+    )]
+    DeadCodeUnanalyzedImportTarget { file_path: String },
 }
 
 #[derive(Error, Debug, Clone, Serialize, PartialEq)]

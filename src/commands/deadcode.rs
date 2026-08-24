@@ -55,13 +55,19 @@ pub fn check_deadcode(
     let files = collect_project_files(&source_roots, &file_walker);
     check_interrupt().map_err(|_| CheckError::Interrupt)?;
 
-    let (edges, unparsable_files) = parse_import_edges(&files, &source_roots);
+    let graph = parse_import_edges(&files, &source_roots);
     check_interrupt().map_err(|_| CheckError::Interrupt)?;
+    let unparsable_files = graph.unparsable;
 
     let mut entry_points = project_config.deadcode.entry_points.clone();
     entry_points.extend(cli_entry_points.unwrap_or_default());
-    let (entry_files, unmatched_entry_points) =
-        resolve_entry_points(&project_root, &source_roots, &file_walker, &files, &entry_points);
+    let (entry_files, unmatched_entry_points) = resolve_entry_points(
+        &project_root,
+        &source_roots,
+        &file_walker,
+        &files,
+        &entry_points,
+    )?;
 
     let mut diagnostics: Vec<Diagnostic> = unmatched_entry_points
         .into_iter()
@@ -72,15 +78,31 @@ pub fn check_deadcode(
         })
         .collect();
 
-    for (file, failure_severity) in &unparsable_files {
+    for (file, failure) in &unparsable_files {
         let file_path = relative_display_path(&project_root, file);
-        let details = match failure_severity {
-            Severity::Error => ConfigurationDiagnostic::SkippedFileSyntaxError { file_path },
-            Severity::Warning => ConfigurationDiagnostic::SkippedFileIoError { file_path },
+        let (failure_severity, details) = match failure {
+            ParseFailure::Syntax => (
+                Severity::Error,
+                ConfigurationDiagnostic::SkippedFileSyntaxError { file_path },
+            ),
+            ParseFailure::Io => (
+                Severity::Warning,
+                ConfigurationDiagnostic::SkippedFileIoError { file_path },
+            ),
         };
         diagnostics.push(Diagnostic::new_global(
-            *failure_severity,
+            failure_severity,
             DiagnosticDetails::Configuration(details),
+        ));
+    }
+
+    for file in &graph.unanalyzed_targets {
+        diagnostics.push(Diagnostic::new_global_warning(
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeUnanalyzedImportTarget {
+                    file_path: relative_display_path(&project_root, file),
+                },
+            ),
         ));
     }
 
@@ -88,11 +110,11 @@ pub fn check_deadcode(
         diagnostics.push(Diagnostic::new_global_warning(
             DiagnosticDetails::Configuration(ConfigurationDiagnostic::DeadCodeNoEntryPoints()),
         ));
-        return Ok(sorted(diagnostics));
+        return Ok(diagnostics);
     }
 
     let entry_roots = expand_entry_roots(&files, &source_roots, &entry_files);
-    let reachable = reachable_files(&edges, &entry_roots);
+    let reachable = reachable_files(&graph.edges, &entry_roots);
 
     if unparsable_files.keys().any(|file| reachable.contains(file)) {
         // Imports of a reachable file are unknown, so reachability cannot be
@@ -102,7 +124,7 @@ pub fn check_deadcode(
                 ConfigurationDiagnostic::DeadCodeSkippedUnparsableFiles(),
             ),
         ));
-        return Ok(sorted(diagnostics));
+        return Ok(diagnostics);
     }
 
     for (file, module_path) in &files {
@@ -131,7 +153,9 @@ pub fn check_deadcode(
         ));
     }
 
-    Ok(sorted(diagnostics))
+    // Diagnostics are already in a stable order: global diagnostics are pushed
+    // first, then located ones in `files` (BTreeMap) path order.
+    Ok(diagnostics)
 }
 
 /// Resolve the effective severity, preferring the CLI override over config.
@@ -157,16 +181,28 @@ fn effective_severity(
 fn build_ignore_matcher(patterns: &[String]) -> Result<GlobSet, CheckError> {
     let mut builder = GlobSetBuilder::new();
     for pattern in patterns {
-        let glob = Glob::new(pattern).map_err(|_| {
-            CheckError::Configuration(format!(
-                "Invalid glob pattern '{pattern}' in '[deadcode]' ignore."
-            ))
-        })?;
-        builder.add(glob);
+        builder.add(validate_glob(pattern, "ignore")?);
     }
     builder
         .build()
         .map_err(|_| CheckError::Configuration("Failed to build '[deadcode]' ignore.".to_string()))
+}
+
+/// Compile a user-supplied glob, reporting a configuration error rather than
+/// panicking (`FSWalker::walk_globbed_files` unwraps invalid patterns).
+fn validate_glob(pattern: &str, setting: &str) -> Result<Glob, CheckError> {
+    Glob::new(pattern).map_err(|err| {
+        CheckError::Configuration(format!(
+            "Invalid glob pattern '{pattern}' in '[deadcode]' {setting}: {err}"
+        ))
+    })
+}
+
+/// Why a file could not be contributed to the import graph.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ParseFailure {
+    Syntax,
+    Io,
 }
 
 /// All Python files under the source roots, mapped to their module paths.
@@ -187,42 +223,49 @@ fn collect_project_files(
 }
 
 /// Parse every file and resolve its imports to project files, in parallel.
-/// Returns the import edges and the files which could not be parsed
-/// (with the severity their skip diagnostic should carry).
-fn parse_import_edges(
-    files: &BTreeMap<PathBuf, String>,
-    source_roots: &[PathBuf],
-) -> (
-    BTreeMap<PathBuf, BTreeSet<PathBuf>>,
-    BTreeMap<PathBuf, Severity>,
-) {
-    let results: Vec<(PathBuf, Result<BTreeSet<PathBuf>, Severity>)> = files
+/// Returns the import edges and the files which could not be parsed.
+fn parse_import_edges(files: &BTreeMap<PathBuf, String>, source_roots: &[PathBuf]) -> ImportGraph {
+    let results: Vec<(PathBuf, Result<ImportTargets, ParseFailure>)> = files
         .par_iter()
-        .map(|(file, _)| (file.clone(), file_import_targets(files, source_roots, file)))
+        .map(|(file, _)| {
+            if check_interrupt().is_err() {
+                return (file.clone(), Err(ParseFailure::Io));
+            }
+            (file.clone(), file_import_targets(files, source_roots, file))
+        })
         .collect();
 
-    let mut edges = BTreeMap::new();
-    let mut unparsable = BTreeMap::new();
+    let mut graph = ImportGraph::default();
     for (file, result) in results {
         match result {
             Ok(targets) => {
-                edges.insert(file, targets);
+                graph.edges.insert(file, targets.files);
+                graph.unanalyzed_targets.extend(targets.unanalyzed);
             }
-            Err(failure_severity) => {
-                unparsable.insert(file, failure_severity);
+            Err(failure) => {
+                graph.unparsable.insert(file, failure);
             }
         }
     }
-    (edges, unparsable)
+    graph
+}
+
+#[derive(Debug, Default)]
+struct ImportGraph {
+    edges: BTreeMap<PathBuf, BTreeSet<PathBuf>>,
+    unparsable: BTreeMap<PathBuf, ParseFailure>,
+    /// Real files under a source root which imports point at, but which were
+    /// not analyzed because they are excluded or gitignored.
+    unanalyzed_targets: BTreeSet<PathBuf>,
 }
 
 fn file_import_targets(
     files: &BTreeMap<PathBuf, String>,
     source_roots: &[PathBuf],
     file: &Path,
-) -> Result<BTreeSet<PathBuf>, Severity> {
-    let contents = fs::read_file_content(file).map_err(|_| Severity::Warning)?;
-    let ast = parse_python_source(&contents).map_err(|_| Severity::Error)?;
+) -> Result<ImportTargets, ParseFailure> {
+    let contents = fs::read_file_content(file).map_err(|_| ParseFailure::Io)?;
+    let ast = parse_python_source(&contents).map_err(|_| ParseFailure::Syntax)?;
     let imports = get_normalized_imports_from_ast(
         source_roots,
         file,
@@ -231,29 +274,50 @@ fn file_import_targets(
         // project-wide setting): a module imported only for type annotations
         // is not dead code.
         false,
-        project_includes_string_imports(),
+        // Follow string literals which look like dotted module paths: errs
+        // toward keeping dynamically-imported files alive.
+        true,
     )
-    .map_err(|_| Severity::Error)?;
+    .map_err(|_| ParseFailure::Syntax)?;
 
-    let mut targets = BTreeSet::new();
+    let mut targets = ImportTargets::default();
     for import in imports {
         let Some(resolved) = fs::module_to_file_path(source_roots, &import.module_path, true)
         else {
             continue;
         };
-        if let Some(target) = project_file_for(files, &resolved.file_path) {
-            targets.insert(target);
+        match project_file_for(files, &resolved.file_path) {
+            Some(target) => {
+                targets.files.insert(target);
+            }
+            None if resolved
+                .file_path
+                .extension()
+                .is_some_and(|ext| ext == "py") =>
+            {
+                // The module resolved to a real file under a source root which
+                // was not analyzed (excluded, or hidden by gitignore). Its own
+                // imports are unknown, so record it for reporting.
+                targets.unanalyzed.insert(resolved.file_path.clone());
+            }
+            None => {}
         }
         // Importing `a.b.c` also executes `a/__init__.py` and `a/b/__init__.py`.
-        targets.extend(ancestor_init_files(files, source_roots, &import.module_path));
+        targets.files.extend(ancestor_init_files(
+            files,
+            source_roots,
+            &import.module_path,
+        ));
     }
     Ok(targets)
 }
 
-/// String literals which look like module paths are treated as imports.
-/// This errs on the side of keeping dynamically-imported files alive.
-fn project_includes_string_imports() -> bool {
-    true
+/// Import targets of a single file: those inside the analyzed set, and those
+/// which resolved to real but unanalyzed (excluded/gitignored) files.
+#[derive(Debug, Default)]
+struct ImportTargets {
+    files: BTreeSet<PathBuf>,
+    unanalyzed: BTreeSet<PathBuf>,
 }
 
 /// Map a resolved import target to the project file that represents it in the
@@ -303,16 +367,21 @@ fn resolve_entry_points(
     file_walker: &fs::FSWalker,
     files: &BTreeMap<PathBuf, String>,
     raw_entry_points: &[String],
-) -> (BTreeSet<PathBuf>, Vec<String>) {
+) -> Result<(BTreeSet<PathBuf>, Vec<String>), CheckError> {
     let mut entry_files = BTreeSet::new();
     let mut unmatched = Vec::new();
 
+    // Paths and globs are resolved against the project root and every source
+    // root, so that both 'src/app.py' and 'app.py' work under source_roots=["src"].
+    let candidate_roots: Vec<&Path> = std::iter::once(project_root)
+        .chain(source_roots.iter().map(PathBuf::as_path))
+        .collect();
+
     for raw_entry_point in raw_entry_points {
-        let spec = raw_entry_point
-            .split(':')
-            .next()
-            .unwrap_or_default()
-            .trim();
+        let spec = match raw_entry_point.split(':').next() {
+            Some(spec) => spec.trim(),
+            None => "",
+        };
         if spec.is_empty() {
             unmatched.push(raw_entry_point.clone());
             continue;
@@ -320,19 +389,16 @@ fn resolve_entry_points(
 
         let mut matched = BTreeSet::new();
         if has_glob_syntax(spec) {
-            let roots = std::iter::once(project_root).chain(source_roots.iter().map(PathBuf::as_path));
-            for root in roots {
-                for path in
-                    file_walker.walk_globbed_files(&root.display().to_string(), std::iter::once(spec))
+            validate_glob(spec, "entry_points")?;
+            for root in &candidate_roots {
+                for path in file_walker
+                    .walk_globbed_files(&root.display().to_string(), std::iter::once(spec))
                 {
                     matched.extend(project_file_for(files, &path));
                 }
             }
         } else {
-            // Literal path, tried against the project root and each source root.
-            let candidate_roots =
-                std::iter::once(project_root).chain(source_roots.iter().map(PathBuf::as_path));
-            for root in candidate_roots {
+            for root in &candidate_roots {
                 matched.extend(project_file_for(files, &root.join(spec)));
             }
             // Module path.
@@ -348,7 +414,7 @@ fn resolve_entry_points(
         }
     }
 
-    (entry_files, unmatched)
+    Ok((entry_files, unmatched))
 }
 
 /// Entry files plus the `__init__.py` of each of their ancestor packages
@@ -391,18 +457,6 @@ fn relative_display_path(project_root: &Path, file: &Path) -> String {
         .unwrap_or_else(|_| file.to_path_buf())
         .display()
         .to_string()
-}
-
-fn sorted(mut diagnostics: Vec<Diagnostic>) -> Vec<Diagnostic> {
-    diagnostics.sort_by(|left, right| match (left.file_path(), right.file_path()) {
-        (None, None) => left.message().cmp(&right.message()),
-        (None, Some(_)) => std::cmp::Ordering::Less,
-        (Some(_), None) => std::cmp::Ordering::Greater,
-        (Some(left_path), Some(right_path)) => left_path
-            .cmp(right_path)
-            .then_with(|| left.message().cmp(&right.message())),
-    });
-    diagnostics
 }
 
 #[cfg(test)]
@@ -456,7 +510,10 @@ mod tests {
             &[
                 ("main.py", "from pkg.used import run\nrun()\n"),
                 ("pkg/__init__.py", ""),
-                ("pkg/used.py", "from pkg.helper import help\ndef run(): ...\n"),
+                (
+                    "pkg/used.py",
+                    "from pkg.helper import help\ndef run(): ...\n",
+                ),
                 ("pkg/helper.py", "def help(): ...\n"),
                 ("pkg/dead.py", "def gone(): ...\n"),
                 ("orphan.py", "x = 1\n"),
@@ -603,7 +660,10 @@ mod tests {
     #[test]
     fn unmatched_entry_point_warns_instead_of_flagging_everything() {
         let temp = TempDir::new().unwrap();
-        write_files(temp.path(), &[("app.py", "x = 1\n"), ("other.py", "y = 2\n")]);
+        write_files(
+            temp.path(),
+            &[("app.py", "x = 1\n"), ("other.py", "y = 2\n")],
+        );
         let config = config_with_entry_points(&["app.py", "missing.py"]);
 
         let diagnostics = run(temp.path(), &config);
@@ -649,6 +709,19 @@ mod tests {
         let diagnostics = run(temp.path(), &config);
 
         assert_eq!(unreachable_modules(&diagnostics), modules(&["still_dead"]));
+    }
+
+    #[test]
+    fn invalid_entry_point_glob_is_a_configuration_error_not_a_panic() {
+        // FSWalker::walk_globbed_files unwraps invalid patterns, so entry-point
+        // globs must be validated before they reach it.
+        let temp = TempDir::new().unwrap();
+        write_files(temp.path(), &[("app.py", "x = 1\n")]);
+        let config = config_with_entry_points(&["bad["]);
+
+        let result = check_deadcode(temp.path(), &config, None, None);
+
+        assert!(matches!(result, Err(CheckError::Configuration(_))));
     }
 
     #[test]
@@ -705,7 +778,9 @@ mod tests {
         )));
         assert!(diagnostics.iter().any(|diagnostic| matches!(
             diagnostic.details(),
-            DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileSyntaxError { .. })
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::SkippedFileSyntaxError { .. }
+            )
         )));
     }
 
@@ -729,14 +804,19 @@ mod tests {
         assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
         assert!(diagnostics.iter().any(|diagnostic| matches!(
             diagnostic.details(),
-            DiagnosticDetails::Configuration(ConfigurationDiagnostic::SkippedFileSyntaxError { .. })
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::SkippedFileSyntaxError { .. }
+            )
         )));
     }
 
     #[test]
     fn severity_off_short_circuits() {
         let temp = TempDir::new().unwrap();
-        write_files(temp.path(), &[("app.py", "x = 1\n"), ("dead.py", "y = 2\n")]);
+        write_files(
+            temp.path(),
+            &[("app.py", "x = 1\n"), ("dead.py", "y = 2\n")],
+        );
         let mut config = config_with_entry_points(&["app.py"]);
         config.deadcode.severity = RuleSetting::Off;
 
@@ -748,7 +828,10 @@ mod tests {
     #[test]
     fn cli_severity_overrides_config() {
         let temp = TempDir::new().unwrap();
-        write_files(temp.path(), &[("app.py", "x = 1\n"), ("dead.py", "y = 2\n")]);
+        write_files(
+            temp.path(),
+            &[("app.py", "x = 1\n"), ("dead.py", "y = 2\n")],
+        );
         let config = config_with_entry_points(&["app.py"]);
 
         let diagnostics =
@@ -768,7 +851,11 @@ mod tests {
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
-            &[("app.py", "x = 1\n"), ("extra.py", "y = 2\n"), ("dead.py", "z = 3\n")],
+            &[
+                ("app.py", "x = 1\n"),
+                ("extra.py", "y = 2\n"),
+                ("dead.py", "z = 3\n"),
+            ],
         );
         let config = config_with_entry_points(&["app.py"]);
 
@@ -808,13 +895,513 @@ mod tests {
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
-            &[("app.py", "x = 1\n"), ("vendored/lib.py", "y = 2\n")],
+            &[
+                ("app.py", "x = 1\n"),
+                ("vendored/lib.py", "y = 2\n"),
+                // Positive control: proves the analysis actually ran.
+                ("still_dead.py", "z = 3\n"),
+            ],
         );
         let mut config = config_with_entry_points(&["app.py"]);
         config.exclude = vec!["vendored".to_string()];
 
         let diagnostics = run(temp.path(), &config);
 
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["still_dead"]));
+    }
+
+    #[test]
+    fn import_through_an_excluded_file_warns_about_the_unanalyzed_target() {
+        // An excluded (or gitignored) file in the middle of a live import chain
+        // severs reachability. That is inherent to excluding it, but the user
+        // is told rather than silently handed a false deletion candidate.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "import generated\n"),
+                ("generated.py", "import helper\n"),
+                ("helper.py", "def h(): ...\n"),
+            ],
+        );
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.exclude = vec!["generated.py".to_string()];
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["helper"]));
+        assert!(diagnostics.iter().any(|diagnostic| matches!(
+            diagnostic.details(),
+            DiagnosticDetails::Configuration(
+                ConfigurationDiagnostic::DeadCodeUnanalyzedImportTarget { file_path }
+            ) if file_path == "generated.py"
+        )));
+    }
+
+    #[test]
+    fn duplicate_module_in_two_roots_resolves_to_the_first_configured_root() {
+        // Deterministic, and matching Python's sys.path semantics: the first
+        // configured source root wins, so the shadowed copy is the dead one.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("appdir/main.py", "import util\n"),
+                ("appdir/util.py", "A = 1\n"),
+                ("libdir/util.py", "B = 2\n"),
+            ],
+        );
+        let mut config = config_with_entry_points(&["appdir/main.py"]);
+        config.source_roots = vec![PathBuf::from("appdir"), PathBuf::from("libdir")];
+
+        for _ in 0..5 {
+            let diagnostics = run(temp.path(), &config);
+            let paths: Vec<PathBuf> = diagnostics
+                .iter()
+                .filter(|d| d.is_deadcode())
+                .filter_map(|d| d.file_path().cloned())
+                .collect();
+            assert_eq!(paths, vec![PathBuf::from("libdir/util.py")]);
+        }
+    }
+
+    #[test]
+    fn namespace_packages_without_init_are_traversed() {
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from nsa.nsb.mod import f\nf()\n"),
+                ("nsa/nsb/mod.py", "def f(): ...\n"),
+                ("nsa/nsb/dead.py", "x = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["nsa.nsb.dead"])
+        );
+    }
+
+    #[test]
+    fn source_root_that_is_itself_a_package_is_handled() {
+        // A root-level __init__.py has module path "."; it must not be reported
+        // and must not break ancestor resolution.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("__init__.py", "import sibling\n"),
+                ("main.py", "from sibling import f\nf()\n"),
+                ("sibling.py", "def f(): ...\n"),
+                ("dead.py", "q = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
+    }
+
+    #[test]
+    fn dunder_main_is_reachable_only_when_declared_as_an_entry_point() {
+        // `python -m pkg` runs pkg/__main__.py, which nothing imports. It is a
+        // convention the import graph cannot see, so it must be declared.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("pkg/__init__.py", ""),
+                ("pkg/__main__.py", "from pkg.cli import main\nmain()\n"),
+                ("pkg/cli.py", "def main(): ...\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["pkg/__init__.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["pkg.__main__", "pkg.cli"])
+        );
+
+        let config = config_with_entry_points(&["pkg/__main__.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn platform_conditional_imports_keep_every_branch_alive() {
+        // Both branches of a platform guard are followed: the module not used
+        // on this machine is still needed on the other platform.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "import os\n\nif os.name == \"nt\":\n    from impl_win32 import read\nelse:\n    from impl_posix import read\n",
+                ),
+                ("impl_win32.py", "def read(): ...\n"),
+                ("impl_posix.py", "def read(): ...\n"),
+                ("dead.py", "x = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["dead"]));
+    }
+
+    #[test]
+    fn optional_dependency_fallback_imports_are_followed() {
+        // try/except ImportError accelerator fallbacks: both the fast path and
+        // the pure-Python fallback are alive.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "try:\n    from fast_impl import run\nexcept ImportError:\n    from slow_impl import run\n",
+                ),
+                ("fast_impl.py", "def run(): ...\n"),
+                ("slow_impl.py", "def run(): ...\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn side_effect_only_import_keeps_the_registering_module_alive() {
+        // `from . import handlers` purely for @register side effects has no
+        // symbol usage, but the file-level edge is real.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "import app\n"),
+                ("app/__init__.py", "from app import handlers\n"),
+                (
+                    "app/handlers.py",
+                    "from app.registry import register\n\n@register\ndef pay(): ...\n",
+                ),
+                ("app/registry.py", "def register(fn): return fn\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn pkgutil_plugin_discovery_is_flagged_and_glob_entry_point_is_the_remedy() {
+        // A package that imports its own children via pkgutil.iter_modules +
+        // import_module(f"...") leaves no static edge to the plugins.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from plugins import load_all\nload_all()\n"),
+                (
+                    "plugins/__init__.py",
+                    "import importlib\nimport pkgutil\n\ndef load_all():\n    for _, name, _ in pkgutil.iter_modules(__path__):\n        importlib.import_module(f\"{__name__}.{name}\")\n",
+                ),
+                ("plugins/csv_export.py", "def run(): ...\n"),
+                ("plugins/json_export.py", "def run(): ...\n"),
+            ],
+        );
+
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["plugins.csv_export", "plugins.json_export"])
+        );
+
+        let config = config_with_entry_points(&["main.py", "plugins/*.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn dead_island_cluster_is_reported_despite_mutual_imports() {
+        // Every file in the cluster has an inbound import edge, so a naive
+        // "is anything importing this?" check would call all of them alive.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from pkg.active import go\ngo()\n"),
+                ("pkg/__init__.py", ""),
+                ("pkg/active.py", "def go(): ...\n"),
+                ("pkg/old_flow.py", "from pkg.old_helpers import fmt\n"),
+                (
+                    "pkg/old_helpers.py",
+                    "from pkg.old_flow import Step\n\ndef fmt(): ...\n",
+                ),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["pkg.old_flow", "pkg.old_helpers"])
+        );
+    }
+
+    #[test]
+    fn console_script_module_must_be_declared_as_an_entry_point() {
+        // pyproject.toml [project.scripts] targets have no importer; tach does
+        // not read pyproject entry points, so they are declared explicitly.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("myapp/__init__.py", ""),
+                (
+                    "myapp/cli.py",
+                    "from myapp.core import work\n\ndef main(): work()\n",
+                ),
+                ("myapp/core.py", "def work(): ...\n"),
+                ("myapp/unused.py", "def leftover(): ...\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["myapp.cli:main"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["myapp.unused"])
+        );
+    }
+
+    // The tests below encode deceptive liveness patterns observed in real
+    // codebases: code that looks dead but is alive (dynamic loading, external
+    // runners) and code that looks alive but is dead (transitive death,
+    // test-only imports). They pin both the detection behavior and the
+    // documented remedy (entry_points / ignore).
+
+    #[test]
+    fn dynamic_file_loading_flags_targets_and_entry_point_glob_heals_transitively() {
+        // Pattern: a live loader uses importlib.util.spec_from_file_location
+        // with a runtime-built path to load per-client scripts; the scripts
+        // (and everything only they import) look dead to the import graph.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "import importlib.util\n\ndef load(client):\n    spec = importlib.util.spec_from_file_location(client, f\"clients/{client}/script.py\")\n    return spec\n",
+                ),
+                ("clients/__init__.py", ""),
+                ("clients/acme/__init__.py", ""),
+                (
+                    "clients/acme/script.py",
+                    "from shared import helper\nhelper()\n",
+                ),
+                ("shared.py", "def helper(): ...\n"),
+                ("truly_dead.py", "x = 1\n"),
+            ],
+        );
+
+        // Without configuration, the dynamically-loaded subgraph is flagged.
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["clients.acme.script", "shared", "truly_dead"])
+        );
+
+        // Declaring the dynamic targets as entry points revives them AND their
+        // transitive imports — the documented remedy.
+        let config = config_with_entry_points(&["main.py", "clients/*/script.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["truly_dead"]));
+    }
+
+    #[test]
+    fn two_dot_string_reference_keeps_target_alive_transitively() {
+        // String literals with >= 2 dots are treated as imports (conservative);
+        // shorter strings are not.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "PLUGIN = \"pkg.plugins.mailer\"\nSHORT = \"pkg.orphan\"\n",
+                ),
+                ("pkg/__init__.py", ""),
+                ("pkg/plugins/__init__.py", ""),
+                (
+                    "pkg/plugins/mailer.py",
+                    "from pkg.plugins.transport import send\n",
+                ),
+                ("pkg/plugins/transport.py", "def send(): ...\n"),
+                ("pkg/orphan.py", "x = 1\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        // The 2-dot reference keeps mailer alive, and mailer's own imports are
+        // then followed; the 1-dot reference does not count.
+        assert_eq!(unreachable_modules(&diagnostics), modules(&["pkg.orphan"]));
+    }
+
+    #[test]
+    fn runtime_built_module_names_are_flagged_and_ignorable() {
+        // f-strings and concatenated module names cannot be followed; the
+        // targets are flagged, and the ignore glob is the remedy when the
+        // files should stay.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "import importlib\n\ndef load(name):\n    return importlib.import_module(f\"plugins.{name}\")\n",
+                ),
+                ("plugins/__init__.py", ""),
+                ("plugins/emailer.py", "def notify(): ...\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["plugins.emailer"])
+        );
+
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.deadcode.ignore = vec!["plugins/**".to_string()];
+        let diagnostics = run(temp.path(), &config);
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn test_only_imports_do_not_keep_code_alive() {
+        // Pattern: a module's only importer is an excluded test file. The
+        // import exists, so the module looks alive to a grep — but it has no
+        // production path and is correctly reported.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "from pkg.used import run\nrun()\n"),
+                ("pkg/__init__.py", ""),
+                ("pkg/used.py", "def run(): ...\n"),
+                ("pkg/only_tested.py", "def helper(): ...\n"),
+                (
+                    "tests/test_helper.py",
+                    "from pkg.only_tested import helper\n\ndef test_helper(): helper()\n",
+                ),
+            ],
+        );
+        let mut config = config_with_entry_points(&["main.py"]);
+        config.exclude = vec!["tests".to_string()];
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["pkg.only_tested"])
+        );
+    }
+
+    #[test]
+    fn transitive_death_chain_is_fully_reported() {
+        // Pattern: b.py and c.py both have importers, so they look alive to a
+        // grep — but their only importers are themselves dead.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "x = 1\n"),
+                ("dead_root.py", "import dead_mid\n"),
+                ("dead_mid.py", "import dead_leaf\n"),
+                ("dead_leaf.py", "def f(): ...\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["dead_root", "dead_mid", "dead_leaf"])
+        );
+    }
+
+    #[test]
+    fn wide_init_facade_keeps_siblings_alive_at_file_level() {
+        // Boundary of file-level analysis, pinned deliberately: importing a
+        // package executes its __init__.py, which imports every sibling — so
+        // a sibling nothing actually uses is still alive at file granularity.
+        // Detecting THAT requires symbol-level analysis (out of scope).
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                ("main.py", "import pkg\n"),
+                (
+                    "pkg/__init__.py",
+                    "from pkg.used import a\nfrom pkg.unused_export import b\n",
+                ),
+                ("pkg/used.py", "a = 1\n"),
+                ("pkg/unused_export.py", "b = 2\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+
+        let diagnostics = run(temp.path(), &config);
+
+        assert!(unreachable_modules(&diagnostics).is_empty());
+    }
+
+    #[test]
+    fn subprocess_script_references_are_not_followed() {
+        // A path string like "jobs/nightly.py" is not a module path, so a
+        // subprocess invocation does not create an edge; the remedy is to
+        // declare the script as an entry point.
+        let temp = TempDir::new().unwrap();
+        write_files(
+            temp.path(),
+            &[
+                (
+                    "main.py",
+                    "import subprocess\n\ndef cron():\n    subprocess.run([\"python\", \"jobs/nightly.py\"])\n",
+                ),
+                ("jobs/__init__.py", ""),
+                ("jobs/nightly.py", "from jobs.shared import work\nwork()\n"),
+                ("jobs/shared.py", "def work(): ...\n"),
+            ],
+        );
+        let config = config_with_entry_points(&["main.py"]);
+        let diagnostics = run(temp.path(), &config);
+        assert_eq!(
+            unreachable_modules(&diagnostics),
+            modules(&["jobs.nightly", "jobs.shared"])
+        );
+
+        let config = config_with_entry_points(&["main.py", "jobs/nightly.py"]);
+        let diagnostics = run(temp.path(), &config);
         assert!(unreachable_modules(&diagnostics).is_empty());
     }
 
@@ -823,7 +1410,11 @@ mod tests {
         let temp = TempDir::new().unwrap();
         write_files(
             temp.path(),
-            &[("app.py", "x = 1\n"), ("pkg/__init__.py", ""), ("pkg/dead.py", "y = 2\n")],
+            &[
+                ("app.py", "x = 1\n"),
+                ("pkg/__init__.py", ""),
+                ("pkg/dead.py", "y = 2\n"),
+            ],
         );
         let config = config_with_entry_points(&["app.py"]);
 

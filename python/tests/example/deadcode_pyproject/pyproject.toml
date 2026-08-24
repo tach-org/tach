@@ -1,0 +1,10 @@
+[project]
+name = "deadcode-pyproject-fixture"
+version = "0.1.0"
+
+[tool.tach]
+exclude = []
+
+[tool.tach.deadcode]
+entry_points = ["main.py"]
+severity = "error"

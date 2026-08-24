@@ -179,8 +179,9 @@ Some behaviors to be aware of:
 
 - `__init__.py` files are never reported; they are flagged implicitly when the rest of their package is dead.
 - If a file reachable from an entry point cannot be parsed, detection is skipped for that run (reachability cannot be trusted), and a diagnostic explains why. Syntax errors in unreachable files are reported without blocking detection.
-- Paths excluded by the global `exclude` configuration (or `-e`) are not analyzed at all.
-- String literals which look like module paths are treated as imports, which errs toward keeping dynamically-imported files alive.
+- Paths excluded by the global `exclude` configuration (or `-e`), and paths hidden by `.gitignore`, are not analyzed at all. If a live import chain passes *through* such a file, files reachable only through it are reported as dead — so a warning names any excluded file that other files import.
+- When the same module path exists under more than one source root, the first configured source root wins, mirroring how Python resolves imports along `sys.path`.
+- String literals which look like module paths with at least two dots (e.g. `"myapp.plugins.emailer"`) are treated as imports, which errs toward keeping dynamically-imported files alive. Shorter strings, f-strings, and module names built at runtime are not followed — declare those targets as entry points or ignore them.
 
 ## tach check-external
 
