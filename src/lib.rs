@@ -4,6 +4,7 @@ pub mod cli;
 pub mod colors;
 pub mod commands;
 pub mod config;
+pub mod deadcode;
 pub mod dep_map;
 pub mod dependencies;
 pub mod diagnostics;
@@ -19,7 +20,7 @@ pub mod python;
 pub mod resolvers;
 pub mod tests;
 use crate::config::RespectGitIgnore;
-use commands::{check, report, server, sync, test};
+use commands::{check, deadcode as command_deadcode, report, server, sync, test};
 use diagnostics::serialize_diagnostics_json;
 use pyo3::{prelude::*, types::PyTuple};
 use std::path::PathBuf;
@@ -291,6 +292,18 @@ fn check_internal(
 }
 
 #[pyfunction]
+#[pyo3(signature = (project_root, project_config, entry_points = None, files = false, symbols = false))]
+fn check_deadcode(
+    project_root: PathBuf,
+    project_config: &config::ProjectConfig,
+    entry_points: Option<Vec<String>>,
+    files: bool,
+    symbols: bool,
+) -> Result<Vec<diagnostics::Diagnostic>, check::CheckError> {
+    command_deadcode::check_deadcode(&project_root, project_config, entry_points, files, symbols)
+}
+
+#[pyfunction]
 pub fn format_diagnostics(diagnostics: Vec<diagnostics::Diagnostic>) -> String {
     check::format::format_diagnostics(&diagnostics)
 }
@@ -335,6 +348,7 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<config::RulesConfig>()?;
     m.add_class::<config::DependencyConfig>()?;
     m.add_class::<config::MapConfig>()?;
+    m.add_class::<config::DeadcodeConfig>()?;
     m.add_class::<diagnostics::Diagnostic>()?;
     m.add_class::<dep_map::PyDependentMap>()?;
     m.add_class::<dep_map::PyDirection>()?;
@@ -350,6 +364,7 @@ fn extension(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(update_computation_cache, m)?)?;
     m.add_function(wrap_pyfunction!(dump_project_config_to_toml, m)?)?;
     m.add_function(wrap_pyfunction!(check_internal, m)?)?;
+    m.add_function(wrap_pyfunction!(check_deadcode, m)?)?;
     m.add_function(wrap_pyfunction!(format_diagnostics, m)?)?;
     m.add_function(wrap_pyfunction!(detect_unused_dependencies, m)?)?;
     m.add_function(wrap_pyfunction!(sync_project, m)?)?;

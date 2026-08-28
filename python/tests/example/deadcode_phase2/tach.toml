@@ -1,0 +1,11 @@
+exclude = []
+source_roots = ["."]
+
+[deadcode]
+entry_points = ["app.py"]
+detect = ["files", "symbols"]
+severity = "warn"
+public_modules = ["pkg.public_api"]
+public_symbols = ["pkg.api:configured_public"]
+public_decorators = ["pkg.api.public_api"]
+ignore_dynamic_modules = true

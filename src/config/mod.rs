@@ -1,4 +1,5 @@
 pub mod cache;
+pub mod deadcode;
 pub mod domain;
 pub mod edit;
 pub mod error;
@@ -15,6 +16,7 @@ pub mod rules;
 pub mod utils;
 
 pub use cache::{CacheBackend, CacheConfig};
+pub use deadcode::{DeadcodeConfig, DeadcodeDetection};
 pub use domain::{ConfigLocation, DomainConfig, LocatedDomainConfig};
 pub use edit::ConfigEdit;
 pub use error::ConfigError;
