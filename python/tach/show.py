@@ -161,9 +161,9 @@ def generate_module_graph_mermaid(
 
 
 __all__ = [
-    "upload_show_report",
     "generate_module_graph_dot_file",
-    "generate_module_graph_mermaid",
     "generate_module_graph_dot_string",
+    "generate_module_graph_mermaid",
     "generate_module_graph_mermaid_string",
+    "upload_show_report",
 ]

@@ -21,7 +21,7 @@
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "testing.automaticallyOpenPeekView": "never",
-  "[python]": {
+  "[python][markdown]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "explorer.compactFolders": false,

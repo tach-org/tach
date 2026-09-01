@@ -1,4 +1,6 @@
-from __future__ import annotations
+from __future__ import (  # noqa: EXE002 TODO: i dont think this file needs to be executable
+    annotations,
+)
 
 from tach.constants import TOOL_NAME
 

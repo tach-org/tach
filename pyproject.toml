@@ -100,7 +100,15 @@ extend-exclude = [
     "pw",
 ]
 lint.extend-select = ["I", "TC", "UP"]
-lint.ignore = ["UP006", "UP007"]
+lint.ignore = [
+    # TODO: why are these rules disabled?
+    "UP006",
+    "UP007",
+
+    # ideally these rulkes should be enabled, but there are too many existing instances in existing code.
+    # should enable them when ruff supports baseline: https://github.com/astral-sh/ruff/issues/1149
+    "BLE001" 
+]
 
 [tool.ruff.lint.isort]
 required-imports = ["from __future__ import annotations"]

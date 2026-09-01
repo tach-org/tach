@@ -840,9 +840,7 @@ def tach_show(
         print_no_dependencies_found()
         sys.exit(1)
     try:
-        included_paths = list(
-            map(lambda path: project_root / path, included_paths or [])
-        )
+        included_paths = [project_root / path for path in included_paths or []]
         if is_web:
             result = upload_show_report(
                 project_root=project_root,
@@ -1096,7 +1094,7 @@ def tach_map(
             closure_file_path = Path(closure_path).resolve().relative_to(project_root)
             closure = dependent_map.get_closure([closure_file_path])
             output_json = json.dumps(
-                {str(closure_file_path): sorted(list(closure))}, indent=2
+                {str(closure_file_path): sorted(closure)}, indent=2
             )
             if output_path == "-":
                 print(output_json)

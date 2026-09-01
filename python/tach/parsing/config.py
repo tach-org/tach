@@ -21,9 +21,8 @@ def dump_project_config_to_toml(config: ProjectConfig) -> str:
 
 
 def migrate_deprecated_cache_backend(data: dict[str, Any]) -> dict[str, Any]:
-    if "cache" in data:
-        if "backend" in data["cache"]:
-            data["cache"]["backend"] = "disk"
+    if "cache" in data and "backend" in data["cache"]:
+        data["cache"]["backend"] = "disk"
     return data
 
 
@@ -38,10 +37,9 @@ def migrate_deprecated_depends_on(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def migrate_deprecated_source_root(data: dict[str, Any]) -> dict[str, Any]:
-    if "source_root" in data:
-        if isinstance(data["source_root"], str):
-            data["source_roots"] = [data["source_root"]]
-            del data["source_root"]
+    if "source_root" in data and isinstance(data["source_root"], str):
+        data["source_roots"] = [data["source_root"]]
+        del data["source_root"]
     return data
 
 

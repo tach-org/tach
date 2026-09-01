@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 from concurrent.futures import Future, ThreadPoolExecutor
+from contextlib import suppress
 from threading import Event
 
 from pyls_jsonrpc.dispatchers import MethodDispatcher
@@ -82,10 +83,8 @@ class LspSession(MethodDispatcher):
     def __exit__(self, typ, value, _tb):
         if self._sub.returncode is None:  # pyright: ignore
             self.shutdown(True)
-        try:
+        with suppress(Exception):
             self._sub.terminate()  # pyright: ignore
-        except Exception:
-            pass
         if self._endpoint is None:
             raise RuntimeError("endpoint not specified")
         self._endpoint.shutdown()

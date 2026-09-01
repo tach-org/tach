@@ -74,7 +74,7 @@ def run_affected_tests(
     pytest_args: list[Any] | None = None,
 ) -> AffectedTestsResult:
     try:
-        import pytest  # type: ignore  # noqa: F401
+        import pytest  # type: ignore
     except ImportError:
         raise TachSetupError("Cannot run tests, could not find 'pytest'.")
 

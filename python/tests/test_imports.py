@@ -11,7 +11,7 @@ from tach.extension import ProjectConfig, get_project_imports
 
 def _get_project_imports(*args, **kwargs):
     result = get_project_imports(*args, **kwargs)
-    return list(map(lambda x: (x.module_path, x.line_number), result))
+    return [(x.module_path, x.line_number) for x in result]
 
 
 # Utility function to create temporary files with content

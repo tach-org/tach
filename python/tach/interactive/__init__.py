@@ -5,4 +5,4 @@ from tach.interactive.modules import (
     get_selected_modules_interactive,
 )
 
-__all__ = ["get_selected_modules_interactive", "InteractiveModuleConfiguration"]
+__all__ = ["InteractiveModuleConfiguration", "get_selected_modules_interactive"]
