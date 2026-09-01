@@ -13,9 +13,11 @@ import os
 import subprocess
 import sys
 import sysconfig
+import tempfile
 import zipfile
 from pathlib import Path
 from urllib import request
+from urllib.error import HTTPError, URLError
 
 try:
     from venv import EnvBuilder
@@ -23,8 +25,8 @@ except ImportError:
     EnvBuilder = None
 
 
-VERSION = "3.3.2"
-UV_VERSION = "0.9.16"
+VERSION = "4.0.0"
+UV_VERSION = "0.12.5"
 
 PYPROJECTX_INSTALL_DIR_ENV_VAR = "PYPROJECTX_INSTALL_DIR"
 PYPROJECTX_PACKAGE_ENV_VAR = "PYPROJECTX_PACKAGE"
@@ -208,7 +210,7 @@ def ensure_pyprojectx(options):  # noqa: C901, PLR0912
                     f'powershell -ExecutionPolicy Bypass -c "irm {release_base_url}/uv-installer.ps1 | iex"'
                 )
             else:
-                install_uv_cmd = f"curl --proto '=https' --tlsv1.2 -LsSf irm {release_base_url}/uv-installer.sh | sh"
+                install_uv_cmd = f"curl --proto '=https' --tlsv1.2 -LsSf {release_base_url}/uv-installer.sh | sh"
             subprocess.run(
                 install_uv_cmd,
                 stdout=out,
@@ -247,11 +249,32 @@ def ensure_pyprojectx(options):  # noqa: C901, PLR0912
 
 def download_wrappers():
     latest = "https://github.com/pyprojectx/pyprojectx/releases/latest/download/wrappers.zip"
-    zip_file, _ = request.urlretrieve(latest)  # noqa: S310
-    with zipfile.ZipFile(zip_file, "r") as zip_ref:
-        for entry in zip_ref.namelist():
-            if Path(__file__).with_name(entry).is_file():
-                zip_ref.extract(entry, Path(__file__).parent)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        zip_file = Path(tmp_dir, "wrappers.zip")
+        download(latest, zip_file)
+        with zipfile.ZipFile(zip_file, "r") as zip_ref:
+            for entry in zip_ref.namelist():
+                if Path(__file__).with_name(entry).is_file():
+                    zip_ref.extract(entry, Path(__file__).parent)
+
+
+def download(url, target):
+    """Download url to target, falling back to curl/powershell if this interpreter has no usable CA bundle."""
+    try:
+        request.urlretrieve(url, target)  # noqa: S310
+    except URLError as e:
+        if isinstance(e, HTTPError):
+            # the server answered, so the connection itself is fine; curl would only repeat the same status
+            raise
+        print(f"{RED}download with urllib failed ({e}), retrying with curl or powershell{RESET}", file=sys.stderr)
+        if sys.platform == "win32":
+            quoted_url = str(url).replace("'", "''")
+            quoted_target = str(target).replace("'", "''")
+            script = f"iwr '{quoted_url}' -OutFile '{quoted_target}'"
+            download_cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-c", script]
+        else:
+            download_cmd = ["curl", "--proto", "=https", "--tlsv1.2", "-LsSf", str(url), "-o", str(target)]
+        subprocess.run(download_cmd, check=True)
 
 
 if __name__ == "__main__":
