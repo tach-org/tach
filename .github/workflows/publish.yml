@@ -82,6 +82,8 @@ jobs:
             target: x86
     steps:
       - uses: actions/checkout@v4
+      - name: Enable long paths
+        run: git config --system core.longpaths true
       - uses: actions/setup-python@v5
         with:
           architecture: ${{ matrix.platform.target }}

@@ -49,6 +49,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable long paths
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: git config --system core.longpaths true
+
       - if: matrix.container
         uses: addnab/docker-run-action@v3
         with:
