@@ -103,10 +103,10 @@ class ModuleConfig:
     unchecked: bool
     layer: str | None
 
-    def __new__(cls, path: str, strict: bool) -> ModuleConfig: ...
+    def __init__(self, path: str, strict: bool) -> None: ...
     def mod_path(self) -> str: ...
 
-InterfaceDataTypes = Literal["all", "primitive"]
+InterfaceDataTypes: TypeAlias = Literal["all", "primitive"]
 
 class InterfaceConfig:
     expose: list[str]
@@ -115,7 +115,7 @@ class InterfaceConfig:
     visibility: list[str] | None
     data_types: InterfaceDataTypes
 
-CacheBackend = Literal["disk"]
+CacheBackend: TypeAlias = Literal["disk"]
 
 class CacheConfig:
     backend: CacheBackend
@@ -130,9 +130,11 @@ class UnusedDependencies:
     path: str
     dependencies: list[DependencyConfig]
 
-RuleSetting = Literal["error", "warn", "off"]
+RuleSetting: TypeAlias = Literal["error", "warn", "off"]
 
-RootModuleTreatment = Literal["allow", "ignore", "dependenciesonly", "forbid"]
+RootModuleTreatment: TypeAlias = Literal[
+    "allow", "ignore", "dependenciesonly", "forbid"
+]
 
 # ideally this should be using the new type alias syntax. see https://github.com/astral-sh/ruff/issues/21677
 RespectGitIgnore: TypeAlias = bool | Literal["if_git_repo"]
@@ -157,7 +159,6 @@ class ProjectConfig:
     rules: RulesConfig
     root_module: RootModuleTreatment
 
-    def __new__(cls) -> ProjectConfig: ...
     def serialize_json(self) -> str: ...
     def exists(self) -> bool: ...
     def set_location(self, location: Path) -> None: ...
@@ -184,13 +185,13 @@ class TachPytestPluginHandler:
     all_affected_modules: set[str]
     num_removed_items: int
     tests_ran_to_completion: bool
-    def __new__(
-        cls,
+    def __init__(
+        self,
         project_root: Path,
         project_config: ProjectConfig,
         changed_files: list[Path],
         all_affected_modules: set[Path],
-    ) -> TachPytestPluginHandler: ...
+    ) -> None: ...
     def remove_test_path(self, path: Path) -> None: ...
     def should_remove_items(self, file_path: Path) -> bool: ...
 
@@ -199,12 +200,12 @@ class Direction(Enum):
     Dependents = 1
 
 class DependentMap:
-    def __new__(
-        cls,
+    def __init__(
+        self,
         project_root: Path,
         project_config: ProjectConfig,
         direction: Direction | None = None,
-    ) -> DependentMap: ...
+    ) -> None: ...
     def rebuild(self) -> None: ...
     def get_closure(self, paths: list[Path]) -> set[str]: ...
     def update_files(self, changed_files: list[Path]) -> None: ...

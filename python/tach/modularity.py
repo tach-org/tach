@@ -93,7 +93,7 @@ def post_json_to_gauge_api(
                 f"API request failed with status {response.status}: {response_data}"
             )
     except Exception as e:
-        raise TachError(f"Failed to upload modularity report: {str(e)}")
+        raise TachError(f"Failed to upload modularity report: {e}")
     finally:
         if conn is not None:
             conn.close()

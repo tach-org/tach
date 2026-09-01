@@ -22,7 +22,7 @@ depends_on = []
 Then, in `parsing.py`:
 
 ```python
-from core.main import get_data # we want to remove this!
+from core.main import get_data  # we want to remove this!
 
 get_data()
 ```

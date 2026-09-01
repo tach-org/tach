@@ -209,4 +209,4 @@ def external_dependency_report(
     )
 
 
-__all__ = ["report", "external_dependency_report"]
+__all__ = ["external_dependency_report", "report"]

@@ -10,7 +10,7 @@ from core.api import private_calculation  # tach-ignore
 
 from core.package import (  # tach-ignore
     service_one,
-    service_two
+    service_two,
 )
 ```
 
@@ -20,11 +20,14 @@ The directive can also be specific about the import to ignore, which is particul
 # tach-ignore private_function
 from core.main import private_function, public_function
 
-from core.api import private_calculation, public_service  # tach-ignore private_calculation
+from core.api import (  # tach-ignore private_calculation
+    private_calculation,
+    public_service,
+)
 
 from core.package import (  # tach-ignore service_two
     service_one,
-    service_two
+    service_two,
 )
 ```
 

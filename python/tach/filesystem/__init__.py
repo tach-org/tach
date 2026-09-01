@@ -16,14 +16,14 @@ from tach.filesystem.service import (
 )
 
 __all__ = [
-    "write_file",
+    "build_project_config_path",
+    "file_to_module_path",
+    "find_project_config_root",
+    "get_deprecated_project_config_path",
+    "get_project_config_path",
+    "install_pre_commit",
+    "module_to_pyfile_or_dir_path",
     "walk",
     "walk_pyfiles",
-    "file_to_module_path",
-    "module_to_pyfile_or_dir_path",
-    "get_project_config_path",
-    "build_project_config_path",
-    "get_deprecated_project_config_path",
-    "find_project_config_root",
-    "install_pre_commit",
+    "write_file",
 ]

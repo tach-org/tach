@@ -49,7 +49,7 @@ def test_distributed_config_dir(example_dir, capfd):
         top_level_module = next(
             module for module in modules if module.path == "project.top_level"
         )
-        assert set(map(lambda dep: dep.path, top_level_module.depends_on)) == {
+        assert {dep.path for dep in top_level_module.depends_on} == {
             "project.module_two"
         }
 
@@ -72,7 +72,7 @@ def test_distributed_config_dir(example_dir, capfd):
         top_level_module = next(
             module for module in modules if module.path == "project.top_level"
         )
-        assert set(map(lambda dep: dep.path, top_level_module.depends_on)) == {
+        assert {dep.path for dep in top_level_module.depends_on} == {
             "project.module_two",
             "project.module_one",
         }
@@ -106,10 +106,10 @@ def test_many_features_example_dir(example_dir, capfd):
         assert len(modules) == 17
 
         module2 = next(module for module in modules if module.path == "module2")
-        assert set(map(lambda dep: dep.path, module2.depends_on)) == {"outer_module"}
+        assert {dep.path for dep in module2.depends_on} == {"outer_module"}
 
         module3 = next(module for module in modules if module.path == "module3")
-        assert set(map(lambda dep: dep.path, module3.depends_on)) == {"module1"}
+        assert {dep.path for dep in module3.depends_on} == {"module1"}
 
         assert (
             '"//module1"'

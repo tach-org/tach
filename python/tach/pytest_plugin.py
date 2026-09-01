@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -67,9 +68,10 @@ def _get_default_branch(project_root: Path) -> str:
     """
     # Method 1: Check remote HEAD symref (most reliable when remote exists)
     # This tells us what branch the remote considers its default
-    try:
+    with suppress(Exception):
         result = subprocess.run(
             ["git", "symbolic-ref", "refs/remotes/origin/HEAD"],
+            check=False,
             cwd=project_root,
             capture_output=True,
             text=True,
@@ -77,23 +79,20 @@ def _get_default_branch(project_root: Path) -> str:
         if result.returncode == 0:
             # Returns something like "refs/remotes/origin/main"
             return result.stdout.strip().split("/")[-1]
-    except Exception:
-        pass
 
     # Method 2: Check which common branch names exist locally
     # Prefer "main" over "master" when both exist (modern convention)
     existing_branches: list[str] = []
     for branch in ["main", "master"]:
-        try:
+        with suppress(Exception):
             result = subprocess.run(
                 ["git", "rev-parse", "--verify", branch],
+                check=False,
                 cwd=project_root,
                 capture_output=True,
             )
             if result.returncode == 0:
                 existing_branches.append(branch)
-        except Exception:
-            pass
 
     if existing_branches:
         # If both exist, prefer "main" (it's first in our check order)
@@ -181,12 +180,10 @@ def _estimate_skipped_duration(
         if "::" in nodeid:
             file_part = nodeid.split("::")[0]
             # Resolve to absolute path for comparison
-            try:
+            with suppress(Exception):
                 abs_path = str(Path(file_part).resolve())
                 if abs_path in resolved_skipped:
                     total_duration += duration
-            except Exception:
-                pass
 
     return total_duration if total_duration > 0 else None
 
@@ -505,9 +502,13 @@ def _record_test_durations(terminalreporter: TerminalReporter, config: Config) -
 
     for report in all_reports:
         # Only record "call" phase duration (not setup/teardown)
-        if hasattr(report, "when") and report.when == "call":
-            if hasattr(report, "nodeid") and hasattr(report, "duration"):
-                durations[report.nodeid] = report.duration
+        if (
+            hasattr(report, "when")
+            and report.when == "call"
+            and hasattr(report, "nodeid")
+            and hasattr(report, "duration")
+        ):
+            durations[report.nodeid] = report.duration
 
     # Save updated durations
     _save_durations(config, durations)

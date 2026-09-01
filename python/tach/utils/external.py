@@ -16,9 +16,7 @@ def is_stdlib_module(module: str) -> bool:
 
     if module in sys.builtin_module_names:
         return True
-    if module in sys.stdlib_module_names:
-        return True
-    return False
+    return module in sys.stdlib_module_names
 
 
 def get_stdlib_modules() -> list[str]:
@@ -51,8 +49,8 @@ def normalize_package_name(import_module_path: str) -> str:
 
 
 __all__ = [
-    "is_stdlib_module",
     "get_module_mappings",
     "get_package_name",
+    "is_stdlib_module",
     "normalize_package_name",
 ]

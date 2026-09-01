@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final, TypeAlias
 
 from prompt_toolkit import ANSI
 from prompt_toolkit.application import Application
@@ -252,6 +253,9 @@ class InteractiveModuleConfiguration:
     utility_paths: list[Path]
 
 
+_Bindings: TypeAlias = Sequence[tuple[str, str]]
+
+
 class InteractiveModuleTree:
     TREE_LABEL = "Confirm Your Modules"
 
@@ -351,18 +355,18 @@ class InteractiveModuleTree:
             }
         )
 
-    KEY_BINDING_LEGEND_TOP: list[tuple[str, str]] = [
+    KEY_BINDING_LEGEND_TOP: Final[_Bindings] = [
         ("Up/Down", "Navigate"),
         ("Right", "Expand"),
         ("Left", "Collapse"),
         ("Ctrl + Up", "Jump to parent"),
     ]
-    KEY_BINDING_LEGEND_MIDDLE: list[tuple[str, str]] = [
+    KEY_BINDING_LEGEND_MIDDLE: Final[_Bindings] = [
         ("Enter", "Mark/unmark Module"),
         ("s", "Mark/unmark Source Root"),
         ("u", "Mark/unmark Utility"),
     ]
-    KEY_BINDING_LEGEND_BOTTOM: list[tuple[str, str]] = [
+    KEY_BINDING_LEGEND_BOTTOM: Final[_Bindings] = [
         ("Ctrl + s", "Exit and save"),
         ("Ctrl + c", "Exit without saving"),
         ("Ctrl + a", "Mark/unmark all"),
@@ -375,7 +379,7 @@ class InteractiveModuleTree:
     @classmethod
     def _build_footer(cls) -> Container:
         def _build_footer_text(
-            bindings: list[tuple[str, str]],
+            bindings: _Bindings,
         ) -> AnyFormattedText:
             return list(
                 chain(
@@ -431,9 +435,9 @@ class InteractiveModuleTree:
             if prev_sibling:
                 curr_node = prev_sibling
                 while curr_node.visible_children:
-                    curr_node = sorted(
+                    curr_node = max(
                         curr_node.visible_children, key=lambda node: node.full_path
-                    )[-1]
+                    )
                 self.selected_node = curr_node
                 self.move_cursor_up()
                 self._update_display()
@@ -447,9 +451,9 @@ class InteractiveModuleTree:
         def _(event: KeyPressEvent):
             # If we have children, should go to first child alphabetically
             if self.selected_node.visible_children:
-                self.selected_node = sorted(
+                self.selected_node = min(
                     self.selected_node.visible_children, key=lambda node: node.full_path
-                )[0]
+                )
                 self.move_cursor_down()
                 self._update_display()
                 return
