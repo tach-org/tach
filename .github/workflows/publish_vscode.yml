@@ -65,8 +65,6 @@ jobs:
             ../pw uv run npx vsce package -o "./dist/tach-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
 
       - if: ${{ !matrix.container }}
-        uses: actions/setup-python@v5
-      - if: ${{ !matrix.container }}
         run: |
           ../pw uv sync --only-group vscode
           ../pw uv run --no-sync nox --session build_package
