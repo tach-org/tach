@@ -3,7 +3,7 @@ use std::io;
 use std::path::StripPrefixError;
 use std::path::{MAIN_SEPARATOR, MAIN_SEPARATOR_STR, Path, PathBuf};
 
-use cached::proc_macro::cached;
+use cached::macros::cached;
 use globset::Glob;
 use globset::GlobSetBuilder;
 use ignore;

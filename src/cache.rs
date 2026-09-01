@@ -1,5 +1,5 @@
 use cached::stores::DiskCacheBuildError;
-use cached::{DiskCache, DiskCacheError, IOCached};
+use cached::{ConcurrentCached, DiskCache, DiskCacheError};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -45,7 +45,7 @@ fn build_computation_cache<P: AsRef<Path>>(
 ) -> Result<DiskCache<String, ComputationCacheValue>> {
     Ok(
         DiskCache::<String, ComputationCacheValue>::new("computation-cache")
-            .set_disk_directory(
+            .disk_directory(
                 project_root
                     .as_ref()
                     .join(CACHE_DIR)
