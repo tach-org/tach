@@ -27,6 +27,9 @@ jobs:
   linux:
     needs: test
     runs-on: ubuntu-22.04
+    env:
+      # https://github.com/rust-lang/stacker/issues/79#issuecomment-1497479267
+      CFLAGS_s390x_unknown_linux_gnu: -march=z10
     strategy:
       fail-fast: false
       matrix:
