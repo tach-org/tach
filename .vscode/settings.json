@@ -24,10 +24,6 @@
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  // why does vscode treat github actions yaml files as a separate language????
-  "[toml][json][jsonc][yaml][markdown][github-actions-workflow]": {
-    "editor.defaultFormatter": "dprint.dprint"
-  },
   "explorer.compactFolders": false,
   "search.exclude": {
     "pw": true
@@ -63,7 +59,6 @@
     "pw.bat": true
   },
   "chat.commandCenter.enabled": false,
-  "dprint.path": ".vscode/dprint", // https://github.com/dprint/dprint/issues/859#issuecomment-3194102785
   "git.blame.editorDecoration.enabled": true,
   "yaml.customTags": [
     // for mkdocs config. see https://squidfunk.github.io/mkdocs-material/creating-your-site/?h=vscode#minimal-configuration
