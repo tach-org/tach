@@ -1,6 +1,6 @@
 [project]
 name = "tach"
-version = "0.35.0"
+version = "0.35.1"
 authors = [
     { name = "Caelean Barnes", email = "caeleanb@gmail.com" },
     { name = "Evan Doyle", email = "evanmdoyle@gmail.com" },
@@ -74,12 +74,7 @@ vscode = [
     "PyHamcrest",
     "python-jsonrpc-server",
 ]
-docs = [
-    "pymdown-extensions>=10.0",
-    "pillow",
-    "cairosvg",
-    "zensical>=0.0.2",
-]
+docs = ["pymdown-extensions>=10.0", "pillow", "cairosvg", "zensical>=0.0.2"]
 
 
 [project.urls]
@@ -96,9 +91,7 @@ default-groups = ["dev", "vscode", "docs"]
 src = ["python"]
 exclude = ["python/tests/example"]
 target-version = "py310"
-extend-exclude = [
-    "pw",
-]
+extend-exclude = ["pw"]
 lint.extend-select = ["I", "TC", "UP"]
 lint.ignore = [
     # TODO: why are these rules disabled?
@@ -107,7 +100,7 @@ lint.ignore = [
 
     # ideally these rulkes should be enabled, but there are too many existing instances in existing code.
     # should enable them when ruff supports baseline: https://github.com/astral-sh/ruff/issues/1149
-    "BLE001" 
+    "BLE001",
 ]
 
 [tool.ruff.lint.isort]
@@ -120,8 +113,20 @@ exempt-modules = ["typing", "typing_extensions"]
 [tool.pyright]
 include = ["python", "vscode"]
 # https://github.com/DetachHead/basedpyright/issues/31
-ignore = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules", "python/tests/example/syntax_error_fixture/**"]
-exclude = ["pw", "vscode/bundled", "vscode/.nox", "vscode/node_modules", "python/tests/example/syntax_error_fixture/**"]
+ignore = [
+    "pw",
+    "vscode/bundled",
+    "vscode/.nox",
+    "vscode/node_modules",
+    "python/tests/example/syntax_error_fixture/**",
+]
+exclude = [
+    "pw",
+    "vscode/bundled",
+    "vscode/.nox",
+    "vscode/node_modules",
+    "python/tests/example/syntax_error_fixture/**",
+]
 executionEnvironments = [{ root = "python" }, { root = "vscode" }]
 pythonVersion = "3.10"
 reportImplicitStringConcatenation = false # conflicts with ruff formatter
