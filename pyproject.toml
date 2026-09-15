@@ -54,11 +54,11 @@ dev = [
     "pip==26.2.1",
     # Code Quality
     "basedpyright>=1.31.7",
-    "ruff==0.16.6",
+    "ruff==0.16.7",
     # Build/Release
     "setuptools==84.0.0",
     "twine==7.0.0",
-    "build==1.6.0",
+    "build==1.6.1",
     "gnumake>=4.4.1",
     # Tests
     "pytest==9.1.1",
