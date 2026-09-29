@@ -1483,7 +1483,7 @@ wheels = [
 
 [[package]]
 name = "tach"
-version = "0.35.0"
+version = "0.35.1"
 source = { editable = "." }
 dependencies = [
     { name = "gitpython" },
@@ -1502,7 +1502,7 @@ dev = [
     { name = "basedpyright" },
     { name = "build" },
     { name = "coverage" },
-    { name = "gnumake" },
+    { name = "gnumake", marker = "platform_machine != 'ARM64' or sys_platform != 'win32'" },
     { name = "maturin" },
     { name = "pip" },
     { name = "pytest" },
@@ -1542,7 +1542,7 @@ dev = [
     { name = "basedpyright", specifier = ">=1.31.7" },
     { name = "build", specifier = "==1.6.0" },
     { name = "coverage", specifier = "==7.16.0" },
-    { name = "gnumake", specifier = ">=4.4.1" },
+    { name = "gnumake", marker = "platform_machine != 'ARM64' or sys_platform != 'win32'", specifier = ">=4.4.1" },
     { name = "maturin", specifier = "==1.15.0" },
     { name = "pip", specifier = "==26.2.1" },
     { name = "pytest", specifier = "==9.1.1" },
