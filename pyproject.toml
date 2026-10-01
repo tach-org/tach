@@ -59,7 +59,7 @@ dev = [
     "setuptools==84.0.0",
     "twine==7.0.0",
     "build==1.6.0",
-    "gnumake>=4.4.1",
+    "gnumake>=4.4.1 ; sys_platform != 'win32' or platform_machine != 'ARM64'", # no win_arm64 wheel, and the sdist doesn't build there
     # Tests
     "pytest==9.1.1",
     "pytest-mock==3.15.1",

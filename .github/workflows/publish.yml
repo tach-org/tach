@@ -83,13 +83,17 @@ jobs:
             target: x64
           - runner: windows-latest
             target: x86
+            # only set for x86; other targets default to the host machine's architecture
+            setup_python_architecture: x86
+          - runner: windows-11-arm
+            target: aarch64
     steps:
       - uses: actions/checkout@v4
       - name: Enable long paths
         run: git config --system core.longpaths true
       - uses: actions/setup-python@v5
         with:
-          architecture: ${{ matrix.platform.target }}
+          architecture: ${{ matrix.platform.setup_python_architecture }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
