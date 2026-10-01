@@ -17,12 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          check-latest: true
-
       - name: Install dependencies
         # we need to change the python version used by uv here otherwise it wil use the version from .python-version.
         # we also need to use the setup-python action for some reason even though uv can manage python versions because
