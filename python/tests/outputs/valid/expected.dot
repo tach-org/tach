@@ -1,0 +1,9 @@
+strict digraph {
+<root>;
+domain_one;
+domain_two;
+domain_three;
+<root> -> domain_one;
+domain_one -> domain_two [style=dashed];
+domain_two -> domain_three;
+}
