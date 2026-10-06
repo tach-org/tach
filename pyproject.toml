@@ -55,7 +55,7 @@ dev = [
     "pip==26.2.1",
     # Code Quality
     "basedpyright>=1.31.7",
-    "ruff==0.16.7",
+    "ruff==0.16.10",
     # Build/Release
     "setuptools==84.0.0",
     "twine==7.0.0",
@@ -63,8 +63,8 @@ dev = [
     "gnumake>=4.4.1 ; sys_platform != 'win32' or platform_machine != 'ARM64'", # no win_arm64 wheel, and the sdist doesn't build there
     # Tests
     "pytest==9.1.1",
-    "pytest-mock==3.15.1",
-    "coverage==7.16.0",
+    "pytest-mock==3.16.0",
+    "coverage==7.16.2",
     # Rust
     "maturin==1.15.0",
     "rustup>=1.29.0.1 ; sys_platform != 'win32'", # https://github.com/konstin/rustup-pypi/issues/5
