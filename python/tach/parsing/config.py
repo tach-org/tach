@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import tomli
 import tomli_w
 
 from tach import extension
 from tach import filesystem as fs
 from tach.constants import CONFIG_FILE_NAME
+from tach.utils.toml import tomllib
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def dump_project_config_to_toml(config: ProjectConfig) -> str:
-    data = tomli.loads(extension.dump_project_config_to_toml(config))
+    data = tomllib.loads(extension.dump_project_config_to_toml(config))
     return tomli_w.dumps(data)
 
 
