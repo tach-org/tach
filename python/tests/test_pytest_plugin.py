@@ -111,6 +111,66 @@ def test_standalone_3():
         result.stdout.fnmatch_lines(["*Skipped 3 test* (1 file*"])
 
 
+@pytest.fixture
+def tach_src_layout_project(pytester: pytest.Pytester):
+    """Create a tach project where the package uses a src/ layout."""
+    _ = pytester.makefile(
+        ".toml",
+        tach="""
+exclude = ["**/tests"]
+source_roots = ["modules"]
+
+[[modules]]
+path = "alpha"
+depends_on = []
+""",
+    )
+    module_dir = pytester.path / "modules" / "alpha" / "src" / "alpha"
+    tests_dir = pytester.path / "modules" / "alpha" / "tests"
+    module_dir.mkdir(parents=True)
+    tests_dir.mkdir(parents=True)
+    _ = (module_dir / "__init__.py").touch()
+    _ = (tests_dir / "__init__.py").touch()
+    (module_dir / "core.py").write_text("def add(a, b):\n    return a + b\n")
+    (tests_dir / "test_core.py").write_text(
+        "from alpha.core import add\n\n\ndef test_add():\n    assert add(1, 2) == 3\n"
+    )
+    (pytester.path / "pyproject.toml").write_text(
+        '[tool.pytest.ini_options]\npythonpath = ["modules/alpha/src"]\ntestpaths = ["modules/alpha/tests"]\n'
+    )
+    _ = pytester.run("git", "init")
+    _ = pytester.run("git", "config", "user.email", "test@test.com")
+    _ = pytester.run("git", "config", "user.name", "Test")
+    _ = pytester.run("git", "add", "-A")
+    _ = pytester.run("git", "commit", "-m", "initial")
+    return pytester
+
+
+class TestPytestPluginSrcLayout:
+    def test_source_change_runs_own_tests_with_src_layout(
+        self, tach_src_layout_project: pytest.Pytester
+    ):
+        """A changed module's own tests must be selected under a src/ layout."""
+        core = (
+            tach_src_layout_project.path
+            / "modules"
+            / "alpha"
+            / "src"
+            / "alpha"
+            / "core.py"
+        )
+        core.write_text(
+            "def add(a, b):\n    return a + b\n\ndef subtract(a, b):\n    return a - b\n"
+        )
+        _ = tach_src_layout_project.run("git", "add", "-A")
+        _ = tach_src_layout_project.run("git", "commit", "-m", "modify source")
+
+        result = run_pytest(tach_src_layout_project, "--tach-base", "HEAD~1")
+        result.assert_outcomes(passed=1)
+        result.stdout.fnmatch_lines(["*1 passed*"])
+        assert "Skipped" not in result.stdout.str()
+
+
 class TestPytestPluginDefaults:
     def test_default_mode_runs_all_tests_with_suggestion(
         self, tach_project: pytest.Pytester

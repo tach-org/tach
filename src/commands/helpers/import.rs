@@ -29,11 +29,12 @@ impl<'py> IntoPyObject<'py> for LocatedImport {
     }
 }
 
-pub fn get_located_project_imports<P: AsRef<Path>>(
+pub fn get_located_imports<P: AsRef<Path>>(
     project_root: &PathBuf,
     source_roots: &[PathBuf],
     file_path: P,
     project_config: &ProjectConfig,
+    include_string_imports: bool,
 ) -> Result<Vec<LocatedImport>> {
     if !file_path.as_ref().starts_with(project_root) {
         return Ok(vec![]);
@@ -46,9 +47,40 @@ pub fn get_located_project_imports<P: AsRef<Path>>(
         file_path.as_ref(),
         &file_contents,
         project_config.ignore_type_checking_imports,
-        project_config.include_string_imports,
+        include_string_imports,
     )?;
     let ignore_directives = get_ignore_directives(&file_contents);
+
+    Ok(normalized_imports
+        .into_iter()
+        .map(|import| {
+            LocatedImport::new(
+                line_index.line_index(import.import_offset).get(),
+                line_index.line_index(import.alias_offset).get(),
+                import,
+            )
+        })
+        .filter(|import| !ignore_directives.is_ignored(import))
+        .collect())
+}
+
+pub fn get_located_project_imports<P: AsRef<Path>>(
+    project_root: &PathBuf,
+    source_roots: &[PathBuf],
+    file_path: P,
+    project_config: &ProjectConfig,
+) -> Result<Vec<LocatedImport>> {
+    if !file_path.as_ref().starts_with(project_root) {
+        return Ok(vec![]);
+    }
+
+    let imports = get_located_imports(
+        project_root,
+        source_roots,
+        file_path.as_ref(),
+        project_config,
+        project_config.include_string_imports,
+    )?;
     let file_walker = filesystem::FSWalker::try_new(
         project_root,
         &project_config.exclude,
@@ -65,20 +97,9 @@ pub fn get_located_project_imports<P: AsRef<Path>>(
         }
     };
 
-    Ok(normalized_imports
+    Ok(imports
         .into_iter()
-        .map(|import| {
-            LocatedImport::new(
-                line_index.line_index(import.import_offset).get(),
-                line_index.line_index(import.alias_offset).get(),
-                import,
-            )
-        })
         .filter(|import| {
-            if ignore_directives.is_ignored(import) {
-                return false;
-            }
-
             match package_resolver.resolve_module_path(import.module_path()) {
                 PackageResolution::Found {
                     package: resolved_package,
@@ -100,16 +121,13 @@ pub fn get_located_external_imports<P: AsRef<Path>>(
         return Ok(vec![]);
     }
 
-    let file_contents = filesystem::read_file_content(file_path.as_ref())?;
-    let line_index = Locator::new(&file_contents).to_index().clone();
-    let normalized_imports = get_normalized_imports(
+    let imports = get_located_imports(
+        project_root,
         source_roots,
         file_path.as_ref(),
-        &file_contents,
-        project_config.ignore_type_checking_imports,
+        project_config,
         false,
     )?;
-    let ignore_directives = get_ignore_directives(&file_contents);
     let file_walker = filesystem::FSWalker::try_new(
         project_root,
         &project_config.exclude,
@@ -126,20 +144,9 @@ pub fn get_located_external_imports<P: AsRef<Path>>(
         }
     };
 
-    Ok(normalized_imports
+    Ok(imports
         .into_iter()
-        .map(|import| {
-            LocatedImport::new(
-                line_index.line_index(import.import_offset).get(),
-                line_index.line_index(import.alias_offset).get(),
-                import,
-            )
-        })
         .filter(|import| {
-            if ignore_directives.is_ignored(import) {
-                return false;
-            }
-
             match package_resolver.resolve_module_path(import.module_path()) {
                 PackageResolution::Found {
                     package: resolved_package,
