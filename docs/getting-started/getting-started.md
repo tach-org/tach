@@ -73,7 +73,7 @@ This will generate a graphical representation of your module dependencies.
 You can add Tach to your pre-commit hooks to automatically check your module boundaries on each commit:
 
 ```bash
-tach install --pre-commit
+tach install pre-commit
 ```
 
 Or manually add it to your `.pre-commit-config.yaml`:
