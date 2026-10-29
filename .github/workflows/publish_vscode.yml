@@ -42,7 +42,7 @@ jobs:
           # macos (https://docs.github.com/en/actions/reference/runners/github-hosted-runners#single-cpu-runners)
           - os: macos-15-intel
             code-target: darwin-x64
-          - os: macos-14
+          - os: macos-latest
             code-target: darwin-arm64
 
     name: Build (${{ matrix.code-target }})
