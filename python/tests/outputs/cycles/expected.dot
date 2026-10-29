@@ -1,0 +1,10 @@
+strict digraph {
+domain_one;
+domain_two;
+domain_three;
+leftover;
+domain_one -> domain_two;
+domain_two -> domain_three;
+domain_three -> domain_one;
+leftover -> domain_one;
+}
